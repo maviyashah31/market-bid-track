@@ -75,7 +75,7 @@ const BuyerDashboard = () => {
         </div>
 
         {/* Quick links */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {quickLinks.map(({ icon: Icon, label, count, tab, href }) => (
             href ? (
               <Link
