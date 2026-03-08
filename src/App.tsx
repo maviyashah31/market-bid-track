@@ -19,6 +19,8 @@ import DisputeDetail from "./pages/DisputeDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
+import SellerProfile from "./pages/SellerProfile";
+import BuyerProfile from "./pages/BuyerProfile";
 
 // Admin Panel
 import AdminLayout from "./layouts/AdminLayout";
