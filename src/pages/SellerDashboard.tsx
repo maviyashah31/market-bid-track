@@ -66,9 +66,32 @@ const SellerDashboard = () => {
   const [productFormOpen, setProductFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  // RFQ bid
+  // RFQ
   const [bidFormOpen, setBidFormOpen] = useState(false);
-  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
+  const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
+  const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
+  const [detailRFQ, setDetailRFQ] = useState<RFQDetail | null>(null);
+  const [rfqSearch, setRfqSearch] = useState("");
+  const [rfqCategoryFilter, setRfqCategoryFilter] = useState("all");
+  const [rfqSortBy, setRfqSortBy] = useState("newest");
+
+  const filteredRFQs = useMemo(() => {
+    let result = [...rfqDetails];
+    if (rfqSearch) {
+      const q = rfqSearch.toLowerCase();
+      result = result.filter(r => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q));
+    }
+    if (rfqCategoryFilter !== "all") {
+      result = result.filter(r => r.category === rfqCategoryFilter);
+    }
+    if (rfqSortBy === "newest") result.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    else if (rfqSortBy === "deadline") result.sort((a, b) => a.daysLeft - b.daysLeft);
+    else if (rfqSortBy === "budget_high") result.sort((a, b) => b.budgetMax - a.budgetMax);
+    else if (rfqSortBy === "bids_low") result.sort((a, b) => a.bidsCount - b.bidsCount);
+    return result;
+  }, [rfqSearch, rfqCategoryFilter, rfqSortBy]);
+
+  const rfqCategories = [...new Set(rfqDetails.map(r => r.category))];
 
   const handleSaveProduct = (data: Partial<Product>) => {
     if (editingProduct) {
