@@ -69,7 +69,7 @@ const HeroSection = () => {
     <>
       {/* Sticky Search Bar */}
       <div
-        className={`fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed left-0 right-0 z-40 bg-gradient-hero backdrop-blur-md border-b border-primary/20 shadow-md transition-all duration-300 ${isSticky ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         style={{ top: navHeight }}
       >
         <div className="container mx-auto px-4 py-2">
