@@ -113,6 +113,9 @@ const HeroSection = () => {
           </motion.div>
         </div>
 
+        {/* Center: Steps */}
+        {stepsColumn}
+
         {/* Right: 4 Cards in 2x2 */}
         <motion.div
           variants={container}
