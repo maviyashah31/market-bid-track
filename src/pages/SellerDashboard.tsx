@@ -87,6 +87,46 @@ const SellerDashboard = () => {
   const [orderDetailOpen, setOrderDetailOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
 
+  // Profile state
+  const [profileData, setProfileData] = useState({
+    businessName: "Lahore Textile Mills",
+    tagline: "Premium quality textiles since 1998",
+    about: "We are one of Pakistan's leading textile manufacturers based in Lahore, specializing in cotton, silk, and blended fabrics. With over 25 years of experience, we serve both domestic and international markets with consistent quality and competitive pricing.\n\nOur factory spans 50,000 sq ft with modern machinery capable of producing 100,000 meters of fabric monthly. We are ISO 9001 certified and committed to sustainable manufacturing practices.",
+    city: "Lahore",
+    province: "Punjab",
+    phone: "+92 42 35761234",
+    email: "info@lahoretextile.pk",
+    website: "www.lahoretextile.pk",
+    established: "1998",
+    employees: "200-500",
+    categories: ["Cotton Fabric", "Silk", "Blended Textiles", "Ready-made Garments"],
+  });
+  const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
+  const [logoPhoto, setLogoPhoto] = useState<string | null>(null);
+  const [profileEditing, setProfileEditing] = useState(false);
+  const [profileDraft, setProfileDraft] = useState(profileData);
+
+  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setCoverPhoto(url);
+    }
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setLogoPhoto(url);
+    }
+  };
+
+  const handleProfileSave = () => {
+    setProfileData(profileDraft);
+    setProfileEditing(false);
+  };
+
   const [bidFormOpen, setBidFormOpen] = useState(false);
   const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
   const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
