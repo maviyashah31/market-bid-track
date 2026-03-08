@@ -53,7 +53,7 @@ const Checkout = () => {
           <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Checkout</h1>
 
           {/* Steps indicator */}
-          <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8">
             {[
               { key: "shipping", label: "Shipping", icon: Truck },
               { key: "payment", label: "Payment", icon: CreditCard },
