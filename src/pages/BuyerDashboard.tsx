@@ -54,6 +54,10 @@ const BuyerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showDisputeForm, setShowDisputeForm] = useState(false);
   const [showRFQForm, setShowRFQForm] = useState(false);
+  const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
+  const [selectedRFQ, setSelectedRFQ] = useState<(typeof rfqDetails)[0] | null>(null);
+
+  const myRFQs = rfqDetails.filter(r => r.buyer === "AcmeCo");
 
   const handleDisputeSubmit = (data: { orderId: string; reason: string; description: string }) => {
     console.log("Dispute submitted:", data);
