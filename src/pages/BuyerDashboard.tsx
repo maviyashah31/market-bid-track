@@ -91,8 +91,8 @@ const BuyerDashboard = () => {
                 <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
               )}
               <aside className={cn(
-                "bg-card border-r border-border flex flex-col shrink-0 transition-all duration-300 z-50",
-                isMobile ? "fixed left-0 top-0 h-full w-64 pt-16" : "sticky top-[var(--navbar-h)] h-[calc(100vh-var(--navbar-h))]",
+                "bg-card border-r border-border flex flex-col shrink-0 transition-all duration-300 overflow-y-auto",
+                isMobile ? "fixed left-0 top-0 h-full w-64 pt-16 z-50" : "sticky top-0 h-screen z-40 pt-0",
                 !isMobile && collapsed ? "w-16" : "w-64"
               )}>
                 {/* Buyer info */}
