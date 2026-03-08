@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 const CategoryGrid = () => (
   <section className="py-12 bg-card">
     <div className="container mx-auto px-4">
-      <div className="text-center mb-8">
-        <h2 className="font-display font-bold text-3xl text-foreground mb-2">Browse by Category</h2>
-        <p className="text-muted-foreground font-body">Explore 500+ categories from verified Pakistani suppliers</p>
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-2">Browse by Category</h2>
+        <p className="text-muted-foreground font-body text-sm sm:text-base">Explore 500+ categories from verified Pakistani suppliers</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {categories.map((cat) => (
