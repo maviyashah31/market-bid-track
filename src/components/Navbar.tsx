@@ -117,6 +117,7 @@ const Navbar = () => {
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-1">
+            <ThemeToggle />
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
               <Button
