@@ -282,7 +282,7 @@ const SellerDashboard = () => {
                   <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="font-display font-bold text-xl text-foreground">Recent Orders</h2>
-                      <Button variant="outline" size="sm" className="font-body" onClick={() => setActiveTab("orders")}>View All</Button>
+                      <Link to="/seller/orders"><Button variant="outline" size="sm" className="font-body">View All</Button></Link>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
