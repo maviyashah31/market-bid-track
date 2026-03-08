@@ -50,7 +50,7 @@ const Checkout = () => {
             <ArrowLeft className="h-4 w-4" /> Back to Cart
           </Link>
 
-          <h1 className="font-display font-bold text-3xl text-foreground mb-8">Checkout</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Checkout</h1>
 
           {/* Steps indicator */}
           <div className="flex items-center gap-2 mb-8">
