@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { buyerOrders, products, rfqs } from "@/data/mockData";
+import { buyerOrders, products, rfqs, disputes, disputeReasons } from "@/data/mockData";
 import {
   Package, FileText, MessageSquare, Star, Heart, ShoppingCart,
-  ArrowRight, Clock, Eye, MapPin
+  ArrowRight, Clock, Eye, MapPin, AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnimatedPage from "@/components/AnimatedPage";
+import DisputeForm from "@/components/DisputeForm";
 
 const statusColors: Record<string, string> = {
   placed: "bg-muted text-muted-foreground",
@@ -22,11 +23,19 @@ const statusColors: Record<string, string> = {
   completed: "bg-success/10 text-success",
 };
 
+const disputeStatusColors: Record<string, string> = {
+  open: "bg-warning/10 text-warning",
+  negotiating: "bg-primary/10 text-primary",
+  escalated: "bg-destructive/10 text-destructive",
+  resolved: "bg-success/10 text-success",
+  closed: "bg-muted text-muted-foreground",
+};
+
 const quickLinks = [
   { icon: Package, label: "My Orders", count: 3, tab: "orders" },
   { icon: FileText, label: "My RFQs", count: 2, tab: "rfqs" },
+  { icon: AlertTriangle, label: "Disputes", count: disputes.length, tab: "disputes" },
   { icon: MessageSquare, label: "Messages", count: 5, href: "/messages" },
-  { icon: Star, label: "Reviews", count: 8, tab: "reviews" },
   { icon: Heart, label: "Wishlist", count: 12, tab: "wishlist" },
   { icon: ShoppingCart, label: "Cart", count: 3, href: "/cart" },
 ];
@@ -40,6 +49,12 @@ const myReviews = [
 
 const BuyerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
+
+  const handleDisputeSubmit = (data: { orderId: string; reason: string; description: string }) => {
+    console.log("Dispute submitted:", data);
+    // In a real app, this would call an API
+  };
 
   return (
     <AnimatedPage>
@@ -70,7 +85,7 @@ const BuyerDashboard = () => {
                 onClick={() => setActiveTab(tab!)}
                 className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-2 hover:border-primary hover:shadow-md transition-all"
               >
-                <Icon className="h-6 w-6 text-primary" />
+                <Icon className={`h-6 w-6 ${label === "Disputes" ? "text-warning" : "text-primary"}`} />
                 <span className="font-display font-semibold text-sm text-foreground">{label}</span>
                 <Badge variant="secondary" className="font-body">{count}</Badge>
               </button>
@@ -83,6 +98,7 @@ const BuyerDashboard = () => {
             <TabsTrigger value="overview" className="font-display">Overview</TabsTrigger>
             <TabsTrigger value="orders" className="font-display">Orders</TabsTrigger>
             <TabsTrigger value="rfqs" className="font-display">My RFQs</TabsTrigger>
+            <TabsTrigger value="disputes" className="font-display">Disputes</TabsTrigger>
             <TabsTrigger value="reviews" className="font-display">Reviews</TabsTrigger>
             <TabsTrigger value="wishlist" className="font-display">Wishlist</TabsTrigger>
           </TabsList>
@@ -183,6 +199,70 @@ const BuyerDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* Disputes */}
+          <TabsContent value="disputes">
+            <div className="bg-card rounded-xl border border-border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display font-bold text-xl text-foreground">My Disputes</h2>
+                <Button 
+                  onClick={() => setShowDisputeForm(true)}
+                  className="bg-warning text-warning-foreground hover:bg-warning/90 font-body gap-2"
+                >
+                  <AlertTriangle className="h-4 w-4" />
+                  Raise Dispute
+                </Button>
+              </div>
+
+              {disputes.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="font-display font-semibold text-foreground mb-2">No Disputes</h3>
+                  <p className="text-muted-foreground font-body">
+                    You haven't raised any disputes yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {disputes.map((dispute) => {
+                    const reasonLabel = disputeReasons.find(r => r.value === dispute.reason)?.label;
+                    return (
+                      <div key={dispute.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className="font-display font-bold text-foreground">{dispute.id}</span>
+                            <Badge className={disputeStatusColors[dispute.status]}>
+                              {dispute.status.charAt(0).toUpperCase() + dispute.status.slice(1)}
+                            </Badge>
+                          </div>
+                          <span className="text-xs text-muted-foreground font-body">{dispute.createdAt}</span>
+                        </div>
+                        <h3 className="font-display font-semibold text-foreground">{dispute.orderName}</h3>
+                        <p className="text-sm text-muted-foreground font-body mt-1">
+                          {dispute.sellerName} • {reasonLabel}
+                        </p>
+                        <p className="text-sm text-muted-foreground font-body mt-2 line-clamp-2">
+                          {dispute.description}
+                        </p>
+                        {dispute.resolution && (
+                          <p className="text-sm text-success font-body mt-2 bg-success/10 rounded p-2">
+                            ✓ {dispute.resolution}
+                          </p>
+                        )}
+                        <div className="flex justify-end mt-4">
+                          <Link to={`/dispute/${dispute.id}`}>
+                            <Button variant="outline" size="sm" className="gap-1 font-body">
+                              <Eye className="h-3 w-3" /> View Details
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           {/* Reviews */}
           <TabsContent value="reviews">
             <div className="bg-card rounded-xl border border-border p-6">
@@ -236,6 +316,13 @@ const BuyerDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dispute Form Modal */}
+      <DisputeForm
+        open={showDisputeForm}
+        onOpenChange={setShowDisputeForm}
+        onSubmit={handleDisputeSubmit}
+      />
     </div>
     </AnimatedPage>
   );
