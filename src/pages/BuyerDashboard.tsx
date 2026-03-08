@@ -36,7 +36,7 @@ const disputeStatusColors: Record<string, string> = {
 
 const quickLinks = [
   { icon: Package, label: "My Orders", count: 3, tab: "orders" },
-  { icon: FileText, label: "My RFQs", count: 2, tab: "rfqs" },
+  { icon: FileText, label: "My RFQs", count: rfqDetails.filter(r => r.buyer === "AcmeCo").length, tab: "rfqs" },
   { icon: AlertTriangle, label: "Disputes", count: disputes.length, tab: "disputes" },
   { icon: MessageSquare, label: "Messages", count: 5, href: "/messages" },
   { icon: Heart, label: "Wishlist", count: 12, tab: "wishlist" },
