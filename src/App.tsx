@@ -20,6 +20,18 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 
+// Admin Panel
+import AdminLayout from "./layouts/AdminLayout";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import SupplierManagement from "./pages/admin/SupplierManagement";
+import BuyerManagement from "./pages/admin/BuyerManagement";
+import OrderManagement from "./pages/admin/OrderManagement";
+import DisputeManagement from "./pages/admin/DisputeManagement";
+import SettlementFinance from "./pages/admin/SettlementFinance";
+import AnalyticsPage from "./pages/admin/AnalyticsPage";
+import NotificationsPage from "./pages/admin/NotificationsPage";
+
 const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
@@ -41,6 +53,20 @@ const AnimatedRoutes = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/order/:orderId" element={<OrderTracking />} />
         <Route path="/dispute/:disputeId" element={<DisputeDetail />} />
+
+        {/* Admin Panel */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="suppliers" element={<SupplierManagement />} />
+          <Route path="buyers" element={<BuyerManagement />} />
+          <Route path="orders" element={<OrderManagement />} />
+          <Route path="disputes" element={<DisputeManagement />} />
+          <Route path="settlement" element={<SettlementFinance />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
