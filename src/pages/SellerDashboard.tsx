@@ -153,10 +153,6 @@ const SellerDashboard = () => {
   const collapsed = isMobile ? !sidebarOpen : !sidebarOpen;
 
   const handleNavClick = (value: string) => {
-    if (value === "orders") {
-      navigate("/seller/orders");
-      return;
-    }
     setActiveTab(value);
     if (isMobile) setSidebarOpen(false);
   };
