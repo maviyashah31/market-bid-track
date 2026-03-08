@@ -30,10 +30,12 @@ const stats = [
 ];
 
 const recentOrders = [
-  { id: "ORD-5001", product: "Cotton T-Shirts x500", buyer: "Metro Wholesale", total: "PKR 175,000", status: "pending" },
-  { id: "ORD-5002", product: "Polo Shirts x200", buyer: "Style Hub", total: "PKR 96,000", status: "processing" },
-  { id: "ORD-5003", product: "Denim Jeans x300", buyer: "Fashion Point", total: "PKR 285,000", status: "shipped" },
-  { id: "ORD-5004", product: "Cotton Fabric 1000m", buyer: "AL Textiles", total: "PKR 450,000", status: "delivered" },
+  { id: "ORD-5001", product: "Cotton T-Shirts x500", buyer: "Metro Wholesale", buyerEmail: "orders@metrowholesale.pk", buyerPhone: "+92 321 1234567", total: "PKR 175,000", status: "pending", date: "2026-03-08", address: "Shop #45, Bolton Market, Karachi", paymentStatus: "escrow" },
+  { id: "ORD-5002", product: "Polo Shirts x200", buyer: "Style Hub", buyerEmail: "buy@stylehub.pk", buyerPhone: "+92 300 9876543", total: "PKR 96,000", status: "processing", date: "2026-03-07", address: "Mall Road, Lahore", paymentStatus: "escrow" },
+  { id: "ORD-5003", product: "Denim Jeans x300", buyer: "Fashion Point", buyerEmail: "procurement@fashionpoint.pk", buyerPhone: "+92 333 5556677", total: "PKR 285,000", status: "shipped", date: "2026-03-05", address: "Blue Area, Islamabad", paymentStatus: "escrow" },
+  { id: "ORD-5004", product: "Cotton Fabric 1000m", buyer: "AL Textiles", buyerEmail: "info@altextiles.pk", buyerPhone: "+92 312 7778899", total: "PKR 450,000", status: "delivered", date: "2026-03-01", address: "Faisalabad Road, Faisalabad", paymentStatus: "released" },
+  { id: "ORD-5005", product: "Silk Scarves x150", buyer: "Karachi Traders", buyerEmail: "buy@karachitraders.pk", buyerPhone: "+92 345 1112233", total: "PKR 67,500", status: "pending", date: "2026-03-08", address: "Tariq Road, Karachi", paymentStatus: "escrow" },
+  { id: "ORD-5006", product: "Leather Jackets x50", buyer: "Premium Wear", buyerEmail: "orders@premiumwear.pk", buyerPhone: "+92 301 4445566", total: "PKR 375,000", status: "processing", date: "2026-03-06", address: "Liberty Market, Lahore", paymentStatus: "escrow" },
 ];
 
 const statusColors: Record<string, string> = {
