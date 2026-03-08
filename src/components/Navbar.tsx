@@ -223,6 +223,12 @@ const Navbar = () => {
             </button>
           </div>
           <div className="space-y-2">
+            <Link to="/seller/dashboard" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Become a Seller</Link>
+            <Link to="/buyer/dashboard" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Post RFQ</Link>
+            <Link to="/help" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Help</Link>
+            <Link to="/how-it-works" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">How It Works</Link>
+          </div>
+          <div className="space-y-2 pt-2 border-t border-border">
             {categories.map((cat) => (
               <Link key={cat} to={`/products?category=${encodeURIComponent(cat)}`} className="block py-1 text-sm text-muted-foreground hover:text-primary">
                 {cat}
