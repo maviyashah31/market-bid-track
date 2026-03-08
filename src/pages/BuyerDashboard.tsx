@@ -237,6 +237,7 @@ const BuyerDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

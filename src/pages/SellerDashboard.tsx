@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const stats = [
   { icon: DollarSign, label: "Revenue", value: "PKR 2.45M", change: "+12.5%", up: true },
