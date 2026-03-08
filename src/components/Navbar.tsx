@@ -51,7 +51,7 @@ const typeLabels: Record<string, string> = {
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchQuery] = useState("");
+  
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const notifRef = useRef<HTMLDivElement>(null);
