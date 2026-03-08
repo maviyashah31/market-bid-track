@@ -83,6 +83,7 @@ const SellerDashboard = () => {
   const [myProducts, setMyProducts] = useState<Product[]>(sellerProducts);
   const [productFormOpen, setProductFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productFormView, setProductFormView] = useState(false);
 
   const [orderDetailOpen, setOrderDetailOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
