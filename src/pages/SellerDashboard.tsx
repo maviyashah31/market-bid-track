@@ -309,6 +309,148 @@ const SellerDashboard = () => {
                 </div>
               )}
 
+              {/* Supplier Profile */}
+              {activeTab === "profile" && (
+                <div className="space-y-6">
+                  {/* Cover Photo */}
+                  <div className="relative rounded-xl overflow-hidden border border-border bg-card">
+                    <div className="h-48 sm:h-64 bg-gradient-hero relative group">
+                      {coverPhoto && (
+                        <img src={coverPhoto} alt="Cover" className="w-full h-full object-cover absolute inset-0" />
+                      )}
+                      <label className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors cursor-pointer">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 bg-card/90 backdrop-blur-sm text-foreground px-4 py-2 rounded-lg font-body text-sm">
+                          <Camera className="h-4 w-4" />
+                          {coverPhoto ? "Change Cover Photo" : "Upload Cover Photo"}
+                        </div>
+                        <input type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+                      </label>
+                    </div>
+
+                    {/* Logo / Avatar */}
+                    <div className="px-6 pb-6">
+                      <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 sm:-mt-14">
+                        <label className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border-4 border-card bg-accent flex items-center justify-center cursor-pointer group shrink-0 overflow-hidden shadow-lg">
+                          {logoPhoto ? (
+                            <img src={logoPhoto} alt="Logo" className="w-full h-full object-cover" />
+                          ) : (
+                            <Store className="h-10 w-10 text-primary" />
+                          )}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+                            <ImagePlus className="h-5 w-5 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                          <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        </label>
+                        <div className="flex-1 pb-1">
+                          <h2 className="font-display font-bold text-xl text-foreground">{profileData.businessName}</h2>
+                          <p className="text-sm text-muted-foreground font-body">{profileData.tagline}</p>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground font-body">
+                            <MapPin className="h-3 w-3" />{profileData.city}, {profileData.province}
+                            <span className="text-border">•</span>
+                            Est. {profileData.established}
+                          </div>
+                        </div>
+                        <Button
+                          variant={profileEditing ? "default" : "outline"}
+                          className="gap-2 font-body shrink-0"
+                          onClick={() => {
+                            if (profileEditing) handleProfileSave();
+                            else { setProfileDraft(profileData); setProfileEditing(true); }
+                          }}
+                        >
+                          {profileEditing ? <><Save className="h-4 w-4" />Save Profile</> : <><Edit className="h-4 w-4" />Edit Profile</>}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* About & Details */}
+                    <div className="lg:col-span-2 space-y-6">
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">About</h3>
+                        {profileEditing ? (
+                          <Textarea
+                            value={profileDraft.about}
+                            onChange={(e) => setProfileDraft(prev => ({ ...prev, about: e.target.value }))}
+                            rows={6}
+                            className="font-body text-sm"
+                          />
+                        ) : (
+                          <p className="font-body text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{profileData.about}</p>
+                        )}
+                      </div>
+
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Business Details</h3>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          {[
+                            { label: "Business Name", key: "businessName" as const },
+                            { label: "Tagline", key: "tagline" as const },
+                            { label: "City", key: "city" as const },
+                            { label: "Province", key: "province" as const },
+                            { label: "Phone", key: "phone" as const },
+                            { label: "Email", key: "email" as const },
+                            { label: "Website", key: "website" as const },
+                            { label: "Established", key: "established" as const },
+                            { label: "Employees", key: "employees" as const },
+                          ].map((field) => (
+                            <div key={field.key}>
+                              <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">{field.label}</label>
+                              {profileEditing ? (
+                                <Input
+                                  value={profileDraft[field.key]}
+                                  onChange={(e) => setProfileDraft(prev => ({ ...prev, [field.key]: e.target.value }))}
+                                  className="mt-1 font-body text-sm"
+                                />
+                              ) : (
+                                <p className="font-body text-sm text-foreground mt-1">{profileData[field.key]}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="space-y-6">
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Categories</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {profileData.categories.map((cat) => (
+                            <Badge key={cat} variant="secondary" className="font-body text-xs">{cat}</Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Quick Stats</h3>
+                        <div className="space-y-3">
+                          {[
+                            { label: "Rating", value: "4.8/5 ⭐" },
+                            { label: "Orders Completed", value: "1,240" },
+                            { label: "On-time Delivery", value: "97%" },
+                            { label: "Response Time", value: "< 2 hours" },
+                          ].map((s) => (
+                            <div key={s.label} className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground font-body">{s.label}</span>
+                              <span className="font-display font-bold text-sm text-foreground">{s.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-3">Profile Preview</h3>
+                        <Link to="/seller/seller-1">
+                          <Button variant="outline" className="w-full gap-2 font-body text-sm"><Eye className="h-4 w-4" />View Public Profile</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Overview */}
               {activeTab === "overview" && (
                 <>
