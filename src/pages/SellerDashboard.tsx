@@ -212,11 +212,11 @@ const SellerDashboard = () => {
           {(isMobile ? sidebarOpen : true) && (
             <>
               {isMobile && sidebarOpen && (
-                <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
+                <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setSidebarOpen(false)} />
               )}
               <aside className={cn(
                 "bg-card border-r border-border flex flex-col shrink-0 transition-all duration-300 overflow-y-auto",
-                isMobile ? "fixed left-0 top-0 h-full w-64 pt-16 z-50" : "sticky top-0 h-screen z-40 pt-0",
+                isMobile ? "fixed left-0 top-0 h-full w-64 z-[70]" : "sticky top-0 h-screen z-40 pt-0",
                 !isMobile && collapsed ? "w-16" : "w-64"
               )}>
                 {/* Seller info */}
@@ -230,11 +230,9 @@ const SellerDashboard = () => {
                         <p className="font-display font-bold text-sm text-foreground truncate">Lahore Textile Mills</p>
                         <p className="text-xs text-muted-foreground font-body">Verified Seller ✅</p>
                       </div>
-                      {!isMobile && (
-                        <Button variant="ghost" size="sm" className="ml-auto shrink-0 h-8 w-8 p-0" onClick={() => setSidebarOpen(false)}>
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button variant="ghost" size="sm" className="ml-auto shrink-0 h-8 w-8 p-0" onClick={() => setSidebarOpen(false)}>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
