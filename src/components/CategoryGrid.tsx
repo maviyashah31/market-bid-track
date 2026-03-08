@@ -12,18 +12,17 @@ const steps = [
 const CategoryGrid = () => (
   <>
     {/* Steps Section */}
-    <section className="py-5 sm:py-6 bg-[hsl(30,95%,55%)]">
+    <section className="py-4 sm:py-5 bg-[hsl(30,95%,55%)]">
       <div className="container mx-auto px-4">
-        <h2 className="font-display font-bold text-lg sm:text-xl text-white text-center mb-4">How to Buy</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {steps.map((s) => (
-            <div key={s.step} className="flex flex-col items-center text-center p-3 sm:p-4 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 hover:bg-white/25 transition-all">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-2">
+            <div key={s.step} className="flex flex-col items-center text-center p-3 sm:p-4 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all">
+              <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center mb-2">
                 <s.icon className="h-4 w-4 text-white" />
               </div>
-              <span className="text-[9px] font-bold text-white/80 uppercase tracking-wider mb-0.5">Step {s.step}</span>
-              <h3 className="font-display font-bold text-xs text-white mb-0.5">{s.title}</h3>
-              <p className="text-[10px] text-white/70 font-body leading-snug">{s.desc}</p>
+              <span className="text-[10px] font-bold text-white uppercase tracking-wider mb-0.5">Step {s.step}</span>
+              <h3 className="font-display font-bold text-sm text-white mb-0.5">{s.title}</h3>
+              <p className="text-[11px] text-white/90 font-body leading-snug">{s.desc}</p>
             </div>
           ))}
         </div>
