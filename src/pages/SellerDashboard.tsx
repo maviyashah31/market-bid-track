@@ -68,6 +68,7 @@ const sidebarItems = [
 ];
 
 const SellerDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
