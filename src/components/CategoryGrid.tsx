@@ -8,7 +8,7 @@ const steps = [
 ];
 
 const CategoryGrid = () => (
-  <section className="py-4 sm:py-5 bg-primary">
+  <section className="py-4 sm:py-5 bg-[hsl(220,50%,20%)]">
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {steps.map((s) => (
