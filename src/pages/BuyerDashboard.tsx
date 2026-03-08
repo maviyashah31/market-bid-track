@@ -4,8 +4,9 @@ import Navbar from "@/components/Navbar";
 import { buyerOrders, products, rfqs, disputes, disputeReasons } from "@/data/mockData";
 import {
   Package, FileText, MessageSquare, Star, Heart, ShoppingCart,
-  ArrowRight, Clock, Eye, MapPin, AlertTriangle
+  ArrowRight, Clock, Eye, MapPin, AlertTriangle, Users
 } from "lucide-react";
+import PostRFQForm from "@/components/PostRFQForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
