@@ -203,6 +203,20 @@ const Navbar = () => {
           {showSearch && (
             <div className="hidden md:flex items-center flex-1">
               <div className="flex w-full rounded-lg overflow-hidden border border-border bg-white focus-within:ring-2 focus-within:ring-primary-foreground/30 transition-all">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="border-0 rounded-none bg-transparent h-8 w-32 text-sm focus:ring-0">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="w-px bg-border"></div>
                 <div className="flex items-center pl-2.5 text-muted-foreground">
                   <Search className="h-3.5 w-3.5" />
                 </div>
@@ -211,7 +225,7 @@ const Navbar = () => {
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
-                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-foreground placeholder:text-muted-foreground"
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-foreground placeholder:text-muted-foreground flex-1"
                 />
               </div>
             </div>
