@@ -117,6 +117,7 @@ const Navbar = () => {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
