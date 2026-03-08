@@ -80,8 +80,8 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
       {/* Top bar */}
       <div className="bg-gradient-hero">
-        <div className="container mx-auto flex items-center justify-between px-4 py-2 text-primary-foreground text-sm">
-          <span className="font-display font-semibold">🇵🇰 Pakistan's #1 B2B Wholesale Marketplace</span>
+        <div className="container mx-auto flex items-center justify-between px-4 py-1.5 sm:py-2 text-primary-foreground text-xs sm:text-sm">
+          <span className="font-display font-semibold truncate">🇵🇰 Pakistan's #1 B2B Wholesale Marketplace</span>
           <div className="hidden md:flex items-center gap-4">
             <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
             <Link to="/help" className="hover:underline">Help</Link>

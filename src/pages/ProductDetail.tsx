@@ -133,15 +133,15 @@ const ProductDetail = () => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { icon: Shield, text: "Escrow Payment" },
                 { icon: Truck, text: "Pan-PK Delivery" },
                 { icon: Clock, text: product.responseTime },
               ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-card border border-border text-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <span className="text-xs font-body text-muted-foreground">{text}</span>
+                <div key={text} className="flex flex-col items-center gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-lg bg-card border border-border text-center">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  <span className="text-[10px] sm:text-xs font-body text-muted-foreground">{text}</span>
                 </div>
               ))}
             </div>

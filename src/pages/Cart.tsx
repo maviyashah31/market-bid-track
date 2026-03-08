@@ -74,7 +74,7 @@ const Cart = () => {
                     </button>
                   </div>
                 </div>
-                <div className="text-right font-display font-bold text-foreground">
+                <div className="text-right font-display font-bold text-foreground text-sm sm:text-base hidden sm:block">
                   PKR {(item.price * item.quantity).toLocaleString()}
                 </div>
               </div>

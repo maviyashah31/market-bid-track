@@ -218,9 +218,9 @@ const SellerDashboard = () => {
           {/* Products */}
           <TabsContent value="products">
             <div className="bg-card rounded-xl border border-border p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                 <h2 className="font-display font-bold text-xl text-foreground">My Products ({myProducts.length})</h2>
-                <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body"><Plus className="h-4 w-4" /> Add Product</Button>
+                <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body w-full sm:w-auto"><Plus className="h-4 w-4" /> Add Product</Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {myProducts.map((product) => (

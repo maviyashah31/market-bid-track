@@ -205,7 +205,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
                 </div>
               </div>
               {images.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
                   {images.map((img, idx) => (
                     <div key={idx} className="relative group rounded-lg overflow-hidden border border-border">
                       <img src={img.url} alt={img.caption || "RFQ image"} className="w-full h-24 object-cover" />

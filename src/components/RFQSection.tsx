@@ -18,7 +18,7 @@ const RFQSection = () => (
           </Button>
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {rfqDetails.slice(0, 3).map((rfq) => (
           <div key={rfq.id} className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
             {rfq.images.length > 0 && (

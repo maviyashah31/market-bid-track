@@ -57,7 +57,7 @@ const Auth = () => {
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
           <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-8 font-body">
             <ArrowLeft className="h-4 w-4" /> Back to home

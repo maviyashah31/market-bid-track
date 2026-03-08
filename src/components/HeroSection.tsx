@@ -57,11 +57,11 @@ const HeroSection = () => (
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-12">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-4 text-center border border-primary-foreground/10">
-            <div className="font-display font-extrabold text-2xl text-primary-foreground">{stat.value}</div>
-            <div className="text-sm text-primary-foreground/70 font-body">{stat.label}</div>
+          <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-primary-foreground/10">
+            <div className="font-display font-extrabold text-lg sm:text-2xl text-primary-foreground">{stat.value}</div>
+            <div className="text-xs sm:text-sm text-primary-foreground/70 font-body">{stat.label}</div>
           </div>
         ))}
       </div>
