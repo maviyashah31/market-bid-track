@@ -186,40 +186,79 @@ const BuyerDashboard = () => {
           <TabsContent value="rfqs">
             <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display font-bold text-xl text-foreground">My RFQs</h2>
+                <h2 className="font-display font-bold text-xl text-foreground">My RFQs ({myRFQs.length})</h2>
                 <Button onClick={() => setShowRFQForm(true)} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body gap-2">
                   <FileText className="h-4 w-4" /> Post New RFQ
                 </Button>
               </div>
-              <div className="space-y-4">
-                {rfqs.slice(0, 2).map((rfq) => (
-                  <div key={rfq.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
-                    <div className="flex items-start justify-between">
-                      <Badge variant="secondary" className="mb-2 font-body">{rfq.category}</Badge>
-                      <Badge className="bg-success/10 text-success font-body">Active</Badge>
-                    </div>
-                    <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
-                    <p className="text-sm text-muted-foreground font-body mt-1">
-                      Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: {rfq.budget}
-                    </p>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
-                        <Clock className="h-3 w-3" /> {rfq.deadline} left
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-xs text-primary font-semibold font-body">
-                          <Users className="h-3 w-3" /> {rfq.bidsCount} bids
+              {myRFQs.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <h3 className="font-display font-semibold text-foreground mb-2">No RFQs Yet</h3>
+                  <p className="text-muted-foreground font-body mb-4">Post your first RFQ and let sellers compete for your business</p>
+                  <Button onClick={() => setShowRFQForm(true)} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Post Your First RFQ</Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {myRFQs.map((rfq) => (
+                    <div
+                      key={rfq.id}
+                      className="border border-border rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer"
+                      onClick={() => { setSelectedRFQ(rfq); setRfqDetailOpen(true); }}
+                    >
+                      <div className="flex items-start gap-4">
+                        {rfq.images.length > 0 && (
+                          <img src={rfq.images[0].url} alt={rfq.title} className="w-20 h-20 rounded-lg object-cover shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="secondary" className="font-body text-xs">{rfq.category}</Badge>
+                            <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">
+                              {rfq.status.charAt(0).toUpperCase() + rfq.status.slice(1)}
+                            </Badge>
+                            {rfq.images.length > 0 && (
+                              <span className="text-xs text-muted-foreground font-body flex items-center gap-0.5">
+                                <ImageIcon className="h-3 w-3" /> {rfq.images.length}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
+                          <p className="text-sm text-muted-foreground font-body mt-1 line-clamp-1">{rfq.description}</p>
+                          <p className="text-sm text-muted-foreground font-body mt-1">
+                            Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: PKR {(rfq.budgetMin / 1000000).toFixed(1)}M - {(rfq.budgetMax / 1000000).toFixed(1)}M
+                          </p>
                         </div>
-                        <Button variant="outline" size="sm" className="font-body text-xs gap-1">
-                          <Eye className="h-3 w-3" /> View Bids
-                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
+                            <Clock className="h-3 w-3" /> {rfq.deadline} left
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
+                            {rfq.certifications.length > 0 && rfq.certifications.slice(0, 2).join(", ")}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 text-xs text-primary font-semibold font-body">
+                            <Users className="h-3 w-3" /> {rfq.bidsCount} bids
+                          </div>
+                          <Button variant="outline" size="sm" className="font-body text-xs gap-1" onClick={(e) => { e.stopPropagation(); setSelectedRFQ(rfq); setRfqDetailOpen(true); }}>
+                            <Eye className="h-3 w-3" /> View Bids
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
             <PostRFQForm open={showRFQForm} onOpenChange={setShowRFQForm} />
+            <RFQDetailDialog
+              open={rfqDetailOpen}
+              onOpenChange={setRfqDetailOpen}
+              rfq={selectedRFQ}
+              mode="buyer"
+            />
           </TabsContent>
 
           {/* Disputes */}
