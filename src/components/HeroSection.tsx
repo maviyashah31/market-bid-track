@@ -59,7 +59,7 @@ const HeroSection = () => {
   return (
     <>
       {/* Sticky Search Bar */}
-      <div className={`fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`} style={{ top: "var(--navbar-height, 90px)" }}>
+      <div className={`sticky top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
         <div className="container mx-auto px-4 py-2">
           <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-sm focus-within:ring-2 focus-within:ring-primary/30 transition-all max-w-2xl mx-auto">
             <div className="flex items-center pl-3 text-muted-foreground">
