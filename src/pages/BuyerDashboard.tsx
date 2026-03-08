@@ -102,14 +102,16 @@ const BuyerDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border flex-wrap h-auto gap-1">
-            <TabsTrigger value="overview" className="font-display">Overview</TabsTrigger>
-            <TabsTrigger value="orders" className="font-display">Orders</TabsTrigger>
-            <TabsTrigger value="rfqs" className="font-display">My RFQs</TabsTrigger>
-            <TabsTrigger value="disputes" className="font-display">Disputes</TabsTrigger>
-            <TabsTrigger value="reviews" className="font-display">Reviews</TabsTrigger>
-            <TabsTrigger value="wishlist" className="font-display">Wishlist</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-card border border-border flex-nowrap h-auto gap-1 w-max sm:w-full">
+              <TabsTrigger value="overview" className="font-display text-xs sm:text-sm">Overview</TabsTrigger>
+              <TabsTrigger value="orders" className="font-display text-xs sm:text-sm">Orders</TabsTrigger>
+              <TabsTrigger value="rfqs" className="font-display text-xs sm:text-sm">My RFQs</TabsTrigger>
+              <TabsTrigger value="disputes" className="font-display text-xs sm:text-sm">Disputes</TabsTrigger>
+              <TabsTrigger value="reviews" className="font-display text-xs sm:text-sm">Reviews</TabsTrigger>
+              <TabsTrigger value="wishlist" className="font-display text-xs sm:text-sm">Wishlist</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview */}
           <TabsContent value="overview">
