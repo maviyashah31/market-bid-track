@@ -100,20 +100,12 @@ const Navbar = () => {
             </h1>
           </Link>
 
-          {/* Search */}
-          <div className="hidden md:flex flex-1 max-w-2xl">
-            <div className="flex w-full rounded-lg overflow-hidden border-2 border-primary focus-within:shadow-glow transition-shadow">
-              <Input
-                placeholder="Search products, suppliers, categories..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="border-0 rounded-none focus-visible:ring-0 font-body"
-              />
-              <button className="bg-gradient-hero px-6 text-primary-foreground hover:opacity-90 transition-opacity">
-                <Search className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+          {/* Nav Links */}
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
+            <Link to="/seller/dashboard" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">Become a Seller</Link>
+            <Link to="/help" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">Help</Link>
+            <Link to="/how-it-works" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">How It Works</Link>
+          </nav>
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-1">
