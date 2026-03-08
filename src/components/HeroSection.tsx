@@ -92,8 +92,9 @@ const HeroSection = () => {
               placeholder="Search products, suppliers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-9 text-sm" />
-            <button className="bg-primary hover:bg-primary/90 px-5 text-primary-foreground font-semibold text-xs transition-colors flex items-center gap-1.5 shrink-0">
+            <button onClick={handleSearch} className="bg-primary hover:bg-primary/90 px-5 text-primary-foreground font-semibold text-xs transition-colors flex items-center gap-1.5 shrink-0">
               Search
               <ArrowRight className="h-3.5 w-3.5 hidden sm:block" />
             </button>
