@@ -206,6 +206,69 @@ const productsByCategory: Record<string, string[]> = {
   "Raw Materials": ["Caustic Soda 50kg Drum", "Industrial Adhesive 20L", "Cotton Yarn 20s Count Bale", "Polyester Resin 200kg", "Rubber Sheets Roll"],
 };
 
+// ===== GENERATE ADMIN PRODUCTS =====
+export type ProductStatus = "active" | "delisted" | "flagged" | "pending_review";
+
+export interface AdminProduct {
+  id: string;
+  name: string;
+  category: string;
+  supplierId: string;
+  supplierName: string;
+  price: number;
+  moq: number;
+  unit: string;
+  stock: number;
+  status: ProductStatus;
+  featured: boolean;
+  totalOrders: number;
+  totalRevenue: number;
+  rating: number;
+  reviewCount: number;
+  createdDate: string;
+  lastUpdated: string;
+  image: string;
+  commissionRate: number;
+}
+
+const productImages = [
+  "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop",
+];
+
+export const adminProducts: AdminProduct[] = [];
+let productId = 1;
+for (const [cat, prods] of Object.entries(productsByCategory)) {
+  for (const prodName of prods) {
+    const supplier = suppliers.filter(s => s.category === cat && s.status === "active")[0] || suppliers[randomBetween(0, suppliers.length - 1)];
+    const status: ProductStatus = randomBetween(1, 10) <= 7 ? "active" : randomBetween(1, 3) === 1 ? "flagged" : randomBetween(1, 2) === 1 ? "delisted" : "pending_review";
+    adminProducts.push({
+      id: `PROD-${String(productId).padStart(4, "0")}`,
+      name: prodName,
+      category: cat,
+      supplierId: supplier.id,
+      supplierName: supplier.businessName,
+      price: randomBetween(500, 250000),
+      moq: randomBetween(5, 200),
+      unit: ["pcs", "kg", "bags", "rolls", "boxes", "meters"][randomBetween(0, 5)],
+      stock: randomBetween(0, 5000),
+      status,
+      featured: Math.random() > 0.8,
+      totalOrders: randomBetween(0, 80),
+      totalRevenue: randomBetween(50000, 5000000),
+      rating: +(Math.random() * 2 + 3).toFixed(1),
+      reviewCount: randomBetween(0, 120),
+      createdDate: randomDate("2024-01-01", "2026-02-01"),
+      lastUpdated: randomDate("2026-01-01", "2026-03-08"),
+      image: productImages[randomBetween(0, productImages.length - 1)],
+      commissionRate: randomBetween(3, 8),
+    });
+    productId++;
+  }
+}
+
 // ===== GENERATE ORDERS =====
 const orderStatuses: OrderStatus[] = ["placed", "confirmed", "in_transit", "delivered", "disputed", "completed", "cancelled"];
 export const orders: Order[] = [];

@@ -33,6 +33,7 @@ import DisputeManagement from "./pages/admin/DisputeManagement";
 import SettlementFinance from "./pages/admin/SettlementFinance";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import NotificationsPage from "./pages/admin/NotificationsPage";
+import ProductManagement from "./pages/admin/ProductManagement";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
+          <Route path="products" element={<ProductManagement />} />
           <Route path="suppliers" element={<SupplierManagement />} />
           <Route path="buyers" element={<BuyerManagement />} />
           <Route path="orders" element={<OrderManagement />} />
