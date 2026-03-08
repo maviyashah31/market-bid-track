@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { products } from "@/data/mockData";
-import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft } from "lucide-react";
+import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import AnimatedPage from "@/components/AnimatedPage";
 
@@ -17,6 +19,16 @@ const moqTiers = [
 const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id) || products[0];
+  const [quantity, setQuantity] = useState(product.moq);
+
+  const getCurrentPrice = () => {
+    if (quantity >= 1000) return 180;
+    if (quantity >= 500) return 220;
+    if (quantity >= 100) return 280;
+    return 350;
+  };
+
+  const subtotal = quantity * getCurrentPrice();
 
   return (
     <AnimatedPage>
@@ -68,6 +80,43 @@ const ProductDetail = () => {
                     <div className="font-display font-bold text-foreground">PKR {tier.price}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-display font-semibold text-foreground mb-3">Quantity</h3>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10"
+                  onClick={() => setQuantity(Math.max(1, quantity - (product.moq >= 100 ? 100 : 10)))}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-28 text-center font-display font-bold text-lg"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10"
+                  onClick={() => setQuantity(quantity + (product.moq >= 100 ? 100 : 10))}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground font-body">{product.unit}</span>
+              </div>
+              {quantity < product.moq && (
+                <p className="text-xs text-destructive font-body mt-2">Minimum order quantity is {product.moq} {product.unit}</p>
+              )}
+              <div className="mt-3 flex items-center justify-between p-3 rounded-lg bg-accent border border-border">
+                <span className="text-sm text-muted-foreground font-body">Subtotal ({quantity} × PKR {getCurrentPrice()})</span>
+                <span className="font-display font-bold text-primary text-lg">PKR {subtotal.toLocaleString()}</span>
               </div>
             </div>
 
