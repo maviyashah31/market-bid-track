@@ -148,7 +148,7 @@ const HeroSection = () => {
               <Link
                 key={cat.id}
                 to={`/products?category=${encodeURIComponent(cat.name)}`}
-                className="aspect-square flex flex-col items-center justify-center gap-1 rounded-xl bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group py-2"
               >
                 <span className="text-lg sm:text-xl group-hover:scale-110 transition-transform">{cat.icon}</span>
                 <span className="font-display font-semibold text-[8px] sm:text-[10px] text-foreground truncate max-w-full px-1">{cat.name}</span>
