@@ -194,17 +194,17 @@ const Navbar = () => {
 
           {/* Search Bar in Header */}
           {showSearch && (
-            <div className="hidden md:flex items-center flex-1 max-w-md">
-              <div className="flex w-full rounded-lg overflow-hidden border border-border bg-background focus-within:ring-2 focus-within:ring-primary/30 transition-all">
-                <div className="flex items-center pl-2.5 text-muted-foreground">
+            <div className="hidden md:flex items-center flex-1">
+              <div className="flex w-full rounded-lg overflow-hidden border border-primary-foreground/30 bg-primary-foreground/10 focus-within:ring-2 focus-within:ring-primary-foreground/30 transition-all">
+                <div className="flex items-center pl-2.5 text-primary-foreground/70">
                   <Search className="h-3.5 w-3.5" />
                 </div>
                 <Input
-                  placeholder="Search products..."
+                  placeholder="What are you looking for?"
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
-                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm"
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-primary-foreground placeholder:text-primary-foreground/60"
                 />
               </div>
             </div>
