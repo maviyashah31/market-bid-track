@@ -52,7 +52,7 @@ const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <section className="bg-background pt-4 pb-6 sm:pt-6 sm:pb-8">
+    <section className="bg-gradient-hero pt-4 pb-6 sm:pt-6 sm:pb-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
           {/* Left — Hero + Search */}
@@ -62,13 +62,13 @@ const HeroSection = () => {
             transition={{ duration: 0.35 }}
             className="flex-1 flex flex-col justify-center"
           >
-            <h1 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-foreground leading-tight mb-1.5">
+            <h1 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-primary-foreground leading-tight mb-1.5">
               Source Wholesale,{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(262,83%,58%)]">
+              <span className="text-primary-foreground/80">
                 Grow Your Business
               </span>
             </h1>
-            <p className="text-muted-foreground font-body text-xs sm:text-sm mb-4 max-w-md">
+            <p className="text-primary-foreground/70 font-body text-xs sm:text-sm mb-4 max-w-md">
               Pakistan's most trusted B2B marketplace — connecting buyers with verified suppliers.
             </p>
 
@@ -88,12 +88,12 @@ const HeroSection = () => {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 mt-3 text-xs text-muted-foreground font-body">
+            <div className="flex flex-wrap gap-1.5 mt-3 text-xs text-primary-foreground/70 font-body">
               <span>Popular:</span>
               {["Textiles", "Rice", "Sports Goods", "Surgical Instruments"].map((t) => (
                 <button
                   key={t}
-                  className="px-2.5 py-0.5 rounded-full border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-[11px]"
+                  className="px-2.5 py-0.5 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground transition-colors text-[11px]"
                 >
                   {t}
                 </button>
@@ -112,13 +112,13 @@ const HeroSection = () => {
               <motion.div
                 key={q.title}
                 variants={item}
-                className={`group rounded-xl border border-border bg-gradient-to-br ${q.gradient} p-3.5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default`}
+                className="group rounded-xl border border-primary-foreground/15 bg-primary-foreground/10 backdrop-blur-sm p-3.5 hover:bg-primary-foreground/15 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
               >
-                <div className={`w-8 h-8 rounded-lg ${q.iconBg} flex items-center justify-center mb-2`}>
-                  <q.icon className={`h-4 w-4 ${q.iconColor}`} />
+                <div className="w-8 h-8 rounded-lg bg-primary-foreground/15 flex items-center justify-center mb-2">
+                  <q.icon className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <h3 className="font-display font-bold text-foreground text-xs sm:text-sm mb-0.5">{q.title}</h3>
-                <p className="text-muted-foreground font-body text-[11px] leading-relaxed line-clamp-2">{q.desc}</p>
+                <h3 className="font-display font-bold text-primary-foreground text-xs sm:text-sm mb-0.5">{q.title}</h3>
+                <p className="text-primary-foreground/70 font-body text-[11px] leading-relaxed line-clamp-2">{q.desc}</p>
               </motion.div>
             ))}
           </motion.div>
