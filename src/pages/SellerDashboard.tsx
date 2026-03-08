@@ -49,6 +49,7 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
