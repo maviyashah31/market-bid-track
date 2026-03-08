@@ -3,19 +3,31 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, ShoppingCart, Factory, Shield } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"buyer" | "seller">("buyer");
+  const [role, setRole] = useState<"buyer" | "seller" | "admin">("buyer");
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(role === "seller" ? "/seller/dashboard" : "/buyer/dashboard");
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (role === "seller") {
+      navigate("/seller/dashboard");
+    } else {
+      navigate("/buyer/dashboard");
+    }
   };
+
+  const roleOptions = [
+    { key: "buyer" as const, label: "Buyer", icon: ShoppingCart, color: "text-primary" },
+    { key: "seller" as const, label: "Seller", icon: Factory, color: "text-verified" },
+    { key: "admin" as const, label: "Admin", icon: Shield, color: "text-destructive" },
+  ];
 
   return (
     <AnimatedPage>
@@ -58,23 +70,27 @@ const Auth = () => {
             {isLogin ? "Sign in to your Bulkur account" : "Join thousands of businesses on Bulkur"}
           </p>
 
-          {!isLogin && (
-            <div className="flex gap-3 mb-6">
-              {(["buyer", "seller"] as const).map((r) => (
+          {/* Role selection - always show */}
+          <div className="mb-6">
+            <Label className="text-sm font-medium text-foreground mb-2 block">Select Role</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {roleOptions.map(({ key, label, icon: Icon, color }) => (
                 <button
-                  key={r}
-                  onClick={() => setRole(r)}
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 font-display font-semibold text-sm transition-all ${
-                    role === r
+                  key={key}
+                  type="button"
+                  onClick={() => setRole(key)}
+                  className={`flex flex-col items-center gap-2 py-3 px-2 rounded-lg border-2 font-display font-semibold text-xs transition-all ${
+                    role === key
                       ? "border-primary bg-accent text-accent-foreground"
                       : "border-border text-muted-foreground hover:border-primary/30"
                   }`}
                 >
-                  {r === "buyer" ? "🛒 I'm a Buyer" : "🏭 I'm a Seller"}
+                  <Icon className={`h-5 w-5 ${role === key ? color : ""}`} />
+                  {label}
                 </button>
               ))}
             </div>
-          )}
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
