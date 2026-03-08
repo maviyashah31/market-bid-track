@@ -94,7 +94,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <h1 className="font-display font-extrabold text-2xl">
+            <h1 className="font-display font-extrabold text-2xl md:text-3xl">
               <span className="text-gradient-hero">Bulk</span>
               <span className="text-foreground">ur</span>
             </h1>
