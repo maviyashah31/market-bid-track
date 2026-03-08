@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Cart from "./pages/Cart";
 import Messages from "./pages/Messages";
 import OrderTracking from "./pages/OrderTracking";
+import DisputeDetail from "./pages/DisputeDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
