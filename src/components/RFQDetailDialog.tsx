@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { type RFQDetail, rfqBids } from "@/data/rfqData";
+import { Link } from "react-router-dom";
 import {
   MapPin, Calendar, Clock, Users, DollarSign, Truck, CreditCard,
   Award, CheckCircle2, Image as ImageIcon, FileText, ChevronRight
