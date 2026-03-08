@@ -48,60 +48,60 @@ const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <section className="bg-gradient-hero py-4 sm:py-5 md:py-7">
-      <div className="container mx-auto px-4 flex flex-col items-center text-center">
-        {/* Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="font-display font-extrabold text-2xl sm:text-3xl md:text-5xl text-primary-foreground leading-tight mb-6"
-        >
-          Bulk buying now made easy
-        </motion.h1>
-
-        {/* Search Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="w-full max-w-2xl mb-10"
-        >
-          <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-lg focus-within:ring-2 focus-within:ring-primary/30 transition-all">
-            <div className="flex items-center pl-4 text-muted-foreground">
-              <Search className="h-5 w-5" />
+    <section className="bg-gradient-hero py-3 sm:py-4 md:py-6">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:gap-8">
+        {/* Left: Heading + Search */}
+        <div className="flex-1 mb-4 md:mb-0">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="font-display font-extrabold text-xl sm:text-2xl md:text-4xl text-primary-foreground leading-tight mb-4"
+          >
+            Bulk buying now made easy
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="max-w-lg"
+          >
+            <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-lg focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+              <div className="flex items-center pl-3 text-muted-foreground">
+                <Search className="h-4 w-4" />
+              </div>
+              <Input
+                placeholder="Search products, suppliers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-10 sm:h-11 text-sm"
+              />
+              <button className="bg-primary hover:bg-primary/90 px-5 text-primary-foreground font-semibold text-xs transition-colors flex items-center gap-1.5 shrink-0">
+                Search
+                <ArrowRight className="h-3.5 w-3.5 hidden sm:block" />
+              </button>
             </div>
-            <Input
-              placeholder="Search products, suppliers, or categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-12 sm:h-14 text-sm sm:text-base"
-            />
-            <button className="bg-primary hover:bg-primary/90 px-6 sm:px-8 text-primary-foreground font-semibold text-sm transition-colors flex items-center gap-2 shrink-0">
-              Search
-              <ArrowRight className="h-4 w-4 hidden sm:block" />
-            </button>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* 4 Vibrant Cards */}
+        {/* Right: 4 Cards in 2x2 */}
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl"
+          className="grid grid-cols-2 gap-3 w-full md:w-auto md:max-w-sm"
         >
           {qualities.map((q) => (
             <motion.div
               key={q.title}
               variants={item}
-              className={`${q.bg} rounded-2xl p-5 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-200 cursor-default shadow-md`}
+              className={`${q.bg} rounded-xl p-3 flex flex-col items-center text-center hover:-translate-y-0.5 transition-transform duration-200 cursor-default shadow-md`}
             >
-              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                <q.icon className={`h-6 w-6 ${q.iconColor}`} />
+              <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center mb-1.5">
+                <q.icon className={`h-4 w-4 ${q.iconColor}`} />
               </div>
-              <h3 className="font-display font-bold text-white text-sm sm:text-base mb-1">{q.title}</h3>
-              <p className="text-white/80 font-body text-xs leading-relaxed">{q.desc}</p>
+              <h3 className="font-display font-bold text-white text-xs mb-0.5">{q.title}</h3>
+              <p className="text-white/80 font-body text-[10px] leading-snug">{q.desc}</p>
             </motion.div>
           ))}
         </motion.div>
