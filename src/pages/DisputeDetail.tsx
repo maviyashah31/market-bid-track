@@ -198,7 +198,7 @@ const DisputeDetail = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Chat Section */}
-            <div className="lg:col-span-2 bg-card rounded-xl border border-border flex flex-col h-[600px]">
+            <div className="lg:col-span-2 bg-card rounded-xl border border-border flex flex-col h-[400px] sm:h-[500px] lg:h-[600px]">
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((msg) => {
