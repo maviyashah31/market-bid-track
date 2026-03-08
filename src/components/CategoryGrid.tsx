@@ -8,8 +8,8 @@ const CategoryGrid = () => (
         <h2 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-2">Browse by Category</h2>
         <p className="text-muted-foreground font-body text-sm sm:text-base">Explore 500+ categories from verified Pakistani suppliers</p>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-        {categories.map((cat) => (
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {categories.slice(0, 4).map((cat) => (
           <Link
             key={cat.id}
             to={`/products?category=${encodeURIComponent(cat.name)}`}
