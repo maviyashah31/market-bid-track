@@ -49,7 +49,7 @@ const HeroSection = () => {
 
   return (
     <section className="bg-gradient-hero py-10 sm:py-14 md:py-20">
-      <div className="container mx-auto px-4 flex flex-col items-center text-center">
+      <div className="max-w-xl mx-auto px-4 flex flex-col items-center text-center">
         {/* Heading */}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
