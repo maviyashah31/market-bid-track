@@ -1,6 +1,6 @@
 import { Shield, Truck, Users, FileText, Search, ArrowRight, ShoppingCart, PackageCheck, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { categories } from "@/data/mockData";
@@ -48,9 +48,37 @@ const item = {
 
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsSticky(window.scrollY > 150);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <section className="bg-gradient-hero py-3 sm:py-4 md:py-6">
+    <>
+      {/* Sticky Search Bar */}
+      <div className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-sm focus-within:ring-2 focus-within:ring-primary/30 transition-all max-w-2xl mx-auto">
+            <div className="flex items-center pl-3 text-muted-foreground">
+              <Search className="h-4 w-4" />
+            </div>
+            <Input
+              placeholder="Search products, suppliers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-9 text-sm" />
+            <button className="bg-primary hover:bg-primary/90 px-5 text-primary-foreground font-semibold text-xs transition-colors flex items-center gap-1.5 shrink-0">
+              Search
+              <ArrowRight className="h-3.5 w-3.5 hidden sm:block" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section className="bg-gradient-hero py-3 sm:py-4 md:py-6">
       <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-center md:gap-12">
         {/* Left: Heading + Search */}
         <div className="flex-1 max-w-2xl mb-4 md:mb-0">
@@ -128,8 +156,9 @@ const HeroSection = () => {
           )}
         </motion.div>
       </div>
-    </section>);
-
+    </section>
+    </>
+  );
 };
 
 export default HeroSection;
