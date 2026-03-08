@@ -1,5 +1,4 @@
-import { categories } from "@/data/mockData";
-import { Link } from "react-router-dom";
+import { Search, ShoppingCart, CreditCard, PackageCheck } from "lucide-react";
 import { Search, ShoppingCart, CreditCard, PackageCheck } from "lucide-react";
 
 const steps = [
