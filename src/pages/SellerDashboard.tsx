@@ -503,33 +503,39 @@ const SellerDashboard = () => {
               )}
 
               {/* Products */}
-              {activeTab === "products" && (
-                <>
-                  <div className="bg-card rounded-xl border border-border p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-                      <h2 className="font-display font-bold text-xl text-foreground">My Products ({myProducts.length})</h2>
-                      <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body w-full sm:w-auto"><Plus className="h-4 w-4" /> Add Product</Button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {myProducts.map((product) => (
-                        <div key={product.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
-                          <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-3" />
-                          <h3 className="font-display font-semibold text-sm text-foreground">{product.name}</h3>
-                          <p className="text-primary font-display font-bold text-sm mt-1">PKR {product.minPrice} - {product.maxPrice}</p>
-                          <p className="text-xs text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
-                          <div className="flex gap-2 mt-3">
-                            <Link to={`/product/${product.id}`}>
-                              <Button variant="outline" size="sm" className="gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
-                            </Link>
-                            <Button variant="outline" size="sm" className="gap-1 font-body" onClick={() => { setEditingProduct(product); setProductFormOpen(true); }}><Edit className="h-3 w-3" /> Edit</Button>
-                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-3 w-3" /></Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+              {activeTab === "products" && !productFormView && (
+                <div className="bg-card rounded-xl border border-border p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                    <h2 className="font-display font-bold text-xl text-foreground">My Products ({myProducts.length})</h2>
+                    <Button onClick={() => { setEditingProduct(null); setProductFormView(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body w-full sm:w-auto"><Plus className="h-4 w-4" /> Add Product</Button>
                   </div>
-                  <ProductFormDialog open={productFormOpen} onOpenChange={setProductFormOpen} product={editingProduct} onSave={handleSaveProduct} />
-                </>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {myProducts.map((product) => (
+                      <div key={product.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
+                        <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-3" />
+                        <h3 className="font-display font-semibold text-sm text-foreground">{product.name}</h3>
+                        <p className="text-primary font-display font-bold text-sm mt-1">PKR {product.minPrice} - {product.maxPrice}</p>
+                        <p className="text-xs text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
+                        <div className="flex gap-2 mt-3">
+                          <Link to={`/product/${product.id}`}>
+                            <Button variant="outline" size="sm" className="gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
+                          </Link>
+                          <Button variant="outline" size="sm" className="gap-1 font-body" onClick={() => { setEditingProduct(product); setProductFormView(true); }}><Edit className="h-3 w-3" /> Edit</Button>
+                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-3 w-3" /></Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Product Form — inline */}
+              {activeTab === "products" && productFormView && (
+                <InlineProductForm
+                  product={editingProduct}
+                  onSave={(data) => { handleSaveProduct(data); setProductFormView(false); }}
+                  onCancel={() => { setProductFormView(false); setEditingProduct(null); }}
+                />
               )}
 
               {/* Orders */}
