@@ -5,6 +5,7 @@ import { products } from "@/data/mockData";
 import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const moqTiers = [
   { range: "1 - 99", price: "350" },
