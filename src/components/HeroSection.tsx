@@ -51,9 +51,9 @@ const HeroSection = () => {
 
   return (
     <section className="bg-gradient-hero py-3 sm:py-4 md:py-6">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between md:gap-6">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-center md:gap-12">
         {/* Left: Heading + Search */}
-        <div className="flex-1 max-w-xl mb-4 md:mb-0">
+        <div className="flex-1 max-w-2xl mb-4 md:mb-0">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="max-w-lg">
+            className="w-full">
             
             <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-lg focus-within:ring-2 focus-within:ring-primary/30 transition-all">
               <div className="flex items-center pl-3 text-muted-foreground">
