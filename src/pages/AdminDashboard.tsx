@@ -316,6 +316,7 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

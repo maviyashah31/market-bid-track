@@ -161,6 +161,7 @@ const Messages = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

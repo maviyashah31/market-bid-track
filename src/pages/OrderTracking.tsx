@@ -104,6 +104,7 @@ const OrderTracking = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 
