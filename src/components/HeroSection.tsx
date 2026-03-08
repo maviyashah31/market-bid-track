@@ -88,10 +88,8 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="mt-4 max-w-lg"
+            className="flex gap-3 mt-4 max-w-lg"
           >
-            <h3 className="text-xs font-bold text-primary-foreground mb-2">How to Buy</h3>
-            <div className="flex gap-3">
             {[
               { icon: Search, step: "1", title: "Browse", desc: "Find products" },
               { icon: ShoppingCart, step: "2", title: "Add to Cart", desc: "Select & add" },
@@ -106,7 +104,6 @@ const HeroSection = () => {
                 <span className="text-[10px] text-muted-foreground hidden sm:block">{s.desc}</span>
               </div>
             ))}
-            </div>
           </motion.div>
         </div>
 
