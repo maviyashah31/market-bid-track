@@ -62,13 +62,13 @@ const HeroSection = () => {
             transition={{ duration: 0.35 }}
             className="flex-1 flex flex-col justify-center"
           >
-            <h1 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-foreground leading-tight mb-1.5">
+            <h1 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-primary-foreground leading-tight mb-1.5">
               Source Wholesale,{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(262,83%,58%)]">
+              <span className="text-primary-foreground/80">
                 Grow Your Business
               </span>
             </h1>
-            <p className="text-muted-foreground font-body text-xs sm:text-sm mb-4 max-w-md">
+            <p className="text-primary-foreground/70 font-body text-xs sm:text-sm mb-4 max-w-md">
               Pakistan's most trusted B2B marketplace — connecting buyers with verified suppliers.
             </p>
 
