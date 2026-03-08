@@ -48,7 +48,7 @@ const ProductDetail = () => {
             <Badge variant="secondary" className="mb-3 font-body">{product.category}</Badge>
             <h1 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4">{product.name}</h1>
 
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6">
               <div className="flex items-center gap-1">
                 {product.sellerVerified && <BadgeCheck className="h-5 w-5 text-verified" />}
                 <span className="font-display font-semibold text-foreground">{product.sellerName}</span>
