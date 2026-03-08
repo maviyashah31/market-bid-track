@@ -49,9 +49,18 @@ const item = {
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSticky, setIsSticky] = useState(false);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => setIsSticky(window.scrollY > 150);
+    const navbar = document.querySelector("header");
+    const updateNavHeight = () => {
+      if (navbar) setNavHeight(navbar.getBoundingClientRect().height);
+    };
+    updateNavHeight();
+    const handleScroll = () => {
+      updateNavHeight();
+      setIsSticky(window.scrollY > 150);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -59,7 +68,10 @@ const HeroSection = () => {
   return (
     <>
       {/* Sticky Search Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+      <div
+        className={`fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300 ${isSticky ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        style={{ top: navHeight }}
+      >
         <div className="container mx-auto px-4 py-2">
           <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-sm focus-within:ring-2 focus-within:ring-primary/30 transition-all max-w-2xl mx-auto">
             <div className="flex items-center pl-3 text-muted-foreground">
