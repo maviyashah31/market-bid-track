@@ -150,7 +150,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-gradient-hero border-b border-primary/20 shadow-sm">
       {/* Top bar — continuous marquee */}
       <div className="bg-gradient-hero overflow-hidden">
         <div className="flex items-center justify-between">
