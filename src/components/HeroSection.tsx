@@ -52,7 +52,7 @@ const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <section className="bg-background pt-4 pb-6 sm:pt-6 sm:pb-8">
+    <section className="bg-gradient-hero pt-4 pb-6 sm:pt-6 sm:pb-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
           {/* Left — Hero + Search */}
