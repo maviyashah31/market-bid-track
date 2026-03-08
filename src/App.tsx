@@ -19,6 +19,8 @@ import DisputeDetail from "./pages/DisputeDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
+import SellerProfile from "./pages/SellerProfile";
+import BuyerProfile from "./pages/BuyerProfile";
 
 // Admin Panel
 import AdminLayout from "./layouts/AdminLayout";
@@ -53,6 +55,8 @@ const AnimatedRoutes = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/order/:orderId" element={<OrderTracking />} />
         <Route path="/dispute/:disputeId" element={<DisputeDetail />} />
+        <Route path="/seller/:sellerId" element={<SellerProfile />} />
+        <Route path="/buyer/:buyerId" element={<BuyerProfile />} />
 
         {/* Admin Panel */}
         <Route path="/admin/login" element={<AdminLogin />} />
