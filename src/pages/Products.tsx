@@ -7,6 +7,7 @@ import { SlidersHorizontal, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const Products = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
