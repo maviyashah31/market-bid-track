@@ -218,7 +218,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="relative"
+                className="relative text-primary-foreground hover:bg-primary-foreground/10"
                 onClick={() => setNotifOpen(!notifOpen)}
               >
                 <Bell className="h-5 w-5" />
