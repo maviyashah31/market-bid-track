@@ -192,19 +192,6 @@ const Navbar = () => {
             </h1>
           </Link>
 
-          {/* Nav Links */}
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
-            {links.map((link) => (
-              <Link
-                key={link.label}
-                to={link.to}
-                className="text-sm font-body font-semibold text-foreground hover:text-primary transition"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
           {/* Search Bar in Header */}
           {showSearch && (
             <div className="hidden md:flex items-center flex-1 max-w-md">
@@ -224,7 +211,7 @@ const Navbar = () => {
           )}
 
           {/* Actions */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 ml-auto">
             <ThemeToggle />
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
@@ -309,6 +296,23 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+
+      {/* Links bar below header */}
+      <nav className="hidden md:block border-t border-border bg-card">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-8 py-1.5">
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="text-sm font-body font-semibold text-foreground hover:text-primary transition"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
 
 
       {/* Mobile menu */}
