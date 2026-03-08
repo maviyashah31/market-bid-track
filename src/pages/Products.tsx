@@ -79,8 +79,8 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="font-display font-bold text-xl sm:text-2xl text-foreground">All Products</h1>
-                <p className="text-sm text-muted-foreground font-body">{products.length} products found</p>
+                <h1 className="font-display font-bold text-xl sm:text-2xl text-foreground">{searchQuery ? `Results for "${searchQuery}"` : categoryFilter ? categoryFilter : "All Products"}</h1>
+                <p className="text-sm text-muted-foreground font-body">{filteredProducts.length} products found</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
