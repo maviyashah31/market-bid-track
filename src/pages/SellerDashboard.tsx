@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { products, rfqs, disputes, disputeReasons, type Dispute } from "@/data/mockData";
+import { products as initialProducts, rfqs, disputes, disputeReasons, type Dispute, type Product, type RFQ } from "@/data/mockData";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
   AlertTriangle, Send
 } from "lucide-react";
+import ProductFormDialog from "@/components/ProductFormDialog";
+import SubmitBidForm from "@/components/SubmitBidForm";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -53,6 +55,39 @@ const SellerDashboard = () => {
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [responseText, setResponseText] = useState("");
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+  
+  // Product management
+  const sellerProducts = initialProducts.filter(p => p.sellerName === "Lahore Textile Mills" || p.sellerName === "Faisalabad Fabric House");
+  const [myProducts, setMyProducts] = useState<Product[]>(sellerProducts);
+  const [productFormOpen, setProductFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // RFQ bid
+  const [bidFormOpen, setBidFormOpen] = useState(false);
+  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
+
+  const handleSaveProduct = (data: Partial<Product>) => {
+    if (editingProduct) {
+      setMyProducts(prev => prev.map(p => p.id === editingProduct.id ? { ...p, ...data } : p));
+    } else {
+      const newProduct: Product = {
+        id: String(Date.now()),
+        sellerName: "Lahore Textile Mills",
+        sellerVerified: true,
+        sellerRating: 4.8,
+        sellerLocation: "Lahore",
+        responseTime: "< 2 hours",
+        ordersCompleted: 0,
+        ...data,
+      } as Product;
+      setMyProducts(prev => [...prev, newProduct]);
+    }
+    setEditingProduct(null);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setMyProducts(prev => prev.filter(p => p.id !== id));
+  };
 
   const sellerDisputes = disputes.filter(d => d.sellerName === "Lahore Textile Mills");
   const activeDisputeCount = sellerDisputes.filter(d => d.status !== "resolved" && d.status !== "closed").length;
@@ -155,25 +190,28 @@ const SellerDashboard = () => {
           <TabsContent value="products">
             <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display font-bold text-xl text-foreground">My Products</h2>
-                <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body"><Plus className="h-4 w-4" /> Add Product</Button>
+                <h2 className="font-display font-bold text-xl text-foreground">My Products ({myProducts.length})</h2>
+                <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body"><Plus className="h-4 w-4" /> Add Product</Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {products.filter(p => p.sellerName === "Lahore Textile Mills" || p.sellerName === "Faisalabad Fabric House").map((product) => (
+                {myProducts.map((product) => (
                   <div key={product.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
                     <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-3" />
                     <h3 className="font-display font-semibold text-sm text-foreground">{product.name}</h3>
                     <p className="text-primary font-display font-bold text-sm mt-1">PKR {product.minPrice} - {product.maxPrice}</p>
                     <p className="text-xs text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
                     <div className="flex gap-2 mt-3">
-                      <Button variant="outline" size="sm" className="flex-1 gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
-                      <Button variant="outline" size="sm" className="flex-1 gap-1 font-body"><Edit className="h-3 w-3" /> Edit</Button>
-                      <Button variant="ghost" size="sm" className="text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                      <Link to={`/product/${product.id}`}>
+                        <Button variant="outline" size="sm" className="gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
+                      </Link>
+                      <Button variant="outline" size="sm" className="gap-1 font-body" onClick={() => { setEditingProduct(product); setProductFormOpen(true); }}><Edit className="h-3 w-3" /> Edit</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-3 w-3" /></Button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+            <ProductFormDialog open={productFormOpen} onOpenChange={setProductFormOpen} product={editingProduct} onSave={handleSaveProduct} />
           </TabsContent>
 
           {/* Orders */}
@@ -227,15 +265,17 @@ const SellerDashboard = () => {
                         <p className="text-sm text-muted-foreground font-body mt-1">
                           Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: {rfq.budget} • {rfq.deadline} left
                         </p>
+                        <p className="text-xs text-muted-foreground font-body mt-1">Buyer: {rfq.buyer} • {rfq.bidsCount} bids so far</p>
                       </div>
                       <div className="mt-3 sm:mt-0">
-                        <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Submit Bid</Button>
+                        <Button onClick={() => { setSelectedRFQ(rfq); setBidFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Submit Bid</Button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+            <SubmitBidForm open={bidFormOpen} onOpenChange={setBidFormOpen} rfq={selectedRFQ} />
           </TabsContent>
 
           {/* Messages */}

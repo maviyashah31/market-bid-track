@@ -16,6 +16,8 @@ import Cart from "./pages/Cart";
 import Messages from "./pages/Messages";
 import OrderTracking from "./pages/OrderTracking";
 import DisputeDetail from "./pages/DisputeDetail";
+import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const AnimatedRoutes = () => {
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/order/:orderId" element={<OrderTracking />} />
         <Route path="/dispute/:disputeId" element={<DisputeDetail />} />
