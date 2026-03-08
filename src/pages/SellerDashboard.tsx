@@ -60,6 +60,7 @@ const walletTransactions = [
 
 const sidebarItems = [
   { icon: BarChart3, label: "Overview", value: "overview" },
+  { icon: Store, label: "My Profile", value: "profile" },
   { icon: Package, label: "Products", value: "products" },
   { icon: ShoppingCart, label: "Orders", value: "orders" },
   { icon: FileText, label: "RFQs", value: "rfqs" },
