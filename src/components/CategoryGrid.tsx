@@ -1,5 +1,4 @@
 import { Search, ShoppingCart, CreditCard, PackageCheck } from "lucide-react";
-import { Search, ShoppingCart, CreditCard, PackageCheck } from "lucide-react";
 
 const steps = [
   { icon: Search, step: "1", title: "Search Products", desc: "Browse thousands of products from verified suppliers" },
