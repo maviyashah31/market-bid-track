@@ -4,6 +4,7 @@ import { buyerOrders } from "@/data/mockData";
 import { Package, CheckCircle2, Truck, Clock, MapPin, ArrowLeft, Box, ClipboardCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const allSteps = [
   { key: "placed", label: "Order Placed", icon: ClipboardCheck, desc: "Your order has been placed successfully" },
