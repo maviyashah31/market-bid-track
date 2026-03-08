@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { products, rfqs } from "@/data/mockData";
+import { products, rfqs, disputes, disputeReasons, type Dispute } from "@/data/mockData";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
-  Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2
+  Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
+  AlertTriangle, Send
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -47,6 +50,29 @@ const walletTransactions = [
 
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [responseText, setResponseText] = useState("");
+  const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+
+  const sellerDisputes = disputes.filter(d => d.sellerName === "Lahore Textile Mills");
+  const activeDisputeCount = sellerDisputes.filter(d => d.status !== "resolved" && d.status !== "closed").length;
+
+  const disputeStatusColors: Record<string, string> = {
+    open: "bg-destructive/10 text-destructive",
+    negotiating: "bg-warning/10 text-warning",
+    escalated: "bg-destructive/10 text-destructive",
+    resolved: "bg-success/10 text-success",
+    closed: "bg-muted text-muted-foreground",
+  };
+
+  const getReasonLabel = (reason: string) => disputeReasons.find(r => r.value === reason)?.label || reason;
+
+  const handleRespond = () => {
+    if (!responseText.trim()) return;
+    setResponseText("");
+    setRespondDialogOpen(false);
+    setSelectedDispute(null);
+  };
 
   return (
     <AnimatedPage>
@@ -65,6 +91,12 @@ const SellerDashboard = () => {
             <TabsTrigger value="orders" className="gap-1.5 font-display"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
             <TabsTrigger value="rfqs" className="gap-1.5 font-display"><FileText className="h-4 w-4" /> RFQ Bids</TabsTrigger>
             <TabsTrigger value="messages" className="gap-1.5 font-display"><MessageSquare className="h-4 w-4" /> Messages</TabsTrigger>
+            <TabsTrigger value="disputes" className="gap-1.5 font-display relative">
+              <AlertTriangle className="h-4 w-4" /> Disputes
+              {activeDisputeCount > 0 && (
+                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="reviews" className="gap-1.5 font-display"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
             <TabsTrigger value="wallet" className="gap-1.5 font-display"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
           </TabsList>
@@ -216,6 +248,101 @@ const SellerDashboard = () => {
                 <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Open Messages</Button>
               </Link>
             </div>
+          </TabsContent>
+
+          {/* Disputes */}
+          <TabsContent value="disputes">
+            <div className="bg-card rounded-xl border border-border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display font-bold text-xl text-foreground">Disputes Against You</h2>
+                {activeDisputeCount > 0 && (
+                  <Badge variant="destructive" className="font-body">{activeDisputeCount} needs response</Badge>
+                )}
+              </div>
+              {sellerDisputes.length === 0 ? (
+                <div className="text-center py-12">
+                  <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground font-body">No disputes raised against you. Keep up the great work!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {sellerDisputes.map((dispute) => (
+                    <div key={dispute.id} className="border border-border rounded-lg p-5 hover:shadow-md transition">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="font-display font-bold text-foreground">{dispute.id}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${disputeStatusColors[dispute.status]}`}>
+                              {dispute.status.replace("_", " ")}
+                            </span>
+                            {dispute.status === "escalated" && (
+                              <Badge variant="destructive" className="text-[10px] font-body">Escalated to Admin</Badge>
+                            )}
+                          </div>
+                          <h3 className="font-display font-semibold text-foreground">{dispute.orderName}</h3>
+                          <p className="text-sm text-muted-foreground font-body mt-1">
+                            Order: {dispute.orderId} • Reason: {getReasonLabel(dispute.reason)}
+                          </p>
+                          <p className="text-sm text-muted-foreground font-body mt-1">{dispute.description}</p>
+                          <p className="text-xs text-muted-foreground font-body mt-2">
+                            Opened: {dispute.createdAt} • Updated: {dispute.updatedAt}
+                          </p>
+                          {dispute.resolution && (
+                            <div className="mt-3 p-3 bg-success/10 rounded-lg border border-success/20">
+                              <p className="text-sm font-body text-success font-medium">Resolution: {dispute.resolution}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Link to={`/dispute/${dispute.id}`}>
+                            <Button variant="outline" size="sm" className="font-body gap-1">
+                              <Eye className="h-3 w-3" /> View Chat
+                            </Button>
+                          </Link>
+                          {dispute.status !== "resolved" && dispute.status !== "closed" && (
+                            <Button
+                              size="sm"
+                              className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body gap-1"
+                              onClick={() => { setSelectedDispute(dispute); setRespondDialogOpen(true); }}
+                            >
+                              <Send className="h-3 w-3" /> Respond
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Respond Dialog */}
+            <Dialog open={respondDialogOpen} onOpenChange={setRespondDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-display">Respond to Dispute {selectedDispute?.id}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-body text-muted-foreground mb-1">Order: {selectedDispute?.orderName}</p>
+                    <p className="text-sm font-body text-muted-foreground">Reason: {selectedDispute ? getReasonLabel(selectedDispute.reason) : ""}</p>
+                    <p className="text-sm font-body text-muted-foreground mt-2 italic">"{selectedDispute?.description}"</p>
+                  </div>
+                  <Textarea
+                    placeholder="Write your response to the buyer... (e.g., offer a resolution, request more details)"
+                    value={responseText}
+                    onChange={(e) => setResponseText(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setRespondDialogOpen(false)} className="font-body">Cancel</Button>
+                  <Button onClick={handleRespond} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body gap-1">
+                    <Send className="h-4 w-4" /> Send Response
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           {/* Reviews */}
