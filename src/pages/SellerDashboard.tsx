@@ -278,31 +278,113 @@ const SellerDashboard = () => {
             </div>
           </TabsContent>
 
-          {/* RFQ Bids */}
+          {/* RFQ Marketplace */}
           <TabsContent value="rfqs">
             <div className="bg-card rounded-xl border border-border p-6">
-              <h2 className="font-display font-bold text-xl text-foreground mb-6">Active RFQs</h2>
-              <div className="space-y-4">
-                {rfqs.map((rfq) => (
-                  <div key={rfq.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                      <div>
-                        <Badge variant="secondary" className="mb-2 font-body">{rfq.category}</Badge>
-                        <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
-                        <p className="text-sm text-muted-foreground font-body mt-1">
-                          Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: {rfq.budget} • {rfq.deadline} left
-                        </p>
-                        <p className="text-xs text-muted-foreground font-body mt-1">Buyer: {rfq.buyer} • {rfq.bidsCount} bids so far</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 className="font-display font-bold text-xl text-foreground">RFQ Marketplace ({filteredRFQs.length})</h2>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={rfqSearch}
+                      onChange={(e) => setRfqSearch(e.target.value)}
+                      placeholder="Search RFQs..."
+                      className="pl-9 w-48"
+                    />
+                  </div>
+                  <Select value={rfqCategoryFilter} onValueChange={setRfqCategoryFilter}>
+                    <SelectTrigger className="w-44">
+                      <Filter className="h-3.5 w-3.5 mr-1" />
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {rfqCategories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={rfqSortBy} onValueChange={setRfqSortBy}>
+                    <SelectTrigger className="w-40">
+                      <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="deadline">Deadline (Urgent)</SelectItem>
+                      <SelectItem value="budget_high">Budget (High)</SelectItem>
+                      <SelectItem value="bids_low">Fewest Bids</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {filteredRFQs.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground font-body">No RFQs match your filters</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredRFQs.map((rfq) => (
+                    <div
+                      key={rfq.id}
+                      className="border border-border rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group"
+                      onClick={() => { setDetailRFQ(rfq); setRfqDetailOpen(true); }}
+                    >
+                      {/* Image preview */}
+                      {rfq.images.length > 0 && (
+                        <div className="mb-3 rounded-lg overflow-hidden">
+                          <img src={rfq.images[0].url} alt={rfq.title} className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="secondary" className="font-body text-xs">{rfq.category}</Badge>
+                        <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">Active</Badge>
+                        <span className="ml-auto text-xs text-muted-foreground font-body">{rfq.daysLeft}d left</span>
                       </div>
-                      <div className="mt-3 sm:mt-0">
-                        <Button onClick={() => { setSelectedRFQ(rfq); setBidFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Submit Bid</Button>
+                      <h3 className="font-display font-semibold text-foreground group-hover:text-primary transition-colors">{rfq.title}</h3>
+                      <p className="text-sm text-muted-foreground font-body mt-1 line-clamp-2">{rfq.description}</p>
+                      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border">
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground font-body">Quantity</p>
+                          <p className="font-display font-bold text-xs text-foreground">{rfq.quantity.toLocaleString()} {rfq.unit}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground font-body">Budget</p>
+                          <p className="font-display font-bold text-xs text-foreground">PKR {(rfq.budgetMax / 1000000).toFixed(1)}M</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground font-body">Bids</p>
+                          <p className="font-display font-bold text-xs text-primary">{rfq.bidsCount}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-border">
+                        <p className="text-xs text-muted-foreground font-body flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {rfq.buyerLocation}
+                        </p>
+                        <Button
+                          size="sm"
+                          className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body text-xs gap-1"
+                          onClick={(e) => { e.stopPropagation(); setSelectedRFQ(rfq); setBidFormOpen(true); }}
+                        >
+                          Submit Bid
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
             <SubmitBidForm open={bidFormOpen} onOpenChange={setBidFormOpen} rfq={selectedRFQ} />
+            <RFQDetailDialog
+              open={rfqDetailOpen}
+              onOpenChange={setRfqDetailOpen}
+              rfq={detailRFQ}
+              mode="seller"
+              onSubmitBid={() => { setRfqDetailOpen(false); setSelectedRFQ(detailRFQ); setBidFormOpen(true); }}
+            />
           </TabsContent>
 
           {/* Messages */}
