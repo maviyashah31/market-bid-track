@@ -88,12 +88,12 @@ const HeroSection = () => {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 mt-3 text-xs text-muted-foreground font-body">
+            <div className="flex flex-wrap gap-1.5 mt-3 text-xs text-primary-foreground/70 font-body">
               <span>Popular:</span>
               {["Textiles", "Rice", "Sports Goods", "Surgical Instruments"].map((t) => (
                 <button
                   key={t}
-                  className="px-2.5 py-0.5 rounded-full border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-[11px]"
+                  className="px-2.5 py-0.5 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground transition-colors text-[11px]"
                 >
                   {t}
                 </button>
