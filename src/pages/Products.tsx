@@ -100,6 +100,7 @@ const Products = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 

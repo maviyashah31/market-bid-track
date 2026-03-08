@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Minus, Plus, Trash2, ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import AnimatedPage from "@/components/AnimatedPage";
 
 interface CartItem {
   id: string;

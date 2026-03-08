@@ -101,6 +101,7 @@ const ProductDetail = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 
