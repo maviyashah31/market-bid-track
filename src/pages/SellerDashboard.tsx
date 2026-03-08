@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import AnimatedPage from "@/components/AnimatedPage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const stats = [
   { icon: DollarSign, label: "Revenue", value: "PKR 2.45M", change: "+12.5%", up: true },
