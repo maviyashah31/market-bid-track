@@ -230,11 +230,9 @@ const SellerDashboard = () => {
                         <p className="font-display font-bold text-sm text-foreground truncate">Lahore Textile Mills</p>
                         <p className="text-xs text-muted-foreground font-body">Verified Seller ✅</p>
                       </div>
-                      {!isMobile && (
-                        <Button variant="ghost" size="sm" className="ml-auto shrink-0 h-8 w-8 p-0" onClick={() => setSidebarOpen(false)}>
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button variant="ghost" size="sm" className="ml-auto shrink-0 h-8 w-8 p-0" onClick={() => setSidebarOpen(false)}>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
