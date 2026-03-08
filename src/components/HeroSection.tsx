@@ -1,4 +1,4 @@
-import { Shield, Truck, Users, FileText, Search, ArrowRight } from "lucide-react";
+import { Shield, Truck, Users, FileText, Search, ArrowRight, ShoppingCart, PackageCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { motion } from "framer-motion";
