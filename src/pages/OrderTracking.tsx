@@ -25,6 +25,7 @@ const OrderTracking = () => {
   const currentIdx = statusIndex[order.status] ?? 0;
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8 max-w-3xl">
