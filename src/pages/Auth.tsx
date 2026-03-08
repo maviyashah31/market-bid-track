@@ -115,6 +115,7 @@ const Auth = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

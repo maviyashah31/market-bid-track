@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const statusColors: Record<string, string> = {
   placed: "bg-muted text-muted-foreground",
