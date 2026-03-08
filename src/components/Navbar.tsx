@@ -274,7 +274,7 @@ const Navbar = () => {
 
             {variant !== "admin" && (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="gap-2 font-body">
+                <Button variant="ghost" size="sm" className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
                   <User className="h-4 w-4" />
                   Sign In
                 </Button>
@@ -282,9 +282,9 @@ const Navbar = () => {
             )}
             {showCart && (
               <Link to="/cart">
-                <Button variant="ghost" size="sm" className="relative">
+                <Button variant="ghost" size="sm" className="relative text-primary-foreground hover:bg-primary-foreground/10">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
+                  <span className="absolute -top-1 -right-1 bg-primary-foreground text-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
                 </Button>
               </Link>
             )}
