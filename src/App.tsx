@@ -50,6 +50,7 @@ const AnimatedRoutes = () => {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
+        <Route path="/seller/orders" element={<SellerOrders />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
