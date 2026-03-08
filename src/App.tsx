@@ -11,6 +11,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import SellerDashboard from "./pages/SellerDashboard";
+import SellerOrders from "./pages/SellerOrders";
 import AdminDashboard from "./pages/AdminDashboard";
 import Cart from "./pages/Cart";
 import Messages from "./pages/Messages";
@@ -49,6 +50,7 @@ const AnimatedRoutes = () => {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
+        <Route path="/seller/orders" element={<SellerOrders />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
