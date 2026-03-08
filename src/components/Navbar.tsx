@@ -83,11 +83,22 @@ const navLinksByVariant: Record<NavVariant, NavLinkItem[]> = {
   ],
 };
 
-const topBarText: Record<NavVariant, string> = {
-  default: "🇵🇰 Pakistan's #1 B2B Wholesale Marketplace",
-  buyer: "🛒 Buyer Dashboard — Source products from verified Pakistani suppliers",
-  seller: "📦 Seller Dashboard — Manage your store and grow your business",
-  admin: "🔒 Admin Panel — BULKUR Platform Management",
+const announcementItems = [
+  "🛡️ Buyer Protection on Every Order",
+  "🚚 Next-Day Delivery Across Pakistan",
+  "✅ 5,000+ Verified Suppliers",
+  "📋 Post RFQs & Get Competitive Bids",
+  "💰 Secure Escrow Payments",
+  "🌍 Serving 15+ Countries",
+  "📦 Bulk Discounts on All Categories",
+  "⭐ Trusted by 10,000+ Businesses",
+];
+
+const topBarTextByVariant: Record<NavVariant, string[]> = {
+  default: announcementItems,
+  buyer: ["🛒 Buyer Dashboard — Source products from verified Pakistani suppliers", ...announcementItems],
+  seller: ["📦 Seller Dashboard — Manage your store and grow your business", ...announcementItems],
+  admin: ["🔒 Admin Panel — BULKUR Platform Management"],
 };
 
 function detectVariant(pathname: string): NavVariant {
@@ -130,11 +141,20 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-      {/* Top bar */}
-      <div className="bg-gradient-hero">
-        <div className="container mx-auto flex items-center justify-between px-4 py-1.5 sm:py-2 text-primary-foreground text-xs sm:text-sm">
-          <span className="font-display font-semibold truncate">{topBarText[variant]}</span>
-          <div className="hidden md:flex items-center gap-4">
+      {/* Top bar — continuous marquee */}
+      <div className="bg-gradient-hero overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 overflow-hidden py-1.5 sm:py-2">
+            <div className="flex animate-marquee whitespace-nowrap">
+              {[...topBarTextByVariant[variant], ...topBarTextByVariant[variant]].map((text, i) => (
+                <span key={i} className="inline-flex items-center text-primary-foreground text-xs sm:text-sm font-display font-semibold mx-6 sm:mx-8">
+                  {text}
+                  <span className="mx-6 sm:mx-8 text-primary-foreground/40">•</span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-4 px-4 text-primary-foreground text-xs sm:text-sm shrink-0">
             {variant === "default" && (
               <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
             )}
