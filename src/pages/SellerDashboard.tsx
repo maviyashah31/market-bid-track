@@ -10,6 +10,7 @@ import {
   Menu, ChevronLeft, Truck, CheckCircle, Phone, Mail, User, Camera, ImagePlus, Store, Save
 } from "lucide-react";
 import ProductFormDialog from "@/components/ProductFormDialog";
+import InlineProductForm from "@/components/InlineProductForm";
 import SubmitBidForm from "@/components/SubmitBidForm";
 import RFQDetailDialog from "@/components/RFQDetailDialog";
 import { Input } from "@/components/ui/input";
