@@ -26,7 +26,7 @@ const Navbar = () => {
         <div className="container mx-auto flex items-center justify-between px-4 py-2 text-primary-foreground text-sm">
           <span className="font-display font-semibold">🇵🇰 Pakistan's #1 B2B Wholesale Marketplace</span>
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/seller/dashboard" className="hover:underline">Sell on PakTrade</Link>
+            <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
             <Link to="/help" className="hover:underline">Help</Link>
           </div>
         </div>
@@ -38,8 +38,8 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <h1 className="font-display font-extrabold text-2xl">
-              <span className="text-gradient-hero">Pak</span>
-              <span className="text-foreground">Trade</span>
+              <span className="text-gradient-hero">Bulk</span>
+              <span className="text-foreground">ur</span>
             </h1>
           </Link>
 

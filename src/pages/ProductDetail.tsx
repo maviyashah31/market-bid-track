@@ -26,12 +26,10 @@ const ProductDetail = () => {
         </Link>
 
         <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Image */}
           <div className="rounded-xl overflow-hidden border border-border bg-card">
             <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
           </div>
 
-          {/* Details */}
           <div>
             <Badge variant="secondary" className="mb-3 font-body">{product.category}</Badge>
             <h1 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4">{product.name}</h1>
@@ -51,7 +49,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Price */}
             <div className="bg-accent rounded-xl p-6 mb-6">
               <div className="font-display font-extrabold text-3xl text-primary mb-1">
                 PKR {product.minPrice} - {product.maxPrice}
@@ -60,7 +57,6 @@ const ProductDetail = () => {
               <p className="text-sm text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
             </div>
 
-            {/* MOQ tiers */}
             <div className="mb-6">
               <h3 className="font-display font-semibold text-foreground mb-3">Pricing Tiers</h3>
               <div className="grid grid-cols-4 gap-2">
@@ -73,17 +69,19 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3 mb-6">
-              <Button className="flex-1 bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 gap-2 font-display font-semibold">
-                <ShoppingCart className="h-5 w-5" /> Add to Cart
-              </Button>
-              <Button variant="outline" className="h-12 gap-2 font-body">
-                <MessageSquare className="h-5 w-5" /> Contact Seller
-              </Button>
+              <Link to="/cart" className="flex-1">
+                <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 gap-2 font-display font-semibold">
+                  <ShoppingCart className="h-5 w-5" /> Add to Cart
+                </Button>
+              </Link>
+              <Link to="/messages">
+                <Button variant="outline" className="h-12 gap-2 font-body">
+                  <MessageSquare className="h-5 w-5" /> Contact Seller
+                </Button>
+              </Link>
             </div>
 
-            {/* Trust signals */}
             <div className="grid grid-cols-3 gap-3">
               {[
                 { icon: Shield, text: "Escrow Payment" },

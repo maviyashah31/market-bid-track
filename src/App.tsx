@@ -9,7 +9,10 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import SellerDashboard from "./pages/SellerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Cart from "./pages/Cart";
+import Messages from "./pages/Messages";
+import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +30,10 @@ const App = () => (
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/order/:orderId" element={<OrderTracking />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

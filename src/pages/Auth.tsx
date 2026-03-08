@@ -22,7 +22,7 @@ const Auth = () => {
       <div className="hidden lg:flex flex-1 bg-gradient-hero items-center justify-center p-12">
         <div className="max-w-md text-primary-foreground">
           <h1 className="font-display font-extrabold text-4xl mb-4">
-            <span className="text-primary-foreground">Pak</span>Trade
+            <span className="text-primary-foreground">Bulk</span>ur
           </h1>
           <p className="text-xl font-display font-semibold mb-6">Pakistan's #1 B2B Wholesale Marketplace</p>
           <ul className="space-y-4 font-body text-primary-foreground/90">
@@ -53,7 +53,7 @@ const Auth = () => {
             {isLogin ? "Welcome back" : "Create your account"}
           </h2>
           <p className="text-muted-foreground mb-6 font-body">
-            {isLogin ? "Sign in to your PakTrade account" : "Join thousands of businesses on PakTrade"}
+            {isLogin ? "Sign in to your Bulkur account" : "Join thousands of businesses on Bulkur"}
           </p>
 
           {!isLogin && (
