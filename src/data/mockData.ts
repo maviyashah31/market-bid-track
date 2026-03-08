@@ -276,3 +276,79 @@ export const adminProducts: { id: string; name: string; seller: string; category
   { id: "P004", name: "Basmati Rice Grade A", seller: "Punjab Agro Exports", category: "Agriculture", status: "active", price: "PKR 220-320", date: "2026-01-20" },
   { id: "P005", name: "Surgical Mask N95", seller: "MedTech Pakistan", category: "Medical", status: "pending", price: "PKR 15-35", date: "2026-03-06" },
 ];
+
+// Dispute Types
+export type DisputeReason = "quality_issue" | "wrong_item" | "not_delivered" | "damaged_goods";
+export type DisputeStatus = "open" | "negotiating" | "escalated" | "resolved" | "closed";
+
+export interface Dispute {
+  id: string;
+  orderId: string;
+  orderName: string;
+  sellerName: string;
+  reason: DisputeReason;
+  description: string;
+  status: DisputeStatus;
+  createdAt: string;
+  updatedAt: string;
+  resolution?: string;
+}
+
+export interface DisputeMessage {
+  id: string;
+  disputeId: string;
+  senderId: string;
+  senderName: string;
+  senderRole: "buyer" | "seller" | "admin";
+  content: string;
+  timestamp: string;
+}
+
+export const disputeReasons: { value: DisputeReason; label: string; description: string }[] = [
+  { value: "quality_issue", label: "Quality Issue", description: "Product quality doesn't match the description" },
+  { value: "wrong_item", label: "Wrong Item", description: "Received different product than ordered" },
+  { value: "not_delivered", label: "Not Delivered", description: "Order was not delivered within expected time" },
+  { value: "damaged_goods", label: "Damaged Goods", description: "Products arrived damaged or broken" },
+];
+
+export const disputes: Dispute[] = [
+  {
+    id: "DSP-001",
+    orderId: "ORD-2024-001",
+    orderName: "Premium Cotton T-Shirts",
+    sellerName: "Lahore Textile Mills",
+    reason: "quality_issue",
+    description: "The fabric quality is not as described. Thread count seems lower than advertised.",
+    status: "negotiating",
+    createdAt: "2026-03-05",
+    updatedAt: "2026-03-07",
+  },
+  {
+    id: "DSP-002",
+    orderId: "ORD-2024-002",
+    orderName: "Basmati Rice Super Kernel",
+    sellerName: "Punjab Agro Exports",
+    reason: "damaged_goods",
+    description: "Several bags arrived torn and rice was exposed to moisture.",
+    status: "resolved",
+    createdAt: "2026-02-25",
+    updatedAt: "2026-03-01",
+    resolution: "Seller agreed to replace 50kg of damaged rice.",
+  },
+];
+
+export const disputeMessages: Record<string, DisputeMessage[]> = {
+  "DSP-001": [
+    { id: "dm1", disputeId: "DSP-001", senderId: "buyer1", senderName: "Muhammad Ahmed", senderRole: "buyer", content: "The T-shirts I received have much lower quality than the samples. The fabric is thinner and the stitching is uneven.", timestamp: "2026-03-05 10:30 AM" },
+    { id: "dm2", disputeId: "DSP-001", senderId: "seller1", senderName: "Lahore Textile Mills", senderRole: "seller", content: "We apologize for the inconvenience. Can you please share photos of the products received?", timestamp: "2026-03-05 02:15 PM" },
+    { id: "dm3", disputeId: "DSP-001", senderId: "buyer1", senderName: "Muhammad Ahmed", senderRole: "buyer", content: "I've attached photos showing the difference between sample and delivered product.", timestamp: "2026-03-06 09:00 AM" },
+    { id: "dm4", disputeId: "DSP-001", senderId: "seller1", senderName: "Lahore Textile Mills", senderRole: "seller", content: "We've reviewed the photos. There seems to be a batch quality issue. We can offer 20% discount or replace 100 pieces.", timestamp: "2026-03-07 11:45 AM" },
+  ],
+  "DSP-002": [
+    { id: "dm5", disputeId: "DSP-002", senderId: "buyer1", senderName: "Muhammad Ahmed", senderRole: "buyer", content: "Multiple rice bags are torn and the rice is damaged due to moisture.", timestamp: "2026-02-25 08:00 AM" },
+    { id: "dm6", disputeId: "DSP-002", senderId: "seller2", senderName: "Punjab Agro Exports", senderRole: "seller", content: "We're very sorry about this. How many bags are affected?", timestamp: "2026-02-25 10:30 AM" },
+    { id: "dm7", disputeId: "DSP-002", senderId: "buyer1", senderName: "Muhammad Ahmed", senderRole: "buyer", content: "About 5 bags of 10kg each are damaged.", timestamp: "2026-02-25 11:00 AM" },
+    { id: "dm8", disputeId: "DSP-002", senderId: "seller2", senderName: "Punjab Agro Exports", senderRole: "seller", content: "We'll send 50kg replacement immediately at no extra cost. Is that acceptable?", timestamp: "2026-02-26 09:00 AM" },
+    { id: "dm9", disputeId: "DSP-002", senderId: "buyer1", senderName: "Muhammad Ahmed", senderRole: "buyer", content: "Yes, that works for me. Thank you for the quick resolution.", timestamp: "2026-02-26 09:30 AM" },
+  ],
+};
