@@ -66,14 +66,14 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display font-bold text-xl">Post New RFQ</DialogTitle>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-1 sm:gap-2 mt-2">
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center gap-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-display font-bold ${step >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{s}</div>
-                <span className={`text-xs font-body ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
-                  {s === 1 ? "Basic Info" : s === 2 ? "Details & Specs" : "Images & Terms"}
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-display font-bold ${step >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{s}</div>
+                <span className={`text-[10px] sm:text-xs font-body hidden sm:inline ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
+                  {s === 1 ? "Basic Info" : s === 2 ? "Details" : "Images"}
                 </span>
-                {s < 3 && <div className={`w-8 h-0.5 ${step > s ? "bg-primary" : "bg-muted"}`} />}
+                {s < 3 && <div className={`w-4 sm:w-8 h-0.5 ${step > s ? "bg-primary" : "bg-muted"}`} />}
               </div>
             ))}
           </div>
