@@ -98,9 +98,11 @@ const Cart = () => {
                 <span className="font-display font-bold text-xl text-primary">PKR {subtotal.toLocaleString()}</span>
               </div>
             </div>
-            <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 font-display font-semibold">
-              Proceed to Checkout
-            </Button>
+            <Link to="/checkout">
+              <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 font-display font-semibold">
+                Proceed to Checkout
+              </Button>
+            </Link>
             <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground font-body justify-center">
               <Shield className="h-4 w-4 text-primary" /> Secure escrow payment
             </div>

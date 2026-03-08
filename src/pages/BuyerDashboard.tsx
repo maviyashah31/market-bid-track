@@ -181,24 +181,39 @@ const BuyerDashboard = () => {
             <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-display font-bold text-xl text-foreground">My RFQs</h2>
-                <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Post New RFQ</Button>
+                <Button onClick={() => setShowRFQForm(true)} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body gap-2">
+                  <FileText className="h-4 w-4" /> Post New RFQ
+                </Button>
               </div>
               <div className="space-y-4">
                 {rfqs.slice(0, 2).map((rfq) => (
                   <div key={rfq.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
-                    <Badge variant="secondary" className="mb-2 font-body">{rfq.category}</Badge>
+                    <div className="flex items-start justify-between">
+                      <Badge variant="secondary" className="mb-2 font-body">{rfq.category}</Badge>
+                      <Badge className="bg-success/10 text-success font-body">Active</Badge>
+                    </div>
                     <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
                     <p className="text-sm text-muted-foreground font-body mt-1">
                       Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: {rfq.budget}
                     </p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <span className="text-xs text-muted-foreground font-body">{rfq.deadline} left</span>
-                      <Badge className="bg-primary/10 text-primary font-body">{rfq.bidsCount} bids received</Badge>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
+                        <Clock className="h-3 w-3" /> {rfq.deadline} left
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-xs text-primary font-semibold font-body">
+                          <Users className="h-3 w-3" /> {rfq.bidsCount} bids
+                        </div>
+                        <Button variant="outline" size="sm" className="font-body text-xs gap-1">
+                          <Eye className="h-3 w-3" /> View Bids
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+            <PostRFQForm open={showRFQForm} onOpenChange={setShowRFQForm} />
           </TabsContent>
 
           {/* Disputes */}

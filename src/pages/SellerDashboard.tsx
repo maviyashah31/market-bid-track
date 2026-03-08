@@ -265,15 +265,17 @@ const SellerDashboard = () => {
                         <p className="text-sm text-muted-foreground font-body mt-1">
                           Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: {rfq.budget} • {rfq.deadline} left
                         </p>
+                        <p className="text-xs text-muted-foreground font-body mt-1">Buyer: {rfq.buyer} • {rfq.bidsCount} bids so far</p>
                       </div>
                       <div className="mt-3 sm:mt-0">
-                        <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Submit Bid</Button>
+                        <Button onClick={() => { setSelectedRFQ(rfq); setBidFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Submit Bid</Button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+            <SubmitBidForm open={bidFormOpen} onOpenChange={setBidFormOpen} rfq={selectedRFQ} />
           </TabsContent>
 
           {/* Messages */}
