@@ -285,18 +285,18 @@ const SellerDashboard = () => {
             <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <h2 className="font-display font-bold text-xl text-foreground">RFQ Marketplace ({filteredRFQs.length})</h2>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
+              <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative w-full sm:w-48">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       value={rfqSearch}
                       onChange={(e) => setRfqSearch(e.target.value)}
                       placeholder="Search RFQs..."
-                      className="pl-9 w-48"
+                      className="pl-9 w-full"
                     />
                   </div>
                   <Select value={rfqCategoryFilter} onValueChange={setRfqCategoryFilter}>
-                    <SelectTrigger className="w-44">
+                    <SelectTrigger className="w-full sm:w-44">
                       <Filter className="h-3.5 w-3.5 mr-1" />
                       <SelectValue placeholder="Category" />
                     </SelectTrigger>
@@ -308,7 +308,7 @@ const SellerDashboard = () => {
                     </SelectContent>
                   </Select>
                   <Select value={rfqSortBy} onValueChange={setRfqSortBy}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full sm:w-40">
                       <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
