@@ -127,10 +127,15 @@ const Navbar = () => {
   const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
 
   const handleNavSearch = () => {
+    const params = new URLSearchParams();
     if (navSearch.trim()) {
-      navigate(`/products?search=${encodeURIComponent(navSearch.trim())}`);
-      setNavSearch("");
+      params.set("search", navSearch.trim());
     }
+    if (selectedCategory !== "all") {
+      params.set("category", selectedCategory);
+    }
+    navigate(`/products?${params.toString()}`);
+    setNavSearch("");
   };
 
   const markAllRead = () => {
