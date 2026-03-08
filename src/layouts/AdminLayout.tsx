@@ -10,6 +10,7 @@ import { adminNotifications } from "@/data/adminMockData";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { label: "Product Management", icon: Package, path: "/admin/products" },
   { label: "Supplier Management", icon: Package, path: "/admin/suppliers" },
   { label: "Buyer Management", icon: Users, path: "/admin/buyers" },
   { label: "Order Management", icon: ShoppingBag, path: "/admin/orders" },
