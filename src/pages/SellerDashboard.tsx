@@ -147,21 +147,23 @@ const SellerDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border flex-wrap h-auto gap-1">
-            <TabsTrigger value="overview" className="gap-1.5 font-display"><BarChart3 className="h-4 w-4" /> Overview</TabsTrigger>
-            <TabsTrigger value="products" className="gap-1.5 font-display"><Package className="h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="orders" className="gap-1.5 font-display"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
-            <TabsTrigger value="rfqs" className="gap-1.5 font-display"><FileText className="h-4 w-4" /> RFQ Bids</TabsTrigger>
-            <TabsTrigger value="messages" className="gap-1.5 font-display"><MessageSquare className="h-4 w-4" /> Messages</TabsTrigger>
-            <TabsTrigger value="disputes" className="gap-1.5 font-display relative">
-              <AlertTriangle className="h-4 w-4" /> Disputes
-              {activeDisputeCount > 0 && (
-                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-1.5 font-display"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
-            <TabsTrigger value="wallet" className="gap-1.5 font-display"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-card border border-border flex-wrap sm:flex-nowrap h-auto gap-1 w-max sm:w-full">
+              <TabsTrigger value="overview" className="gap-1.5 font-display text-xs sm:text-sm"><BarChart3 className="h-4 w-4" /> <span className="hidden sm:inline">Overview</span><span className="sm:hidden">Stats</span></TabsTrigger>
+              <TabsTrigger value="products" className="gap-1.5 font-display text-xs sm:text-sm"><Package className="h-4 w-4" /> Products</TabsTrigger>
+              <TabsTrigger value="orders" className="gap-1.5 font-display text-xs sm:text-sm"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
+              <TabsTrigger value="rfqs" className="gap-1.5 font-display text-xs sm:text-sm"><FileText className="h-4 w-4" /> RFQs</TabsTrigger>
+              <TabsTrigger value="messages" className="gap-1.5 font-display text-xs sm:text-sm"><MessageSquare className="h-4 w-4" /> <span className="hidden sm:inline">Messages</span><span className="sm:hidden">Msgs</span></TabsTrigger>
+              <TabsTrigger value="disputes" className="gap-1.5 font-display text-xs sm:text-sm relative">
+                <AlertTriangle className="h-4 w-4" /> Disputes
+                {activeDisputeCount > 0 && (
+                  <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="gap-1.5 font-display text-xs sm:text-sm"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
+              <TabsTrigger value="wallet" className="gap-1.5 font-display text-xs sm:text-sm"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview */}
           <TabsContent value="overview">
