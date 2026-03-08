@@ -328,8 +328,8 @@ const SellerDashboard = () => {
                     </div>
 
                     {/* Logo / Avatar */}
-                    <div className="px-6 pb-6">
-                      <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 sm:-mt-14">
+                    <div className="px-6 pb-6 pt-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <label className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl border-4 border-card bg-accent flex items-center justify-center cursor-pointer group shrink-0 overflow-hidden shadow-lg">
                           {logoPhoto ? (
                             <img src={logoPhoto} alt="Logo" className="w-full h-full object-cover" />
