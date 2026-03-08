@@ -141,11 +141,20 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-      {/* Top bar */}
-      <div className="bg-gradient-hero">
-        <div className="container mx-auto flex items-center justify-between px-4 py-1.5 sm:py-2 text-primary-foreground text-xs sm:text-sm">
-          <span className="font-display font-semibold truncate">{topBarText[variant]}</span>
-          <div className="hidden md:flex items-center gap-4">
+      {/* Top bar — continuous marquee */}
+      <div className="bg-gradient-hero overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 overflow-hidden py-1.5 sm:py-2">
+            <div className="flex animate-marquee whitespace-nowrap">
+              {[...topBarTextByVariant[variant], ...topBarTextByVariant[variant]].map((text, i) => (
+                <span key={i} className="inline-flex items-center text-primary-foreground text-xs sm:text-sm font-display font-semibold mx-6 sm:mx-8">
+                  {text}
+                  <span className="mx-6 sm:mx-8 text-primary-foreground/40">•</span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-4 px-4 text-primary-foreground text-xs sm:text-sm shrink-0">
             {variant === "default" && (
               <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
             )}
