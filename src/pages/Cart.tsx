@@ -109,6 +109,7 @@ const Cart = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 
