@@ -7,7 +7,7 @@ import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
   AlertTriangle, Send, Search, Filter, Clock, Users, MapPin, SlidersHorizontal,
-  Menu, ChevronLeft
+  Menu, ChevronLeft, Truck, CheckCircle, Phone, Mail, User
 } from "lucide-react";
 import ProductFormDialog from "@/components/ProductFormDialog";
 import SubmitBidForm from "@/components/SubmitBidForm";
@@ -30,10 +30,12 @@ const stats = [
 ];
 
 const recentOrders = [
-  { id: "ORD-5001", product: "Cotton T-Shirts x500", buyer: "Metro Wholesale", total: "PKR 175,000", status: "pending" },
-  { id: "ORD-5002", product: "Polo Shirts x200", buyer: "Style Hub", total: "PKR 96,000", status: "processing" },
-  { id: "ORD-5003", product: "Denim Jeans x300", buyer: "Fashion Point", total: "PKR 285,000", status: "shipped" },
-  { id: "ORD-5004", product: "Cotton Fabric 1000m", buyer: "AL Textiles", total: "PKR 450,000", status: "delivered" },
+  { id: "ORD-5001", product: "Cotton T-Shirts x500", buyer: "Metro Wholesale", buyerEmail: "orders@metrowholesale.pk", buyerPhone: "+92 321 1234567", total: "PKR 175,000", status: "pending", date: "2026-03-08", address: "Shop #45, Bolton Market, Karachi", paymentStatus: "escrow" },
+  { id: "ORD-5002", product: "Polo Shirts x200", buyer: "Style Hub", buyerEmail: "buy@stylehub.pk", buyerPhone: "+92 300 9876543", total: "PKR 96,000", status: "processing", date: "2026-03-07", address: "Mall Road, Lahore", paymentStatus: "escrow" },
+  { id: "ORD-5003", product: "Denim Jeans x300", buyer: "Fashion Point", buyerEmail: "procurement@fashionpoint.pk", buyerPhone: "+92 333 5556677", total: "PKR 285,000", status: "shipped", date: "2026-03-05", address: "Blue Area, Islamabad", paymentStatus: "escrow" },
+  { id: "ORD-5004", product: "Cotton Fabric 1000m", buyer: "AL Textiles", buyerEmail: "info@altextiles.pk", buyerPhone: "+92 312 7778899", total: "PKR 450,000", status: "delivered", date: "2026-03-01", address: "Faisalabad Road, Faisalabad", paymentStatus: "released" },
+  { id: "ORD-5005", product: "Silk Scarves x150", buyer: "Karachi Traders", buyerEmail: "buy@karachitraders.pk", buyerPhone: "+92 345 1112233", total: "PKR 67,500", status: "pending", date: "2026-03-08", address: "Tariq Road, Karachi", paymentStatus: "escrow" },
+  { id: "ORD-5006", product: "Leather Jackets x50", buyer: "Premium Wear", buyerEmail: "orders@premiumwear.pk", buyerPhone: "+92 301 4445566", total: "PKR 375,000", status: "processing", date: "2026-03-06", address: "Liberty Market, Lahore", paymentStatus: "escrow" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -80,6 +82,9 @@ const SellerDashboard = () => {
   const [myProducts, setMyProducts] = useState<Product[]>(sellerProducts);
   const [productFormOpen, setProductFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const [orderDetailOpen, setOrderDetailOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
 
   const [bidFormOpen, setBidFormOpen] = useState(false);
   const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
@@ -153,10 +158,6 @@ const SellerDashboard = () => {
   const collapsed = isMobile ? !sidebarOpen : !sidebarOpen;
 
   const handleNavClick = (value: string) => {
-    if (value === "orders") {
-      navigate("/seller/orders");
-      return;
-    }
     setActiveTab(value);
     if (isMobile) setSidebarOpen(false);
   };
@@ -287,7 +288,7 @@ const SellerDashboard = () => {
                   <div className="bg-card rounded-xl border border-border p-6">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="font-display font-bold text-xl text-foreground">Recent Orders</h2>
-                      <Link to="/seller/orders"><Button variant="outline" size="sm" className="font-body">View All</Button></Link>
+                      <Button variant="outline" size="sm" className="font-body" onClick={() => setActiveTab("orders")}>View All</Button>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -349,7 +350,102 @@ const SellerDashboard = () => {
                 </>
               )}
 
-              {/* Orders — redirects to /seller/orders */}
+              {/* Orders */}
+              {activeTab === "orders" && (
+                <div className="bg-card rounded-xl border border-border p-6">
+                  <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
+                  <div className="space-y-3">
+                    {recentOrders.map((order) => {
+                      const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                      const StatusIcon = icons[order.status] || Clock;
+                      return (
+                        <div
+                          key={order.id}
+                          onClick={() => { setSelectedOrder(order); setOrderDetailOpen(true); }}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-border hover:bg-accent/30 hover:shadow-sm transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`p-2 rounded-lg shrink-0 ${statusColors[order.status]}`}>
+                              <StatusIcon className="h-4 w-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-display font-bold text-sm text-foreground">{order.id}</span>
+                                <Badge className={`text-[10px] capitalize border ${statusColors[order.status]}`} variant="outline">{order.status}</Badge>
+                              </div>
+                              <p className="font-body text-sm text-foreground truncate">{order.product}</p>
+                              <p className="text-xs text-muted-foreground font-body">{order.buyer} • {order.date}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-display font-bold text-sm text-foreground">{order.total}</span>
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Order Detail Dialog */}
+              <Dialog open={orderDetailOpen} onOpenChange={setOrderDetailOpen}>
+                <DialogContent className="max-w-lg">
+                  {selectedOrder && (
+                    <>
+                      <DialogHeader>
+                        <DialogTitle className="font-display flex items-center gap-2">
+                          {selectedOrder.id}
+                          <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="bg-accent/30 rounded-lg p-4">
+                          <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
+                          <p className="font-body font-semibold text-foreground text-sm">{selectedOrder.product}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="font-display font-bold text-foreground">{selectedOrder.total}</span>
+                            <Badge variant="outline" className="text-[10px] capitalize">{selectedOrder.paymentStatus} payment</Badge>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Buyer Details</p>
+                          <div className="grid gap-2 text-sm font-body">
+                            <div className="flex items-center gap-2 text-foreground"><User className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyer}</div>
+                            <div className="flex items-center gap-2 text-foreground"><Mail className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerEmail}</div>
+                            <div className="flex items-center gap-2 text-foreground"><Phone className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerPhone}</div>
+                            <div className="flex items-center gap-2 text-foreground"><MapPin className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.address}</div>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Order Timeline</p>
+                          <div className="space-y-3 pl-3 border-l-2 border-border">
+                            {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
+                              const steps = ["pending", "processing", "shipped", "delivered"];
+                              const currentIdx = steps.indexOf(selectedOrder.status);
+                              const done = i <= currentIdx;
+                              const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                              const StepIcon = icons[step];
+                              return (
+                                <div key={step} className="flex items-center gap-3 relative">
+                                  <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"}`} />
+                                  <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
+                                  <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Link to="/messages">
+                          <Button variant="outline" className="gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
+                        </Link>
+                      </DialogFooter>
+                    </>
+                  )}
+                </DialogContent>
+              </Dialog>
 
               {/* RFQ Marketplace */}
               {activeTab === "rfqs" && (
