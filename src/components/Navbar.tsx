@@ -102,9 +102,10 @@ const Navbar = () => {
 
           {/* Nav Links */}
           <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
-            <Link to="/seller/dashboard" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">Become a Seller</Link>
-            <Link to="/help" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">Help</Link>
-            <Link to="/how-it-works" className="text-sm font-body font-medium text-muted-foreground hover:text-primary transition">How It Works</Link>
+            <Link to="/seller/dashboard" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Become a Seller</Link>
+            <Link to="/buyer/dashboard" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Post RFQ</Link>
+            <Link to="/help" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Help</Link>
+            <Link to="/how-it-works" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">How It Works</Link>
           </nav>
 
           {/* Actions */}
