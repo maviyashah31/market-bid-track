@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { type RFQDetail, rfqBids } from "@/data/rfqData";
+import { Link } from "react-router-dom";
 import {
   MapPin, Calendar, Clock, Users, DollarSign, Truck, CreditCard,
   Award, CheckCircle2, Image as ImageIcon, FileText, ChevronRight
@@ -91,12 +92,16 @@ const RFQDetailDialog = ({ open, onOpenChange, rfq, onSubmitBid, mode = "seller"
           </div>
 
           {/* Buyer info */}
-          <div className="flex items-center gap-3 p-3 bg-accent/30 rounded-lg">
+          <Link
+            to={`/buyer/${rfq.buyer.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
+            onClick={() => onOpenChange(false)}
+            className="flex items-center gap-3 p-3 bg-accent/30 rounded-lg hover:bg-accent/50 transition-colors"
+          >
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="font-display font-bold text-primary">{rfq.buyer.charAt(0)}</span>
             </div>
             <div>
-              <p className="font-display font-semibold text-foreground text-sm">{rfq.buyer}</p>
+              <p className="font-display font-semibold text-foreground text-sm hover:text-primary transition-colors">{rfq.buyer}</p>
               <p className="text-xs text-muted-foreground font-body flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {rfq.buyerLocation}
               </p>
@@ -104,7 +109,7 @@ const RFQDetailDialog = ({ open, onOpenChange, rfq, onSubmitBid, mode = "seller"
             <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground font-body">
               <Calendar className="h-3 w-3" /> Posted {rfq.createdAt}
             </div>
-          </div>
+          </Link>
 
           <Separator />
 

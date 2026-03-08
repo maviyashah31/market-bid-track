@@ -26,10 +26,14 @@ const ProductCard = ({ product }: { product: Product }) => (
         MOQ: {product.moq} {product.unit}
       </div>
       <div className="border-t border-border pt-3 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
+        <Link
+          to={`/seller/${product.sellerName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1.5 hover:text-primary transition-colors"
+        >
           {product.sellerVerified && <BadgeCheck className="h-4 w-4 text-verified" />}
-          <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{product.sellerName}</span>
-        </div>
+          <span className="text-xs font-medium text-foreground truncate max-w-[120px] hover:text-primary hover:underline underline-offset-2">{product.sellerName}</span>
+        </Link>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Star className="h-3 w-3 fill-warning text-warning" />
           {product.sellerRating}

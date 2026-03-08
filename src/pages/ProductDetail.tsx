@@ -49,10 +49,10 @@ const ProductDetail = () => {
             <h1 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4">{product.name}</h1>
 
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6">
-              <div className="flex items-center gap-1">
+              <Link to={`/seller/${product.sellerName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`} className="flex items-center gap-1 hover:text-primary transition-colors">
                 {product.sellerVerified && <BadgeCheck className="h-5 w-5 text-verified" />}
-                <span className="font-display font-semibold text-foreground">{product.sellerName}</span>
-              </div>
+                <span className="font-display font-semibold text-foreground hover:text-primary transition-colors underline-offset-2 hover:underline">{product.sellerName}</span>
+              </Link>
               <div className="flex items-center gap-1 text-sm text-muted-foreground font-body">
                 <Star className="h-4 w-4 fill-warning text-warning" />
                 {product.sellerRating} ({product.ordersCompleted} orders)

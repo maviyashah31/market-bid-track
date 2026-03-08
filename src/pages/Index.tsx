@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import RFQSection from "@/components/RFQSection";
+import TrustSection from "@/components/TrustSection";
 import Footer from "@/components/Footer";
 import AnimatedPage from "@/components/AnimatedPage";
 
@@ -14,6 +15,7 @@ const Index = () => (
       <CategoryGrid />
       <FeaturedProducts />
       <RFQSection />
+      <TrustSection />
       <Footer />
     </div>
   </AnimatedPage>
