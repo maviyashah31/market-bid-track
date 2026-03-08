@@ -351,7 +351,7 @@ const SellerDashboard = () => {
               )}
 
               {/* Orders */}
-              {activeTab === "orders" && (
+              {activeTab === "orders" && !selectedOrder && (
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
                   <div className="space-y-3">
@@ -361,7 +361,7 @@ const SellerDashboard = () => {
                       return (
                         <div
                           key={order.id}
-                          onClick={() => { setSelectedOrder(order); setOrderDetailOpen(true); }}
+                          onClick={() => setSelectedOrder(order)}
                           className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-border hover:bg-accent/30 hover:shadow-sm transition-all cursor-pointer"
                         >
                           <div className="flex items-center gap-3 min-w-0">
@@ -388,64 +388,79 @@ const SellerDashboard = () => {
                 </div>
               )}
 
-              {/* Order Detail Dialog */}
-              <Dialog open={orderDetailOpen} onOpenChange={setOrderDetailOpen}>
-                <DialogContent className="max-w-lg">
-                  {selectedOrder && (
-                    <>
-                      <DialogHeader>
-                        <DialogTitle className="font-display flex items-center gap-2">
-                          {selectedOrder.id}
-                          <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
+              {/* Order Detail — inline page */}
+              {activeTab === "orders" && selectedOrder && (
+                <div className="space-y-6">
+                  <Button variant="outline" size="sm" className="gap-2 font-body" onClick={() => setSelectedOrder(null)}>
+                    <ChevronLeft className="h-4 w-4" /> Back to Orders
+                  </Button>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main info */}
+                    <div className="lg:col-span-2 space-y-6">
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <h2 className="font-display font-bold text-xl text-foreground">{selectedOrder.id}</h2>
+                            <Badge variant="outline" className={`capitalize ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
+                          </div>
+                          <Badge variant="outline" className="text-xs capitalize">{selectedOrder.paymentStatus} payment</Badge>
+                        </div>
                         <div className="bg-accent/30 rounded-lg p-4">
                           <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
-                          <p className="font-body font-semibold text-foreground text-sm">{selectedOrder.product}</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="font-display font-bold text-foreground">{selectedOrder.total}</span>
-                            <Badge variant="outline" className="text-[10px] capitalize">{selectedOrder.paymentStatus} payment</Badge>
-                          </div>
+                          <p className="font-body font-semibold text-foreground">{selectedOrder.product}</p>
+                          <p className="font-display font-bold text-lg text-foreground mt-1">{selectedOrder.total}</p>
                         </div>
-                        <div className="space-y-2">
-                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Buyer Details</p>
-                          <div className="grid gap-2 text-sm font-body">
-                            <div className="flex items-center gap-2 text-foreground"><User className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyer}</div>
-                            <div className="flex items-center gap-2 text-foreground"><Mail className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerEmail}</div>
-                            <div className="flex items-center gap-2 text-foreground"><Phone className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerPhone}</div>
-                            <div className="flex items-center gap-2 text-foreground"><MapPin className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.address}</div>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Order Timeline</p>
-                          <div className="space-y-3 pl-3 border-l-2 border-border">
-                            {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
-                              const steps = ["pending", "processing", "shipped", "delivered"];
-                              const currentIdx = steps.indexOf(selectedOrder.status);
-                              const done = i <= currentIdx;
-                              const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
-                              const StepIcon = icons[step];
-                              return (
-                                <div key={step} className="flex items-center gap-3 relative">
-                                  <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"}`} />
-                                  <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
-                                  <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
+                        <p className="text-xs text-muted-foreground font-body mt-3">Order placed on {selectedOrder.date}</p>
+                      </div>
+
+                      {/* Buyer details */}
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Buyer Details</h3>
+                        <div className="grid sm:grid-cols-2 gap-3 text-sm font-body">
+                          <div className="flex items-center gap-2 text-foreground"><User className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyer}</div>
+                          <div className="flex items-center gap-2 text-foreground"><Mail className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyerEmail}</div>
+                          <div className="flex items-center gap-2 text-foreground"><Phone className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyerPhone}</div>
+                          <div className="flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.address}</div>
                         </div>
                       </div>
-                      <DialogFooter>
-                        <Link to="/messages">
-                          <Button variant="outline" className="gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
+                    </div>
+
+                    {/* Sidebar — Timeline + Actions */}
+                    <div className="space-y-6">
+                      <div className="bg-card rounded-xl border border-border p-6">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Order Timeline</h3>
+                        <div className="space-y-4 pl-3 border-l-2 border-border">
+                          {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
+                            const steps = ["pending", "processing", "shipped", "delivered"];
+                            const currentIdx = steps.indexOf(selectedOrder.status);
+                            const done = i <= currentIdx;
+                            const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                            const StepIcon = icons[step];
+                            return (
+                              <div key={step} className="flex items-center gap-3 relative">
+                                <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"}`} />
+                                <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
+                                <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="bg-card rounded-xl border border-border p-6 space-y-3">
+                        <h3 className="font-display font-bold text-sm text-foreground mb-2">Actions</h3>
+                        <Link to="/messages" className="block">
+                          <Button variant="outline" className="w-full gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
                         </Link>
-                      </DialogFooter>
-                    </>
-                  )}
-                </DialogContent>
-              </Dialog>
+                        <Link to={`/order/${selectedOrder.id}`} className="block">
+                          <Button variant="outline" className="w-full gap-2 font-body"><Eye className="h-4 w-4" />Track Order</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* RFQ Marketplace */}
               {activeTab === "rfqs" && (
