@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { products } from "@/data/mockData";
-import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft } from "lucide-react";
+import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import AnimatedPage from "@/components/AnimatedPage";
 
@@ -17,6 +19,16 @@ const moqTiers = [
 const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id) || products[0];
+  const [quantity, setQuantity] = useState(product.moq);
+
+  const getCurrentPrice = () => {
+    if (quantity >= 1000) return 180;
+    if (quantity >= 500) return 220;
+    if (quantity >= 100) return 280;
+    return 350;
+  };
+
+  const subtotal = quantity * getCurrentPrice();
 
   return (
     <AnimatedPage>
