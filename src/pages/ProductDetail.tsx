@@ -19,6 +19,7 @@ const ProductDetail = () => {
   const product = products.find((p) => p.id === id) || products[0];
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
