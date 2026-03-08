@@ -41,6 +41,7 @@ const Messages = () => {
   };
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 flex overflow-hidden" style={{ height: "calc(100vh - 140px)" }}>
