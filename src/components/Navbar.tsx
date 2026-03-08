@@ -110,16 +110,26 @@ function detectVariant(pathname: string): NavVariant {
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const variant = detectVariant(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [navSearch, setNavSearch] = useState("");
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const links = navLinksByVariant[variant];
   const showCart = variant === "default" || variant === "buyer";
   const showCategories = variant === "default";
+  const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
+
+  const handleNavSearch = () => {
+    if (navSearch.trim()) {
+      navigate(`/products?search=${encodeURIComponent(navSearch.trim())}`);
+      setNavSearch("");
+    }
+  };
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
