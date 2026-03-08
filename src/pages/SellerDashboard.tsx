@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { products as initialProducts, rfqs, disputes, disputeReasons, type Dispute, type Product, type RFQ } from "@/data/mockData";
+import { products as initialProducts, disputes, disputeReasons, type Dispute, type Product } from "@/data/mockData";
+import { rfqDetails, type RFQDetail } from "@/data/rfqData";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
-  AlertTriangle, Send
+  AlertTriangle, Send, Search, Filter, Clock, Users, MapPin, SlidersHorizontal
 } from "lucide-react";
 import ProductFormDialog from "@/components/ProductFormDialog";
 import SubmitBidForm from "@/components/SubmitBidForm";
+import RFQDetailDialog from "@/components/RFQDetailDialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
