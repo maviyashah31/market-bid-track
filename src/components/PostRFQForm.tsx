@@ -185,22 +185,24 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
             <div>
               <Label className="font-body text-sm font-medium">Reference Images</Label>
               <p className="text-xs text-muted-foreground font-body mb-2">Add image URLs to show sellers exactly what you're looking for</p>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="Image URL (https://...)"
                   className="flex-1"
                 />
-                <Input
-                  value={imageCaption}
-                  onChange={(e) => setImageCaption(e.target.value)}
-                  placeholder="Caption (optional)"
-                  className="w-40"
-                />
-                <Button type="button" variant="outline" size="sm" onClick={addImage} className="gap-1 shrink-0">
-                  <ImagePlus className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Input
+                    value={imageCaption}
+                    onChange={(e) => setImageCaption(e.target.value)}
+                    placeholder="Caption (optional)"
+                    className="flex-1 sm:w-40"
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={addImage} className="gap-1 shrink-0">
+                    <ImagePlus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               {images.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-3">
