@@ -51,6 +51,7 @@ const myReviews = [
 const BuyerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showDisputeForm, setShowDisputeForm] = useState(false);
+  const [showRFQForm, setShowRFQForm] = useState(false);
 
   const handleDisputeSubmit = (data: { orderId: string; reason: string; description: string }) => {
     console.log("Dispute submitted:", data);
