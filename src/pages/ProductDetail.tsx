@@ -83,6 +83,43 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            <div className="mb-6">
+              <h3 className="font-display font-semibold text-foreground mb-3">Quantity</h3>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10"
+                  onClick={() => setQuantity(Math.max(1, quantity - (product.moq >= 100 ? 100 : 10)))}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-28 text-center font-display font-bold text-lg"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10"
+                  onClick={() => setQuantity(quantity + (product.moq >= 100 ? 100 : 10))}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground font-body">{product.unit}</span>
+              </div>
+              {quantity < product.moq && (
+                <p className="text-xs text-destructive font-body mt-2">Minimum order quantity is {product.moq} {product.unit}</p>
+              )}
+              <div className="mt-3 flex items-center justify-between p-3 rounded-lg bg-accent border border-border">
+                <span className="text-sm text-muted-foreground font-body">Subtotal ({quantity} × PKR {getCurrentPrice()})</span>
+                <span className="font-display font-bold text-primary text-lg">PKR {subtotal.toLocaleString()}</span>
+              </div>
+            </div>
+
             <div className="flex gap-3 mb-6">
               <Link to="/cart" className="flex-1">
                 <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 gap-2 font-display font-semibold">
