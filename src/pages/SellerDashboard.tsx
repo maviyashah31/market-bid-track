@@ -350,7 +350,102 @@ const SellerDashboard = () => {
                 </>
               )}
 
-              {/* Orders — redirects to /seller/orders */}
+              {/* Orders */}
+              {activeTab === "orders" && (
+                <div className="bg-card rounded-xl border border-border p-6">
+                  <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
+                  <div className="space-y-3">
+                    {recentOrders.map((order) => {
+                      const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                      const StatusIcon = icons[order.status] || Clock;
+                      return (
+                        <div
+                          key={order.id}
+                          onClick={() => { setSelectedOrder(order); setOrderDetailOpen(true); }}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-border hover:bg-accent/30 hover:shadow-sm transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`p-2 rounded-lg shrink-0 ${statusColors[order.status]}`}>
+                              <StatusIcon className="h-4 w-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-display font-bold text-sm text-foreground">{order.id}</span>
+                                <Badge className={`text-[10px] capitalize border ${statusColors[order.status]}`} variant="outline">{order.status}</Badge>
+                              </div>
+                              <p className="font-body text-sm text-foreground truncate">{order.product}</p>
+                              <p className="text-xs text-muted-foreground font-body">{order.buyer} • {order.date}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-display font-bold text-sm text-foreground">{order.total}</span>
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Order Detail Dialog */}
+              <Dialog open={orderDetailOpen} onOpenChange={setOrderDetailOpen}>
+                <DialogContent className="max-w-lg">
+                  {selectedOrder && (
+                    <>
+                      <DialogHeader>
+                        <DialogTitle className="font-display flex items-center gap-2">
+                          {selectedOrder.id}
+                          <Badge variant="outline" className={`text-[10px] capitalize ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="bg-accent/30 rounded-lg p-4">
+                          <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
+                          <p className="font-body font-semibold text-foreground text-sm">{selectedOrder.product}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="font-display font-bold text-foreground">{selectedOrder.total}</span>
+                            <Badge variant="outline" className="text-[10px] capitalize">{selectedOrder.paymentStatus} payment</Badge>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Buyer Details</p>
+                          <div className="grid gap-2 text-sm font-body">
+                            <div className="flex items-center gap-2 text-foreground"><User className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyer}</div>
+                            <div className="flex items-center gap-2 text-foreground"><Mail className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerEmail}</div>
+                            <div className="flex items-center gap-2 text-foreground"><Phone className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.buyerPhone}</div>
+                            <div className="flex items-center gap-2 text-foreground"><MapPin className="h-3.5 w-3.5 text-muted-foreground" />{selectedOrder.address}</div>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Order Timeline</p>
+                          <div className="space-y-3 pl-3 border-l-2 border-border">
+                            {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
+                              const steps = ["pending", "processing", "shipped", "delivered"];
+                              const currentIdx = steps.indexOf(selectedOrder.status);
+                              const done = i <= currentIdx;
+                              const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                              const StepIcon = icons[step];
+                              return (
+                                <div key={step} className="flex items-center gap-3 relative">
+                                  <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"}`} />
+                                  <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
+                                  <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Link to="/messages">
+                          <Button variant="outline" className="gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
+                        </Link>
+                      </DialogFooter>
+                    </>
+                  )}
+                </DialogContent>
+              </Dialog>
 
               {/* RFQ Marketplace */}
               {activeTab === "rfqs" && (
