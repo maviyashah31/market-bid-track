@@ -2,6 +2,8 @@ import { Shield, Truck, Users, FileText, Search, ArrowRight, ShoppingCart, Packa
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { categories } from "@/data/mockData";
 
 const qualities = [
 {
