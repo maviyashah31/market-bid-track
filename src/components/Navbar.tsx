@@ -150,7 +150,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-gradient-hero border-b border-primary/20 shadow-sm">
       {/* Top bar — continuous marquee */}
       <div className="bg-gradient-hero overflow-hidden">
         <div className="flex items-center justify-between">
@@ -187,24 +187,24 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <h1 className="font-display font-extrabold text-2xl md:text-3xl">
-              <span className="text-gradient-hero">Bulk</span>
-              <span className="text-foreground">ur</span>
+              <span className="text-primary-foreground">Bulk</span>
+              <span className="text-primary-foreground/80">ur</span>
             </h1>
           </Link>
 
           {/* Search Bar in Header */}
           {showSearch && (
-            <div className="hidden md:flex items-center flex-1 max-w-md">
-              <div className="flex w-full rounded-lg overflow-hidden border border-border bg-background focus-within:ring-2 focus-within:ring-primary/30 transition-all">
-                <div className="flex items-center pl-2.5 text-muted-foreground">
+            <div className="hidden md:flex items-center flex-1">
+              <div className="flex w-full rounded-lg overflow-hidden border border-primary-foreground/30 bg-primary-foreground/10 focus-within:ring-2 focus-within:ring-primary-foreground/30 transition-all">
+                <div className="flex items-center pl-2.5 text-primary-foreground/70">
                   <Search className="h-3.5 w-3.5" />
                 </div>
                 <Input
-                  placeholder="Search products..."
+                  placeholder="What are you looking for?"
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
-                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm"
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-primary-foreground placeholder:text-primary-foreground/60"
                 />
               </div>
             </div>
@@ -218,7 +218,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="relative"
+                className="relative text-primary-foreground hover:bg-primary-foreground/10"
                 onClick={() => setNotifOpen(!notifOpen)}
               >
                 <Bell className="h-5 w-5" />
@@ -274,7 +274,7 @@ const Navbar = () => {
 
             {variant !== "admin" && (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="gap-2 font-body">
+                <Button variant="ghost" size="sm" className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
                   <User className="h-4 w-4" />
                   Sign In
                 </Button>
@@ -282,16 +282,16 @@ const Navbar = () => {
             )}
             {showCart && (
               <Link to="/cart">
-                <Button variant="ghost" size="sm" className="relative">
+                <Button variant="ghost" size="sm" className="relative text-primary-foreground hover:bg-primary-foreground/10">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
+                  <span className="absolute -top-1 -right-1 bg-primary-foreground text-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
                 </Button>
               </Link>
             )}
           </div>
 
           {/* Mobile toggle */}
-          <button className="md:hidden ml-auto" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="md:hidden ml-auto text-primary-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
