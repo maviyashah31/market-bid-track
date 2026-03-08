@@ -349,42 +349,7 @@ const SellerDashboard = () => {
                 </>
               )}
 
-              {/* Orders */}
-              {activeTab === "orders" && (
-                <div className="bg-card rounded-xl border border-border p-6">
-                  <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground">Order ID</th>
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground">Product</th>
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground hidden sm:table-cell">Buyer</th>
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground">Total</th>
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground">Status</th>
-                          <th className="text-left py-3 px-2 font-display font-semibold text-muted-foreground">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {recentOrders.map((order) => (
-                          <tr key={order.id} className="border-b border-border last:border-0 hover:bg-accent/30">
-                            <td className="py-3 px-2 font-body font-medium text-foreground">{order.id}</td>
-                            <td className="py-3 px-2 font-body text-foreground">{order.product}</td>
-                            <td className="py-3 px-2 font-body text-muted-foreground hidden sm:table-cell">{order.buyer}</td>
-                            <td className="py-3 px-2 font-display font-semibold text-foreground">{order.total}</td>
-                            <td className="py-3 px-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[order.status]}`}>{order.status}</span>
-                            </td>
-                            <td className="py-3 px-2">
-                              <Button variant="outline" size="sm" className="font-body text-xs">Update Status</Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+              {/* Orders — redirects to /seller/orders */}
 
               {/* RFQ Marketplace */}
               {activeTab === "rfqs" && (
