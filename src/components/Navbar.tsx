@@ -1,5 +1,5 @@
 import { ShoppingCart, User, Menu, X, ChevronDown, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,16 +110,26 @@ function detectVariant(pathname: string): NavVariant {
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const variant = detectVariant(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [navSearch, setNavSearch] = useState("");
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const links = navLinksByVariant[variant];
   const showCart = variant === "default" || variant === "buyer";
   const showCategories = variant === "default";
+  const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
+
+  const handleNavSearch = () => {
+    if (navSearch.trim()) {
+      navigate(`/products?search=${encodeURIComponent(navSearch.trim())}`);
+      setNavSearch("");
+    }
+  };
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -194,6 +204,24 @@ const Navbar = () => {
               </Link>
             ))}
           </nav>
+
+          {/* Search Bar in Header */}
+          {showSearch && (
+            <div className="hidden md:flex items-center flex-1 max-w-md">
+              <div className="flex w-full rounded-lg overflow-hidden border border-border bg-background focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+                <div className="flex items-center pl-2.5 text-muted-foreground">
+                  <Search className="h-3.5 w-3.5" />
+                </div>
+                <Input
+                  placeholder="Search products..."
+                  value={navSearch}
+                  onChange={(e) => setNavSearch(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-1">
