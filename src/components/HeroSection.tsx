@@ -106,6 +106,7 @@ const HeroSection = () => {
                 <span className="text-[10px] text-muted-foreground hidden sm:block">{s.desc}</span>
               </div>
             ))}
+            </div>
           </motion.div>
         </div>
 
