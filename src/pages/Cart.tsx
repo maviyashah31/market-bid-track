@@ -47,7 +47,7 @@ const Cart = () => {
           <ArrowLeft className="h-4 w-4" /> Continue Shopping
         </Link>
 
-        <h1 className="font-display font-bold text-3xl text-foreground mb-8">Shopping Cart ({items.length})</h1>
+        <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Shopping Cart ({items.length})</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Items */}
