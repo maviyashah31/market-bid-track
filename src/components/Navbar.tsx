@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Menu, X, ChevronDown, Bell } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, Bell, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
