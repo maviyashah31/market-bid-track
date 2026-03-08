@@ -24,14 +24,14 @@ const HeroSection = () => {
 
         {/* Search Bar */}
         <div className="max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="flex w-full rounded-lg overflow-hidden border-2 border-primary-foreground/20 focus-within:border-primary-foreground/50 transition-all bg-primary-foreground/10 backdrop-blur-md">
+          <div className="flex w-full rounded-lg overflow-hidden border-2 border-white/30 focus-within:border-white/60 transition-all bg-white/20 backdrop-blur-md shadow-lg">
             <Input
               placeholder="What are you looking for"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent text-primary-foreground placeholder:text-primary-foreground/60 h-12 sm:h-14 text-sm sm:text-base"
+              className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent text-white placeholder:text-white/70 h-12 sm:h-14 text-sm sm:text-base"
             />
-            <button className="bg-primary-foreground/20 hover:bg-primary-foreground/30 px-5 sm:px-8 text-primary-foreground transition-colors">
+            <button className="bg-white/25 hover:bg-white/35 px-5 sm:px-8 text-white transition-colors">
               <Search className="h-5 w-5" />
             </button>
           </div>
