@@ -142,26 +142,28 @@ const SellerDashboard = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="font-display font-bold text-3xl text-foreground">Seller Dashboard</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground">Seller Dashboard</h1>
           <p className="text-muted-foreground font-body mt-1">Lahore Textile Mills • Verified Seller ✅</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border flex-wrap h-auto gap-1">
-            <TabsTrigger value="overview" className="gap-1.5 font-display"><BarChart3 className="h-4 w-4" /> Overview</TabsTrigger>
-            <TabsTrigger value="products" className="gap-1.5 font-display"><Package className="h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="orders" className="gap-1.5 font-display"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
-            <TabsTrigger value="rfqs" className="gap-1.5 font-display"><FileText className="h-4 w-4" /> RFQ Bids</TabsTrigger>
-            <TabsTrigger value="messages" className="gap-1.5 font-display"><MessageSquare className="h-4 w-4" /> Messages</TabsTrigger>
-            <TabsTrigger value="disputes" className="gap-1.5 font-display relative">
-              <AlertTriangle className="h-4 w-4" /> Disputes
-              {activeDisputeCount > 0 && (
-                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-1.5 font-display"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
-            <TabsTrigger value="wallet" className="gap-1.5 font-display"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-card border border-border flex-wrap sm:flex-nowrap h-auto gap-1 w-max sm:w-full">
+              <TabsTrigger value="overview" className="gap-1.5 font-display text-xs sm:text-sm"><BarChart3 className="h-4 w-4" /> <span className="hidden sm:inline">Overview</span><span className="sm:hidden">Stats</span></TabsTrigger>
+              <TabsTrigger value="products" className="gap-1.5 font-display text-xs sm:text-sm"><Package className="h-4 w-4" /> Products</TabsTrigger>
+              <TabsTrigger value="orders" className="gap-1.5 font-display text-xs sm:text-sm"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
+              <TabsTrigger value="rfqs" className="gap-1.5 font-display text-xs sm:text-sm"><FileText className="h-4 w-4" /> RFQs</TabsTrigger>
+              <TabsTrigger value="messages" className="gap-1.5 font-display text-xs sm:text-sm"><MessageSquare className="h-4 w-4" /> <span className="hidden sm:inline">Messages</span><span className="sm:hidden">Msgs</span></TabsTrigger>
+              <TabsTrigger value="disputes" className="gap-1.5 font-display text-xs sm:text-sm relative">
+                <AlertTriangle className="h-4 w-4" /> Disputes
+                {activeDisputeCount > 0 && (
+                  <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="gap-1.5 font-display text-xs sm:text-sm"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
+              <TabsTrigger value="wallet" className="gap-1.5 font-display text-xs sm:text-sm"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview */}
           <TabsContent value="overview">
@@ -216,9 +218,9 @@ const SellerDashboard = () => {
           {/* Products */}
           <TabsContent value="products">
             <div className="bg-card rounded-xl border border-border p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                 <h2 className="font-display font-bold text-xl text-foreground">My Products ({myProducts.length})</h2>
-                <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body"><Plus className="h-4 w-4" /> Add Product</Button>
+                <Button onClick={() => { setEditingProduct(null); setProductFormOpen(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body w-full sm:w-auto"><Plus className="h-4 w-4" /> Add Product</Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {myProducts.map((product) => (
@@ -283,18 +285,18 @@ const SellerDashboard = () => {
             <div className="bg-card rounded-xl border border-border p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <h2 className="font-display font-bold text-xl text-foreground">RFQ Marketplace ({filteredRFQs.length})</h2>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
+              <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative w-full sm:w-48">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       value={rfqSearch}
                       onChange={(e) => setRfqSearch(e.target.value)}
                       placeholder="Search RFQs..."
-                      className="pl-9 w-48"
+                      className="pl-9 w-full"
                     />
                   </div>
                   <Select value={rfqCategoryFilter} onValueChange={setRfqCategoryFilter}>
-                    <SelectTrigger className="w-44">
+                    <SelectTrigger className="w-full sm:w-44">
                       <Filter className="h-3.5 w-3.5 mr-1" />
                       <SelectValue placeholder="Category" />
                     </SelectTrigger>
@@ -306,7 +308,7 @@ const SellerDashboard = () => {
                     </SelectContent>
                   </Select>
                   <Select value={rfqSortBy} onValueChange={setRfqSortBy}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full sm:w-40">
                       <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>

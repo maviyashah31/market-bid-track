@@ -18,26 +18,26 @@ const HeroSection = () => (
       <div className="absolute inset-0 bg-foreground/70" />
     </div>
 
-    <div className="relative container mx-auto px-4 py-16 md:py-24">
+    <div className="relative container mx-auto px-4 py-10 sm:py-16 md:py-24">
       <div className="max-w-2xl">
-        <div className="inline-flex items-center gap-2 bg-primary/20 text-primary-foreground px-4 py-1.5 rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 bg-primary/20 text-primary-foreground px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-4 sm:mb-6 backdrop-blur-sm">
           <BadgeCheck className="h-4 w-4" />
           Pakistan's Trusted B2B Platform
         </div>
-        <h1 className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight mb-4">
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight mb-3 sm:mb-4">
           Source Wholesale,{" "}
           <span className="text-gradient-hero">Grow Your Business</span>
         </h1>
-        <p className="text-lg text-primary-foreground/80 mb-8 font-body">
+        <p className="text-sm sm:text-lg text-primary-foreground/80 mb-6 sm:mb-8 font-body">
           Connect with verified Pakistani suppliers. Get the best wholesale prices on textiles, electronics, agriculture, and 500+ categories.
         </p>
 
-        <div className="flex rounded-xl overflow-hidden shadow-lg mb-8">
+        <div className="flex rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8">
           <Input
             placeholder="What are you looking for?"
-            className="h-14 border-0 rounded-none text-base bg-card text-foreground font-body"
+            className="h-11 sm:h-14 border-0 rounded-none text-sm sm:text-base bg-card text-foreground font-body"
           />
-          <button className="bg-gradient-hero px-8 text-primary-foreground font-semibold hover:opacity-90 transition flex items-center gap-2 whitespace-nowrap">
+          <button className="bg-gradient-hero px-4 sm:px-8 text-primary-foreground font-semibold hover:opacity-90 transition flex items-center gap-2 whitespace-nowrap">
             <Search className="h-5 w-5" />
             <span className="hidden sm:inline">Search</span>
           </button>
@@ -57,11 +57,11 @@ const HeroSection = () => (
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-12">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-4 text-center border border-primary-foreground/10">
-            <div className="font-display font-extrabold text-2xl text-primary-foreground">{stat.value}</div>
-            <div className="text-sm text-primary-foreground/70 font-body">{stat.label}</div>
+          <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-primary-foreground/10">
+            <div className="font-display font-extrabold text-lg sm:text-2xl text-primary-foreground">{stat.value}</div>
+            <div className="text-xs sm:text-sm text-primary-foreground/70 font-body">{stat.label}</div>
           </div>
         ))}
       </div>

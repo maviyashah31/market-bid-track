@@ -70,12 +70,12 @@ const BuyerDashboard = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="font-display font-bold text-3xl text-foreground">Buyer Dashboard</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground">Buyer Dashboard</h1>
           <p className="text-muted-foreground font-body mt-1">Welcome back, Muhammad Ahmed!</p>
         </div>
 
         {/* Quick links */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {quickLinks.map(({ icon: Icon, label, count, tab, href }) => (
             href ? (
               <Link
@@ -102,14 +102,16 @@ const BuyerDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border flex-wrap h-auto gap-1">
-            <TabsTrigger value="overview" className="font-display">Overview</TabsTrigger>
-            <TabsTrigger value="orders" className="font-display">Orders</TabsTrigger>
-            <TabsTrigger value="rfqs" className="font-display">My RFQs</TabsTrigger>
-            <TabsTrigger value="disputes" className="font-display">Disputes</TabsTrigger>
-            <TabsTrigger value="reviews" className="font-display">Reviews</TabsTrigger>
-            <TabsTrigger value="wishlist" className="font-display">Wishlist</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-card border border-border flex-nowrap h-auto gap-1 w-max sm:w-full">
+              <TabsTrigger value="overview" className="font-display text-xs sm:text-sm">Overview</TabsTrigger>
+              <TabsTrigger value="orders" className="font-display text-xs sm:text-sm">Orders</TabsTrigger>
+              <TabsTrigger value="rfqs" className="font-display text-xs sm:text-sm">My RFQs</TabsTrigger>
+              <TabsTrigger value="disputes" className="font-display text-xs sm:text-sm">Disputes</TabsTrigger>
+              <TabsTrigger value="reviews" className="font-display text-xs sm:text-sm">Reviews</TabsTrigger>
+              <TabsTrigger value="wishlist" className="font-display text-xs sm:text-sm">Wishlist</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview */}
           <TabsContent value="overview">
@@ -355,7 +357,7 @@ const BuyerDashboard = () => {
           <TabsContent value="wishlist">
             <div className="bg-card rounded-xl border border-border p-6">
               <h2 className="font-display font-bold text-xl text-foreground mb-6">My Wishlist</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {wishlistItems.map((product) => (
                   <div key={product.id} className="border border-border rounded-lg overflow-hidden hover:shadow-md transition">
                     <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />

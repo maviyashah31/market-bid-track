@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 const Footer = () => (
   <footer className="bg-gradient-dark text-secondary">
     <div className="container mx-auto px-4 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
         <div>
           <h3 className="font-display font-extrabold text-xl mb-4">
             <span className="text-gradient-hero">Bulk</span>

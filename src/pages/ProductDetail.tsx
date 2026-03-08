@@ -48,7 +48,7 @@ const ProductDetail = () => {
             <Badge variant="secondary" className="mb-3 font-body">{product.category}</Badge>
             <h1 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4">{product.name}</h1>
 
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6">
               <div className="flex items-center gap-1">
                 {product.sellerVerified && <BadgeCheck className="h-5 w-5 text-verified" />}
                 <span className="font-display font-semibold text-foreground">{product.sellerName}</span>
@@ -73,11 +73,11 @@ const ProductDetail = () => {
 
             <div className="mb-6">
               <h3 className="font-display font-semibold text-foreground mb-3">Pricing Tiers</h3>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {moqTiers.map((tier) => (
-                  <div key={tier.range} className="text-center p-3 rounded-lg border border-border bg-card">
+                  <div key={tier.range} className="text-center p-2 sm:p-3 rounded-lg border border-border bg-card">
                     <div className="text-xs text-muted-foreground font-body mb-1">{tier.range}</div>
-                    <div className="font-display font-bold text-foreground">PKR {tier.price}</div>
+                    <div className="font-display font-bold text-sm sm:text-base text-foreground">PKR {tier.price}</div>
                   </div>
                 ))}
               </div>
@@ -133,15 +133,15 @@ const ProductDetail = () => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { icon: Shield, text: "Escrow Payment" },
                 { icon: Truck, text: "Pan-PK Delivery" },
                 { icon: Clock, text: product.responseTime },
               ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-card border border-border text-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <span className="text-xs font-body text-muted-foreground">{text}</span>
+                <div key={text} className="flex flex-col items-center gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-lg bg-card border border-border text-center">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  <span className="text-[10px] sm:text-xs font-body text-muted-foreground">{text}</span>
                 </div>
               ))}
             </div>

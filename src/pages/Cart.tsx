@@ -47,18 +47,18 @@ const Cart = () => {
           <ArrowLeft className="h-4 w-4" /> Continue Shopping
         </Link>
 
-        <h1 className="font-display font-bold text-3xl text-foreground mb-8">Shopping Cart ({items.length})</h1>
+        <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Shopping Cart ({items.length})</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="bg-card rounded-xl border border-border p-4 flex gap-4">
-                <img src={item.image} alt={item.name} className="w-24 h-24 rounded-lg object-cover" />
-                <div className="flex-1">
-                  <h3 className="font-display font-semibold text-foreground">{item.name}</h3>
+              <div key={item.id} className="bg-card rounded-xl border border-border p-3 sm:p-4 flex gap-3 sm:gap-4">
+                <img src={item.image} alt={item.name} className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-display font-semibold text-foreground text-sm sm:text-base truncate">{item.name}</h3>
                   <p className="text-xs text-muted-foreground font-body">{item.seller}</p>
-                  <p className="font-display font-bold text-primary mt-1">PKR {item.price}/{item.unit}</p>
+                  <p className="font-display font-bold text-primary mt-1 text-sm sm:text-base">PKR {item.price}/{item.unit}</p>
                   <div className="flex items-center gap-3 mt-2">
                     <div className="flex items-center border border-border rounded-lg">
                       <button onClick={() => updateQty(item.id, -50)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
@@ -74,7 +74,7 @@ const Cart = () => {
                     </button>
                   </div>
                 </div>
-                <div className="text-right font-display font-bold text-foreground">
+                <div className="text-right font-display font-bold text-foreground text-sm sm:text-base hidden sm:block">
                   PKR {(item.price * item.quantity).toLocaleString()}
                 </div>
               </div>

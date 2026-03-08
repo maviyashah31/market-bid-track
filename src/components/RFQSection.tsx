@@ -7,18 +7,18 @@ import { Link } from "react-router-dom";
 const RFQSection = () => (
   <section className="py-12 bg-accent">
     <div className="container mx-auto px-4">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="font-display font-bold text-3xl text-foreground mb-1">Latest RFQs</h2>
-          <p className="text-muted-foreground font-body">Active buying requests from verified buyers</p>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-1">Latest RFQs</h2>
+          <p className="text-muted-foreground font-body text-sm sm:text-base">Active buying requests from verified buyers</p>
         </div>
         <Link to="/buyer/dashboard">
-          <Button className="gap-2 font-body bg-gradient-hero text-primary-foreground hover:opacity-90">
+          <Button className="gap-2 font-body bg-gradient-hero text-primary-foreground hover:opacity-90 w-full sm:w-auto">
             Post an RFQ <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {rfqDetails.slice(0, 3).map((rfq) => (
           <div key={rfq.id} className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
             {rfq.images.length > 0 && (

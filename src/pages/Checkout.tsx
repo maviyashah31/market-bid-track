@@ -50,23 +50,23 @@ const Checkout = () => {
             <ArrowLeft className="h-4 w-4" /> Back to Cart
           </Link>
 
-          <h1 className="font-display font-bold text-3xl text-foreground mb-8">Checkout</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Checkout</h1>
 
           {/* Steps indicator */}
-          <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8">
             {[
               { key: "shipping", label: "Shipping", icon: Truck },
               { key: "payment", label: "Payment", icon: CreditCard },
               { key: "review", label: "Review", icon: CheckCircle2 },
             ].map(({ key, label, icon: Icon }, idx) => (
               <div key={key} className="flex items-center gap-2">
-                {idx > 0 && <div className={`h-px w-8 sm:w-16 ${["shipping", "payment", "review"].indexOf(step) >= idx ? "bg-primary" : "bg-border"}`} />}
+                {idx > 0 && <div className={`h-px w-4 sm:w-8 md:w-16 ${["shipping", "payment", "review"].indexOf(step) >= idx ? "bg-primary" : "bg-border"}`} />}
                 <button
                   onClick={() => {
                     const steps = ["shipping", "payment", "review"];
                     if (steps.indexOf(key) <= steps.indexOf(step)) setStep(key as typeof step);
                   }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-display font-semibold transition ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-display font-semibold transition ${
                     step === key ? "bg-primary text-primary-foreground" : ["shipping", "payment", "review"].indexOf(step) > idx ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                   }`}
                 >
