@@ -28,26 +28,6 @@ const CategoryGrid = () => (
         </div>
       </div>
     </section>
-
-    {/* Categories */}
-    <section className="py-6 bg-card">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          {categories.slice(0, 4).map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/products?category=${encodeURIComponent(cat.name)}`}
-              className="group flex flex-col items-center p-3 sm:p-5 rounded-xl border border-border bg-background hover:border-primary hover:shadow-md transition-all"
-            >
-              <span className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{cat.icon}</span>
-              <span className="font-display font-semibold text-xs sm:text-sm text-center text-foreground">{cat.name}</span>
-              <span className="text-xs text-muted-foreground mt-1">{cat.productCount.toLocaleString()} products</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  </>
-);
+  );
 
 export default CategoryGrid;
