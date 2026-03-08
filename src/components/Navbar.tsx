@@ -83,11 +83,22 @@ const navLinksByVariant: Record<NavVariant, NavLinkItem[]> = {
   ],
 };
 
-const topBarText: Record<NavVariant, string> = {
-  default: "🇵🇰 Pakistan's #1 B2B Wholesale Marketplace",
-  buyer: "🛒 Buyer Dashboard — Source products from verified Pakistani suppliers",
-  seller: "📦 Seller Dashboard — Manage your store and grow your business",
-  admin: "🔒 Admin Panel — BULKUR Platform Management",
+const announcementItems = [
+  "🛡️ Buyer Protection on Every Order",
+  "🚚 Next-Day Delivery Across Pakistan",
+  "✅ 5,000+ Verified Suppliers",
+  "📋 Post RFQs & Get Competitive Bids",
+  "💰 Secure Escrow Payments",
+  "🌍 Serving 15+ Countries",
+  "📦 Bulk Discounts on All Categories",
+  "⭐ Trusted by 10,000+ Businesses",
+];
+
+const topBarTextByVariant: Record<NavVariant, string[]> = {
+  default: announcementItems,
+  buyer: ["🛒 Buyer Dashboard — Source products from verified Pakistani suppliers", ...announcementItems],
+  seller: ["📦 Seller Dashboard — Manage your store and grow your business", ...announcementItems],
+  admin: ["🔒 Admin Panel — BULKUR Platform Management"],
 };
 
 function detectVariant(pathname: string): NavVariant {
