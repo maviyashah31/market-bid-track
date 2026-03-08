@@ -66,7 +66,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="max-w-lg">
+            className="w-full">
             
             <div className="flex rounded-xl overflow-hidden border border-border bg-card shadow-lg focus-within:ring-2 focus-within:ring-primary/30 transition-all">
               <div className="flex items-center pl-3 text-muted-foreground">
