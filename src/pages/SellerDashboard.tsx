@@ -91,6 +91,12 @@ const SellerDashboard = () => {
             <TabsTrigger value="orders" className="gap-1.5 font-display"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
             <TabsTrigger value="rfqs" className="gap-1.5 font-display"><FileText className="h-4 w-4" /> RFQ Bids</TabsTrigger>
             <TabsTrigger value="messages" className="gap-1.5 font-display"><MessageSquare className="h-4 w-4" /> Messages</TabsTrigger>
+            <TabsTrigger value="disputes" className="gap-1.5 font-display relative">
+              <AlertTriangle className="h-4 w-4" /> Disputes
+              {activeDisputeCount > 0 && (
+                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{activeDisputeCount}</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="reviews" className="gap-1.5 font-display"><Star className="h-4 w-4" /> Reviews</TabsTrigger>
             <TabsTrigger value="wallet" className="gap-1.5 font-display"><Wallet className="h-4 w-4" /> Wallet</TabsTrigger>
           </TabsList>
