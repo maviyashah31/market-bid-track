@@ -18,6 +18,7 @@ const Auth = () => {
   };
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
       <div className="hidden lg:flex flex-1 bg-gradient-hero items-center justify-center p-12">
