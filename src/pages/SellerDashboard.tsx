@@ -7,7 +7,7 @@ import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
   AlertTriangle, Send, Search, Filter, Clock, Users, MapPin, SlidersHorizontal,
-  Menu, ChevronLeft, Truck, CheckCircle, Phone, Mail, User
+  Menu, ChevronLeft, Truck, CheckCircle, Phone, Mail, User, Camera, ImagePlus, Store, Save
 } from "lucide-react";
 import ProductFormDialog from "@/components/ProductFormDialog";
 import SubmitBidForm from "@/components/SubmitBidForm";
