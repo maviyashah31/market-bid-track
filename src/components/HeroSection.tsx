@@ -112,7 +112,7 @@ const HeroSection = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 gap-3 w-full md:w-auto md:max-w-sm"
+          className="grid grid-cols-2 gap-3 w-full md:w-[320px] shrink-0"
         >
           {qualities.map((q) => (
             <motion.div
