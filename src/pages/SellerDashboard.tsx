@@ -283,6 +283,7 @@ const SellerDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 
