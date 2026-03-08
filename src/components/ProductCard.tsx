@@ -14,15 +14,15 @@ const ProductCard = ({ product }: { product: Product }) => (
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
     </div>
-    <div className="p-2.5">
-      <h3 className="font-display font-semibold text-xs text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors leading-tight">
+    <div className="p-3">
+      <h3 className="font-display font-semibold text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors leading-snug">
         {product.name}
       </h3>
-      <div className="font-display font-bold text-sm text-primary mb-0.5">
+      <div className="font-display font-bold text-base text-primary mb-0.5">
         PKR {product.minPrice}
-        <span className="text-[10px] font-normal text-muted-foreground">/{product.unit}</span>
+        <span className="text-xs font-normal text-muted-foreground">/{product.unit}</span>
       </div>
-      <div className="text-[10px] text-muted-foreground font-body">
+      <div className="text-xs text-muted-foreground font-body">
         MOQ: {product.moq} {product.unit}
       </div>
       <div className="border-t border-border pt-1.5 mt-1.5 flex items-center justify-between">
