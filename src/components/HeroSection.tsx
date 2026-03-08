@@ -13,7 +13,6 @@ const stats = [
 
 const HeroSection = () => (
   <section className="relative overflow-hidden">
-    {/* Background */}
     <div className="absolute inset-0">
       <img src={heroBanner} alt="B2B Wholesale Marketplace" className="w-full h-full object-cover" />
       <div className="absolute inset-0 bg-foreground/70" />
@@ -33,7 +32,6 @@ const HeroSection = () => (
           Connect with verified Pakistani suppliers. Get the best wholesale prices on textiles, electronics, agriculture, and 500+ categories.
         </p>
 
-        {/* Search */}
         <div className="flex rounded-xl overflow-hidden shadow-lg mb-8">
           <Input
             placeholder="What are you looking for?"
@@ -45,7 +43,6 @@ const HeroSection = () => (
           </button>
         </div>
 
-        {/* Quick actions */}
         <div className="flex flex-wrap gap-3">
           <Link to="/products">
             <Button variant="secondary" className="gap-2 font-body">
@@ -60,7 +57,6 @@ const HeroSection = () => (
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-4 text-center border border-primary-foreground/10">
@@ -71,7 +67,6 @@ const HeroSection = () => (
       </div>
     </div>
 
-    {/* Trust bar */}
     <div className="relative bg-card border-t border-border">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-wrap justify-center gap-8 text-sm font-body">

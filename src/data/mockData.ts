@@ -201,3 +201,78 @@ export const buyerOrders: Order[] = [
   { id: "ORD-2024-002", productName: "Basmati Rice Super Kernel", status: "delivered", total: 320000, date: "2026-02-20", sellerName: "Punjab Agro Exports", quantity: 1000 },
   { id: "ORD-2024-003", productName: "Leather Footballs", status: "processing", total: 170000, date: "2026-03-05", sellerName: "Sialkot Sports Co.", quantity: 200 },
 ];
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  content: string;
+  timestamp: string;
+  isOwn: boolean;
+}
+
+export interface ChatConversation {
+  id: string;
+  contactName: string;
+  contactAvatar?: string;
+  lastMessage: string;
+  lastTime: string;
+  unread: number;
+  online: boolean;
+}
+
+export const chatConversations: ChatConversation[] = [
+  { id: "1", contactName: "Lahore Textile Mills", lastMessage: "We can offer 15% discount on bulk orders above 1000 pcs", lastTime: "2 min ago", unread: 2, online: true },
+  { id: "2", contactName: "Punjab Agro Exports", lastMessage: "The shipment will be dispatched on Monday", lastTime: "1 hr ago", unread: 0, online: true },
+  { id: "3", contactName: "Sialkot Sports Co.", lastMessage: "Please share the custom logo file", lastTime: "3 hrs ago", unread: 1, online: false },
+  { id: "4", contactName: "MedTech Pakistan", lastMessage: "Certificate of quality has been attached", lastTime: "Yesterday", unread: 0, online: false },
+  { id: "5", contactName: "Faisalabad Fabric House", lastMessage: "New collection samples are ready for review", lastTime: "2 days ago", unread: 0, online: true },
+];
+
+export const chatMessages: Record<string, ChatMessage[]> = {
+  "1": [
+    { id: "m1", senderId: "seller1", senderName: "Lahore Textile Mills", content: "Assalam o Alaikum! Thank you for your interest in our cotton T-shirts.", timestamp: "10:30 AM", isOwn: false },
+    { id: "m2", senderId: "buyer1", senderName: "You", content: "Walaikum Assalam! I need 2000 pieces of premium cotton T-shirts. What's your best price?", timestamp: "10:32 AM", isOwn: true },
+    { id: "m3", senderId: "seller1", senderName: "Lahore Textile Mills", content: "For 2000 pieces, we can offer PKR 200/piece. Quality is 100% combed cotton, 180 GSM.", timestamp: "10:35 AM", isOwn: false },
+    { id: "m4", senderId: "buyer1", senderName: "You", content: "Can you do PKR 180/piece? I'm looking for a long-term supplier.", timestamp: "10:38 AM", isOwn: true },
+    { id: "m5", senderId: "seller1", senderName: "Lahore Textile Mills", content: "We can offer 15% discount on bulk orders above 1000 pcs", timestamp: "10:40 AM", isOwn: false },
+  ],
+  "2": [
+    { id: "m6", senderId: "seller2", senderName: "Punjab Agro Exports", content: "Your order ORD-2024-002 has been packed and is ready for dispatch.", timestamp: "9:00 AM", isOwn: false },
+    { id: "m7", senderId: "buyer1", senderName: "You", content: "Great! When will it be shipped?", timestamp: "9:15 AM", isOwn: true },
+    { id: "m8", senderId: "seller2", senderName: "Punjab Agro Exports", content: "The shipment will be dispatched on Monday", timestamp: "9:20 AM", isOwn: false },
+  ],
+  "3": [
+    { id: "m9", senderId: "seller3", senderName: "Sialkot Sports Co.", content: "We've started production on your custom football order.", timestamp: "Yesterday 3:00 PM", isOwn: false },
+    { id: "m10", senderId: "buyer1", senderName: "You", content: "Excellent! I'll send the logo files shortly.", timestamp: "Yesterday 3:30 PM", isOwn: true },
+    { id: "m11", senderId: "seller3", senderName: "Sialkot Sports Co.", content: "Please share the custom logo file", timestamp: "Yesterday 4:00 PM", isOwn: false },
+  ],
+};
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "buyer" | "seller";
+  status: "active" | "suspended" | "pending";
+  joinDate: string;
+  orders: number;
+}
+
+export const adminUsers: AdminUser[] = [
+  { id: "1", name: "Muhammad Ahmed", email: "ahmed@company.com", role: "buyer", status: "active", joinDate: "2025-11-01", orders: 15 },
+  { id: "2", name: "Lahore Textile Mills", email: "info@ltm.pk", role: "seller", status: "active", joinDate: "2025-08-15", orders: 156 },
+  { id: "3", name: "Ali Hassan", email: "ali@gmail.com", role: "buyer", status: "pending", joinDate: "2026-03-01", orders: 0 },
+  { id: "4", name: "Karachi Electronics Hub", email: "sales@keh.pk", role: "seller", status: "suspended", joinDate: "2025-10-20", orders: 34 },
+  { id: "5", name: "Sara Khan", email: "sara@business.com", role: "buyer", status: "active", joinDate: "2025-12-10", orders: 8 },
+  { id: "6", name: "Faisalabad Fabric House", email: "contact@ffh.pk", role: "seller", status: "active", joinDate: "2025-06-05", orders: 423 },
+];
+
+export const adminProducts: { id: string; name: string; seller: string; category: string; status: "active" | "pending" | "rejected"; price: string; date: string }[] = [
+  { id: "P001", name: "Premium Cotton T-Shirts", seller: "Lahore Textile Mills", category: "Textiles", status: "active", price: "PKR 180-350", date: "2026-02-15" },
+  { id: "P002", name: "Counterfeit Brand Shoes", seller: "Unknown Seller", category: "Footwear", status: "rejected", price: "PKR 500-800", date: "2026-03-05" },
+  { id: "P003", name: "Organic Honey 500g", seller: "KPK Organics", category: "Food", status: "pending", price: "PKR 1200-1800", date: "2026-03-07" },
+  { id: "P004", name: "Basmati Rice Grade A", seller: "Punjab Agro Exports", category: "Agriculture", status: "active", price: "PKR 220-320", date: "2026-01-20" },
+  { id: "P005", name: "Surgical Mask N95", seller: "MedTech Pakistan", category: "Medical", status: "pending", price: "PKR 15-35", date: "2026-03-06" },
+];
