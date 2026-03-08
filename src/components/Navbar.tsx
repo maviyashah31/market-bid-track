@@ -205,6 +205,24 @@ const Navbar = () => {
             ))}
           </nav>
 
+          {/* Search Bar in Header */}
+          {showSearch && (
+            <div className="hidden md:flex items-center flex-1 max-w-md">
+              <div className="flex w-full rounded-lg overflow-hidden border border-border bg-background focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+                <div className="flex items-center pl-2.5 text-muted-foreground">
+                  <Search className="h-3.5 w-3.5" />
+                </div>
+                <Input
+                  placeholder="Search products..."
+                  value={navSearch}
+                  onChange={(e) => setNavSearch(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="hidden md:flex items-center gap-1">
             <ThemeToggle />
