@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const Messages = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>("1");
