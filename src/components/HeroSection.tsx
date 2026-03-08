@@ -112,13 +112,13 @@ const HeroSection = () => {
               <motion.div
                 key={q.title}
                 variants={item}
-                className={`group rounded-xl border border-border bg-gradient-to-br ${q.gradient} p-3.5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default`}
+                className="group rounded-xl border border-primary-foreground/15 bg-primary-foreground/10 backdrop-blur-sm p-3.5 hover:bg-primary-foreground/15 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
               >
-                <div className={`w-8 h-8 rounded-lg ${q.iconBg} flex items-center justify-center mb-2`}>
-                  <q.icon className={`h-4 w-4 ${q.iconColor}`} />
+                <div className="w-8 h-8 rounded-lg bg-primary-foreground/15 flex items-center justify-center mb-2">
+                  <q.icon className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <h3 className="font-display font-bold text-foreground text-xs sm:text-sm mb-0.5">{q.title}</h3>
-                <p className="text-muted-foreground font-body text-[11px] leading-relaxed line-clamp-2">{q.desc}</p>
+                <h3 className="font-display font-bold text-primary-foreground text-xs sm:text-sm mb-0.5">{q.title}</h3>
+                <p className="text-primary-foreground/70 font-body text-[11px] leading-relaxed line-clamp-2">{q.desc}</p>
               </motion.div>
             ))}
           </motion.div>
