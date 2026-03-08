@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { products, rfqs, disputes, disputeReasons, type Dispute } from "@/data/mockData";
+import { products as initialProducts, rfqs, disputes, disputeReasons, type Dispute, type Product, type RFQ } from "@/data/mockData";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
   AlertTriangle, Send
 } from "lucide-react";
+import ProductFormDialog from "@/components/ProductFormDialog";
+import SubmitBidForm from "@/components/SubmitBidForm";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
