@@ -83,25 +83,31 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* Steps below search */}
+          {/* Steps - vertical center column */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="flex gap-3 mt-4 max-w-lg"
+            className="flex flex-col items-center gap-1.5 mt-4 md:mt-0"
           >
             {[
               { icon: Search, step: "1", title: "Browse", desc: "Find products" },
               { icon: ShoppingCart, step: "2", title: "Add to Cart", desc: "Select & add" },
               { icon: PackageCheck, step: "3", title: "Checkout", desc: "Get delivered" },
-            ].map((s, i) => (
-              <div key={i} className="flex-1 bg-card/80 border border-border rounded-lg p-2.5 flex flex-col items-center text-center">
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mb-1">
-                  <s.icon className="h-3.5 w-3.5 text-primary" />
+            ].map((s, i, arr) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="bg-card/80 border border-border rounded-lg px-4 py-2 flex items-center gap-2 min-w-[140px]">
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <s.icon className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-primary">Step {s.step}</span>
+                    <p className="text-xs font-semibold text-foreground leading-tight">{s.title}</p>
+                  </div>
                 </div>
-                <span className="text-[10px] font-bold text-primary">Step {s.step}</span>
-                <span className="text-xs font-semibold text-foreground">{s.title}</span>
-                <span className="text-[10px] text-muted-foreground hidden sm:block">{s.desc}</span>
+                {i < arr.length - 1 && (
+                  <ChevronDown className="h-4 w-4 text-primary/60 my-0.5" />
+                )}
               </div>
             ))}
           </motion.div>
