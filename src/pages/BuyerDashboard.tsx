@@ -357,7 +357,7 @@ const BuyerDashboard = () => {
           <TabsContent value="wishlist">
             <div className="bg-card rounded-xl border border-border p-6">
               <h2 className="font-display font-bold text-xl text-foreground mb-6">My Wishlist</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {wishlistItems.map((product) => (
                   <div key={product.id} className="border border-border rounded-lg overflow-hidden hover:shadow-md transition">
                     <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />

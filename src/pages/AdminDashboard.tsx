@@ -142,20 +142,22 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="bg-card border border-border flex-wrap h-auto gap-1">
-            <TabsTrigger value="users" className="gap-1.5 font-display"><Users className="h-4 w-4" /> Users</TabsTrigger>
-            <TabsTrigger value="products" className="gap-1.5 font-display"><Package className="h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="orders" className="gap-1.5 font-display"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
-            <TabsTrigger value="disputes" className="gap-1.5 font-display">
-              <Gavel className="h-4 w-4" /> Disputes
-              {adminDisputes.length > 0 && (
-                <Badge className="ml-1 bg-destructive text-destructive-foreground h-5 w-5 p-0 flex items-center justify-center text-xs">
-                  {adminDisputes.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-1.5 font-display"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-card border border-border flex-nowrap h-auto gap-1 w-max sm:w-full">
+              <TabsTrigger value="users" className="gap-1.5 font-display text-xs sm:text-sm"><Users className="h-4 w-4" /> Users</TabsTrigger>
+              <TabsTrigger value="products" className="gap-1.5 font-display text-xs sm:text-sm"><Package className="h-4 w-4" /> Products</TabsTrigger>
+              <TabsTrigger value="orders" className="gap-1.5 font-display text-xs sm:text-sm"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
+              <TabsTrigger value="disputes" className="gap-1.5 font-display text-xs sm:text-sm">
+                <Gavel className="h-4 w-4" /> Disputes
+                {adminDisputes.length > 0 && (
+                  <Badge className="ml-1 bg-destructive text-destructive-foreground h-5 w-5 p-0 flex items-center justify-center text-xs">
+                    {adminDisputes.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-1.5 font-display text-xs sm:text-sm"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Users */}
           <TabsContent value="users">
