@@ -48,7 +48,7 @@ const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <section className="bg-gradient-hero py-10 sm:py-14 md:py-20">
+    <section className="bg-gradient-hero py-5 sm:py-7 md:py-10">
       <div className="container mx-auto px-4 flex flex-col items-center text-center">
         {/* Heading */}
         <motion.h1
