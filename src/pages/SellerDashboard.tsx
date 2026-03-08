@@ -772,15 +772,102 @@ const SellerDashboard = () => {
                 </>
               )}
 
-              {/* Messages */}
+              {/* Messages — inline chat */}
               {activeTab === "messages" && (
-                <div className="bg-card rounded-xl border border-border p-6 text-center">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <h2 className="font-display font-bold text-xl text-foreground mb-2">Messages</h2>
-                  <p className="text-muted-foreground font-body mb-4">View and manage your buyer conversations</p>
-                  <Link to="/messages">
-                    <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Open Messages</Button>
-                  </Link>
+                <div className="bg-card rounded-xl border border-border overflow-hidden flex" style={{ height: "calc(100vh - 200px)" }}>
+                  {/* Conversation list */}
+                  <div className={`w-full md:w-72 lg:w-80 border-r border-border flex flex-col ${!showMobileChatList ? "hidden md:flex" : "flex"}`}>
+                    <div className="p-3 border-b border-border">
+                      <h3 className="font-display font-bold text-sm text-foreground mb-2">Messages</h3>
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                        <Input placeholder="Search..." className="pl-8 h-8 text-xs font-body" />
+                      </div>
+                    </div>
+                    <ScrollArea className="flex-1">
+                      {chatConversations.map((conv) => (
+                        <button
+                          key={conv.id}
+                          onClick={() => { setSelectedChat(conv.id); setShowMobileChatList(false); }}
+                          className={`w-full flex items-start gap-2.5 p-3 hover:bg-accent/50 transition text-left border-b border-border ${selectedChat === conv.id ? "bg-accent" : ""}`}
+                        >
+                          <div className="relative">
+                            <Avatar className="h-9 w-9">
+                              <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-xs">
+                                {conv.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {conv.online && <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-success border-2 border-card" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="font-display font-semibold text-xs text-foreground truncate">{conv.contactName}</span>
+                              <span className="text-[10px] text-muted-foreground font-body ml-1">{conv.lastTime}</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground font-body truncate mt-0.5">{conv.lastMessage}</p>
+                          </div>
+                          {conv.unread > 0 && (
+                            <Badge className="bg-primary text-primary-foreground text-[10px] h-4 w-4 flex items-center justify-center rounded-full p-0">{conv.unread}</Badge>
+                          )}
+                        </button>
+                      ))}
+                    </ScrollArea>
+                  </div>
+
+                  {/* Chat area */}
+                  <div className={`flex-1 flex flex-col ${showMobileChatList ? "hidden md:flex" : "flex"}`}>
+                    {selectedChat && currentContact ? (
+                      <>
+                        <div className="flex items-center gap-2.5 p-3 border-b border-border">
+                          <button className="md:hidden" onClick={() => setShowMobileChatList(true)}><ArrowLeft className="h-4 w-4" /></button>
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-xs">
+                              {currentContact.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="font-display font-semibold text-sm text-foreground">{currentContact.contactName}</h3>
+                            <p className="text-[10px] text-muted-foreground font-body">{currentContact.online ? "Online" : "Offline"}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7"><Video className="h-3.5 w-3.5" /></Button>
+                          </div>
+                        </div>
+                        <ScrollArea className="flex-1 p-4">
+                          <div className="space-y-3 max-w-2xl mx-auto">
+                            {currentMessages.map((msg) => (
+                              <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
+                                <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${msg.isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-accent text-foreground rounded-bl-md"}`}>
+                                  <p className="text-sm font-body">{msg.content}</p>
+                                  <p className={`text-[10px] mt-0.5 ${msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{msg.timestamp}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                        <div className="p-3 border-t border-border">
+                          <div className="flex items-center gap-2 max-w-2xl mx-auto">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><Paperclip className="h-3.5 w-3.5" /></Button>
+                            <Input
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              onKeyDown={(e) => e.key === "Enter" && handleChatSend()}
+                              placeholder="Type a message..."
+                              className="font-body h-8 text-sm"
+                            />
+                            <Button onClick={handleChatSend} size="icon" className="bg-gradient-hero text-primary-foreground h-8 w-8 shrink-0 hover:opacity-90">
+                              <Send className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center text-muted-foreground font-body text-sm">
+                        Select a conversation
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
