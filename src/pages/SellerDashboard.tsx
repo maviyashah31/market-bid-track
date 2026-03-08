@@ -50,6 +50,29 @@ const walletTransactions = [
 
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [responseText, setResponseText] = useState("");
+  const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+
+  const sellerDisputes = disputes.filter(d => d.sellerName === "Lahore Textile Mills");
+  const activeDisputeCount = sellerDisputes.filter(d => d.status !== "resolved" && d.status !== "closed").length;
+
+  const disputeStatusColors: Record<string, string> = {
+    open: "bg-destructive/10 text-destructive",
+    negotiating: "bg-warning/10 text-warning",
+    escalated: "bg-destructive/10 text-destructive",
+    resolved: "bg-success/10 text-success",
+    closed: "bg-muted text-muted-foreground",
+  };
+
+  const getReasonLabel = (reason: string) => disputeReasons.find(r => r.value === reason)?.label || reason;
+
+  const handleRespond = () => {
+    if (!responseText.trim()) return;
+    setResponseText("");
+    setRespondDialogOpen(false);
+    setSelectedDispute(null);
+  };
 
   return (
     <AnimatedPage>
