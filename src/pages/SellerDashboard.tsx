@@ -129,6 +129,20 @@ const SellerDashboard = () => {
     setProfileEditing(false);
   };
 
+  // Chat state
+  const [selectedChat, setSelectedChat] = useState<string | null>("1");
+  const [newMessage, setNewMessage] = useState("");
+  const [chatMsgs, setChatMsgs] = useState(chatMessages);
+  const [showMobileChatList, setShowMobileChatList] = useState(true);
+  const currentMessages = selectedChat ? chatMsgs[selectedChat] || [] : [];
+  const currentContact = chatConversations.find((c) => c.id === selectedChat);
+  const handleChatSend = () => {
+    if (!newMessage.trim() || !selectedChat) return;
+    const msg: ChatMessage = { id: `m${Date.now()}`, senderId: "seller1", senderName: "You", content: newMessage, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), isOwn: true };
+    setChatMsgs((prev) => ({ ...prev, [selectedChat]: [...(prev[selectedChat] || []), msg] }));
+    setNewMessage("");
+  };
+
   const [bidFormOpen, setBidFormOpen] = useState(false);
   const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
   const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
