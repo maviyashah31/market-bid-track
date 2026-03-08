@@ -73,11 +73,11 @@ const ProductDetail = () => {
 
             <div className="mb-6">
               <h3 className="font-display font-semibold text-foreground mb-3">Pricing Tiers</h3>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {moqTiers.map((tier) => (
-                  <div key={tier.range} className="text-center p-3 rounded-lg border border-border bg-card">
+                  <div key={tier.range} className="text-center p-2 sm:p-3 rounded-lg border border-border bg-card">
                     <div className="text-xs text-muted-foreground font-body mb-1">{tier.range}</div>
-                    <div className="font-display font-bold text-foreground">PKR {tier.price}</div>
+                    <div className="font-display font-bold text-sm sm:text-base text-foreground">PKR {tier.price}</div>
                   </div>
                 ))}
               </div>
