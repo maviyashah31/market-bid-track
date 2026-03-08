@@ -187,8 +187,8 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <h1 className="font-display font-extrabold text-2xl md:text-3xl">
-              <span className="text-gradient-hero">Bulk</span>
-              <span className="text-foreground">ur</span>
+              <span className="text-primary-foreground">Bulk</span>
+              <span className="text-primary-foreground/80">ur</span>
             </h1>
           </Link>
 
