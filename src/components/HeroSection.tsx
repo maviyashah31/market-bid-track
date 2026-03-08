@@ -2,6 +2,8 @@ import { Shield, Truck, Users, FileText, Search, ArrowRight, ShoppingCart, Packa
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { categories } from "@/data/mockData";
 
 const qualities = [
 {
@@ -81,6 +83,24 @@ const HeroSection = () => {
                 <ArrowRight className="h-3.5 w-3.5 hidden sm:block" />
               </button>
             </div>
+          </motion.div>
+
+          {/* Quick Categories */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            className="flex gap-2 mt-3 max-w-lg">
+            {categories.slice(0, 4).map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/products?category=${encodeURIComponent(cat.name)}`}
+                className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+              >
+                <span className="text-base group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <span className="font-display font-semibold text-[10px] sm:text-xs text-foreground truncate">{cat.name}</span>
+              </Link>
+            ))}
           </motion.div>
 
         </div>
