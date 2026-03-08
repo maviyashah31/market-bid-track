@@ -282,29 +282,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Categories bar — only on default/public pages */}
-      {showCategories && (
-        <div className="hidden md:block border-t border-border">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-6 py-2 overflow-x-auto text-sm font-body">
-              <button className="flex items-center gap-1 font-semibold text-primary hover:text-primary/80 transition whitespace-nowrap">
-                <Menu className="h-4 w-4" />
-                All Categories
-                <ChevronDown className="h-3 w-3" />
-              </button>
-              {categories.map((cat) => (
-                <Link
-                  key={cat}
-                  to={`/products?category=${encodeURIComponent(cat)}`}
-                  className="text-muted-foreground hover:text-primary transition whitespace-nowrap"
-                >
-                  {cat}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Mobile menu */}
       {mobileOpen && (
