@@ -33,6 +33,7 @@ import DisputeManagement from "./pages/admin/DisputeManagement";
 import SettlementFinance from "./pages/admin/SettlementFinance";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import NotificationsPage from "./pages/admin/NotificationsPage";
+import ProductManagement from "./pages/admin/ProductManagement";
 
 const queryClient = new QueryClient();
 
