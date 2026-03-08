@@ -55,6 +55,39 @@ const SellerDashboard = () => {
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [responseText, setResponseText] = useState("");
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+  
+  // Product management
+  const sellerProducts = initialProducts.filter(p => p.sellerName === "Lahore Textile Mills" || p.sellerName === "Faisalabad Fabric House");
+  const [myProducts, setMyProducts] = useState<Product[]>(sellerProducts);
+  const [productFormOpen, setProductFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // RFQ bid
+  const [bidFormOpen, setBidFormOpen] = useState(false);
+  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
+
+  const handleSaveProduct = (data: Partial<Product>) => {
+    if (editingProduct) {
+      setMyProducts(prev => prev.map(p => p.id === editingProduct.id ? { ...p, ...data } : p));
+    } else {
+      const newProduct: Product = {
+        id: String(Date.now()),
+        sellerName: "Lahore Textile Mills",
+        sellerVerified: true,
+        sellerRating: 4.8,
+        sellerLocation: "Lahore",
+        responseTime: "< 2 hours",
+        ordersCompleted: 0,
+        ...data,
+      } as Product;
+      setMyProducts(prev => [...prev, newProduct]);
+    }
+    setEditingProduct(null);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setMyProducts(prev => prev.filter(p => p.id !== id));
+  };
 
   const sellerDisputes = disputes.filter(d => d.sellerName === "Lahore Textile Mills");
   const activeDisputeCount = sellerDisputes.filter(d => d.status !== "resolved" && d.status !== "closed").length;
