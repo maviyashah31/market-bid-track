@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const categories = [
@@ -116,6 +117,7 @@ const Navbar = () => {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -125,10 +127,15 @@ const Navbar = () => {
   const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
 
   const handleNavSearch = () => {
+    const params = new URLSearchParams();
     if (navSearch.trim()) {
-      navigate(`/products?search=${encodeURIComponent(navSearch.trim())}`);
-      setNavSearch("");
+      params.set("search", navSearch.trim());
     }
+    if (selectedCategory !== "all") {
+      params.set("category", selectedCategory);
+    }
+    navigate(`/products?${params.toString()}`);
+    setNavSearch("");
   };
 
   const markAllRead = () => {
@@ -196,6 +203,20 @@ const Navbar = () => {
           {showSearch && (
             <div className="hidden md:flex items-center flex-1">
               <div className="flex w-full rounded-lg overflow-hidden border border-border bg-white focus-within:ring-2 focus-within:ring-primary-foreground/30 transition-all">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="border-0 rounded-none bg-transparent h-8 w-32 text-sm focus:ring-0">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="w-px bg-border"></div>
                 <div className="flex items-center pl-2.5 text-muted-foreground">
                   <Search className="h-3.5 w-3.5" />
                 </div>
@@ -204,7 +225,7 @@ const Navbar = () => {
                   value={navSearch}
                   onChange={(e) => setNavSearch(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
-                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-foreground placeholder:text-muted-foreground"
+                  className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-foreground placeholder:text-muted-foreground flex-1"
                 />
               </div>
             </div>
