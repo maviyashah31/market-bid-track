@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { products as initialProducts, disputes, disputeReasons, type Dispute, type Product } from "@/data/mockData";
+import { products as initialProducts, disputes, disputeReasons, chatConversations, chatMessages, type Dispute, type Product, type ChatMessage } from "@/data/mockData";
 import { rfqDetails, type RFQDetail } from "@/data/rfqData";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
