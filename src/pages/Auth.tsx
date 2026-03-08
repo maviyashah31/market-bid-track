@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +18,7 @@ const Auth = () => {
   };
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
       <div className="hidden lg:flex flex-1 bg-gradient-hero items-center justify-center p-12">
@@ -113,6 +115,7 @@ const Auth = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

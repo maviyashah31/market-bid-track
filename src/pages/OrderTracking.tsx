@@ -4,6 +4,7 @@ import { buyerOrders } from "@/data/mockData";
 import { Package, CheckCircle2, Truck, Clock, MapPin, ArrowLeft, Box, ClipboardCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const allSteps = [
   { key: "placed", label: "Order Placed", icon: ClipboardCheck, desc: "Your order has been placed successfully" },
@@ -24,6 +25,7 @@ const OrderTracking = () => {
   const currentIdx = statusIndex[order.status] ?? 0;
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -102,6 +104,7 @@ const OrderTracking = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

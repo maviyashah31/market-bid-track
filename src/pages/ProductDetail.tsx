@@ -5,6 +5,7 @@ import { products } from "@/data/mockData";
 import { BadgeCheck, Star, MapPin, Clock, ShoppingCart, MessageSquare, Shield, Truck, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const moqTiers = [
   { range: "1 - 99", price: "350" },
@@ -18,6 +19,7 @@ const ProductDetail = () => {
   const product = products.find((p) => p.id === id) || products[0];
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
@@ -99,6 +101,7 @@ const ProductDetail = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 

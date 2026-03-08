@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const Messages = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>("1");
@@ -40,6 +41,7 @@ const Messages = () => {
   };
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 flex overflow-hidden" style={{ height: "calc(100vh - 140px)" }}>
@@ -159,6 +161,7 @@ const Messages = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

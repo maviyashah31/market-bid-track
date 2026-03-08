@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const stats = [
   { icon: DollarSign, label: "Revenue", value: "PKR 2.45M", change: "+12.5%", up: true },
@@ -48,6 +49,7 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
@@ -281,6 +283,7 @@ const SellerDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

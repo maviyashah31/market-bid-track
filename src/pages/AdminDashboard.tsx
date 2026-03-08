@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const stats = [
   { icon: Users, label: "Total Users", value: "8,542", change: "+245", color: "text-primary" },
@@ -56,6 +57,7 @@ const AdminDashboard = () => {
   );
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
@@ -314,6 +316,7 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

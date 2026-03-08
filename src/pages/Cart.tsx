@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Minus, Plus, Trash2, ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import AnimatedPage from "@/components/AnimatedPage";
 
 interface CartItem {
   id: string;
@@ -38,6 +39,7 @@ const Cart = () => {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
@@ -107,6 +109,7 @@ const Cart = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 

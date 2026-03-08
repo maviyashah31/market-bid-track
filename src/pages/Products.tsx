@@ -7,11 +7,13 @@ import { SlidersHorizontal, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const Products = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   return (
+    <AnimatedPage>
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
@@ -98,6 +100,7 @@ const Products = () => {
       </div>
       <Footer />
     </div>
+    </AnimatedPage>
   );
 };
 
