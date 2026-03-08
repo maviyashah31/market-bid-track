@@ -143,15 +143,15 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.25 }}
-            className="flex gap-2 mt-3 max-w-lg">
+            className="flex gap-2 mt-3">
             {categories.slice(0, 4).map((cat) => (
               <Link
                 key={cat.id}
                 to={`/products?category=${encodeURIComponent(cat.name)}`}
-                className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+                className="w-16 h-16 sm:w-20 sm:h-20 flex flex-col items-center justify-center gap-1 rounded-xl bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group"
               >
-                <span className="text-base group-hover:scale-110 transition-transform">{cat.icon}</span>
-                <span className="font-display font-semibold text-[10px] sm:text-xs text-foreground truncate">{cat.name}</span>
+                <span className="text-lg sm:text-xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <span className="font-display font-semibold text-[8px] sm:text-[10px] text-foreground truncate max-w-full px-1">{cat.name}</span>
               </Link>
             ))}
           </motion.div>
