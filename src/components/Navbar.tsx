@@ -1,11 +1,11 @@
-import { ShoppingCart, User, Menu, X, ChevronDown, Bell, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingCart, User, Menu, X, ChevronDown, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ThemeToggle from "@/components/ThemeToggle";
+
 const categories = [
   "Textiles & Garments",
   "Electronics",
@@ -48,14 +48,67 @@ const typeLabels: Record<string, string> = {
   rfq: "RFQ",
 };
 
+type NavVariant = "default" | "buyer" | "seller" | "admin";
+
+interface NavLinkItem {
+  label: string;
+  to: string;
+  icon?: React.ElementType;
+}
+
+const navLinksByVariant: Record<NavVariant, NavLinkItem[]> = {
+  default: [
+    { label: "Become a Seller", to: "/seller/dashboard", icon: Store },
+    { label: "Post RFQ", to: "/buyer/dashboard", icon: FileText },
+    { label: "Products", to: "/products", icon: Package },
+    { label: "Help", to: "/help", icon: HelpCircle },
+  ],
+  buyer: [
+    { label: "Browse Products", to: "/products", icon: Package },
+    { label: "My Orders", to: "/buyer/dashboard", icon: Package },
+    { label: "Messages", to: "/messages" },
+    { label: "Help", to: "/help", icon: HelpCircle },
+  ],
+  seller: [
+    { label: "My Products", to: "/seller/dashboard", icon: Package },
+    { label: "Orders", to: "/seller/dashboard", icon: Package },
+    { label: "RFQ Marketplace", to: "/seller/dashboard", icon: FileText },
+    { label: "Messages", to: "/messages" },
+  ],
+  admin: [
+    { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
+    { label: "Suppliers", to: "/admin/suppliers" },
+    { label: "Orders", to: "/admin/orders" },
+    { label: "Disputes", to: "/admin/disputes" },
+  ],
+};
+
+const topBarText: Record<NavVariant, string> = {
+  default: "🇵🇰 Pakistan's #1 B2B Wholesale Marketplace",
+  buyer: "🛒 Buyer Dashboard — Source products from verified Pakistani suppliers",
+  seller: "📦 Seller Dashboard — Manage your store and grow your business",
+  admin: "🔒 Admin Panel — BULKUR Platform Management",
+};
+
+function detectVariant(pathname: string): NavVariant {
+  if (pathname.startsWith("/admin")) return "admin";
+  if (pathname.startsWith("/seller/dashboard")) return "seller";
+  if (pathname.startsWith("/buyer/dashboard")) return "buyer";
+  return "default";
+}
+
 const Navbar = () => {
+  const location = useLocation();
+  const variant = detectVariant(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
-  
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const links = navLinksByVariant[variant];
+  const showCart = variant === "default" || variant === "buyer";
+  const showCategories = variant === "default";
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -65,7 +118,6 @@ const Navbar = () => {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
   };
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -81,10 +133,20 @@ const Navbar = () => {
       {/* Top bar */}
       <div className="bg-gradient-hero">
         <div className="container mx-auto flex items-center justify-between px-4 py-1.5 sm:py-2 text-primary-foreground text-xs sm:text-sm">
-          <span className="font-display font-semibold truncate">🇵🇰 Pakistan's #1 B2B Wholesale Marketplace</span>
+          <span className="font-display font-semibold truncate">{topBarText[variant]}</span>
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
-            <Link to="/help" className="hover:underline">Help</Link>
+            {variant === "default" && (
+              <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
+            )}
+            {variant === "buyer" && (
+              <Link to="/seller/dashboard" className="hover:underline">Switch to Seller</Link>
+            )}
+            {variant === "seller" && (
+              <Link to="/buyer/dashboard" className="hover:underline">Switch to Buyer</Link>
+            )}
+            {variant !== "admin" && (
+              <Link to="/help" className="hover:underline">Help</Link>
+            )}
           </div>
         </div>
       </div>
@@ -102,10 +164,15 @@ const Navbar = () => {
 
           {/* Nav Links */}
           <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
-            <Link to="/seller/dashboard" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Become a Seller</Link>
-            <Link to="/buyer/dashboard" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Post RFQ</Link>
-            <Link to="/help" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">Help</Link>
-            <Link to="/how-it-works" className="text-sm font-body font-semibold text-foreground hover:text-primary transition">How It Works</Link>
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="text-sm font-body font-semibold text-foreground hover:text-primary transition"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Actions */}
@@ -162,7 +229,7 @@ const Navbar = () => {
                     ))}
                   </ScrollArea>
                   <div className="p-3 border-t border-border text-center">
-                    <Link to="/buyer/dashboard" onClick={() => setNotifOpen(false)} className="text-xs text-primary font-semibold hover:underline font-body">
+                    <Link to={variant === "seller" ? "/seller/dashboard" : "/buyer/dashboard"} onClick={() => setNotifOpen(false)} className="text-xs text-primary font-semibold hover:underline font-body">
                       View all notifications
                     </Link>
                   </div>
@@ -170,18 +237,22 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link to="/auth">
-              <Button variant="ghost" size="sm" className="gap-2 font-body">
-                <User className="h-4 w-4" />
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/cart">
-              <Button variant="ghost" size="sm" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
-              </Button>
-            </Link>
+            {variant !== "admin" && (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm" className="gap-2 font-body">
+                  <User className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
+            {showCart && (
+              <Link to="/cart">
+                <Button variant="ghost" size="sm" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">3</span>
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -191,54 +262,68 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Categories bar */}
-      <div className="hidden md:block border-t border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-6 py-2 overflow-x-auto text-sm font-body">
-            <button className="flex items-center gap-1 font-semibold text-primary hover:text-primary/80 transition whitespace-nowrap">
-              <Menu className="h-4 w-4" />
-              All Categories
-              <ChevronDown className="h-3 w-3" />
-            </button>
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                to={`/products?category=${encodeURIComponent(cat)}`}
-                className="text-muted-foreground hover:text-primary transition whitespace-nowrap"
-              >
-                {cat}
-              </Link>
-            ))}
+      {/* Categories bar — only on default/public pages */}
+      {showCategories && (
+        <div className="hidden md:block border-t border-border">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-6 py-2 overflow-x-auto text-sm font-body">
+              <button className="flex items-center gap-1 font-semibold text-primary hover:text-primary/80 transition whitespace-nowrap">
+                <Menu className="h-4 w-4" />
+                All Categories
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {categories.map((cat) => (
+                <Link
+                  key={cat}
+                  to={`/products?category=${encodeURIComponent(cat)}`}
+                  className="text-muted-foreground hover:text-primary transition whitespace-nowrap"
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card p-4 space-y-3">
-          <div className="flex rounded-lg overflow-hidden border border-border">
-            <Input placeholder="Search..." className="border-0 rounded-none" />
-            <button className="bg-primary px-4 text-primary-foreground">
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
+          {variant === "default" && (
+            <div className="flex rounded-lg overflow-hidden border border-border">
+              <Input placeholder="Search..." className="border-0 rounded-none" />
+              <button className="bg-primary px-4 text-primary-foreground">
+                <Search className="h-4 w-4" />
+              </button>
+            </div>
+          )}
           <div className="space-y-2">
-            <Link to="/seller/dashboard" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Become a Seller</Link>
-            <Link to="/buyer/dashboard" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Post RFQ</Link>
-            <Link to="/help" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">Help</Link>
-            <Link to="/how-it-works" className="block py-1 text-sm font-semibold text-foreground hover:text-primary">How It Works</Link>
-          </div>
-          <div className="space-y-2 pt-2 border-t border-border">
-            {categories.map((cat) => (
-              <Link key={cat} to={`/products?category=${encodeURIComponent(cat)}`} className="block py-1 text-sm text-muted-foreground hover:text-primary">
-                {cat}
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="block py-1 text-sm font-semibold text-foreground hover:text-primary"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
               </Link>
             ))}
           </div>
+          {showCategories && (
+            <div className="space-y-2 pt-2 border-t border-border">
+              {categories.map((cat) => (
+                <Link key={cat} to={`/products?category=${encodeURIComponent(cat)}`} className="block py-1 text-sm text-muted-foreground hover:text-primary" onClick={() => setMobileOpen(false)}>
+                  {cat}
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2 pt-2 border-t border-border">
-            <Link to="/auth" className="flex-1">
-              <Button className="w-full" size="sm">Sign In</Button>
-            </Link>
+            {variant !== "admin" && (
+              <Link to="/auth" className="flex-1">
+                <Button className="w-full" size="sm">Sign In</Button>
+              </Link>
+            )}
             <Link to="/messages">
               <Button variant="outline" size="sm" className="relative">
                 <Bell className="h-4 w-4" />
@@ -249,9 +334,11 @@ const Navbar = () => {
                 )}
               </Button>
             </Link>
-            <Link to="/cart">
-              <Button variant="outline" size="sm"><ShoppingCart className="h-4 w-4" /></Button>
-            </Link>
+            {showCart && (
+              <Link to="/cart">
+                <Button variant="outline" size="sm"><ShoppingCart className="h-4 w-4" /></Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
