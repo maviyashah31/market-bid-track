@@ -49,9 +49,9 @@ const HeroSection = () => {
 
   return (
     <section className="bg-gradient-hero py-3 sm:py-4 md:py-6">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:gap-8">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between md:gap-6">
         {/* Left: Heading + Search */}
-        <div className="flex-1 mb-4 md:mb-0">
+        <div className="flex-1 max-w-xl mb-4 md:mb-0">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ const HeroSection = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 gap-3 w-full md:w-auto md:max-w-sm"
+          className="grid grid-cols-2 gap-3 w-full md:w-[320px] shrink-0"
         >
           {qualities.map((q) => (
             <motion.div
