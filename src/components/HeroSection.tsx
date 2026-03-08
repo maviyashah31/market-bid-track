@@ -1,86 +1,32 @@
-import { Search, ArrowRight, Shield, Truck, BadgeCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import heroBanner from "@/assets/hero-banner.jpg";
-import { Link } from "react-router-dom";
+import { Shield, Truck, BadgeCheck } from "lucide-react";
 
-const stats = [
-  { label: "Verified Suppliers", value: "12,000+" },
-  { label: "Product Categories", value: "500+" },
-  { label: "Orders Fulfilled", value: "2.5M+" },
-  { label: "Cities Covered", value: "180+" },
+const trustBadges = [
+  { icon: Shield, text: "Secure Escrow Payments" },
+  { icon: BadgeCheck, text: "Verified Suppliers" },
+  { icon: Truck, text: "Pan-Pakistan Delivery" },
 ];
 
 const HeroSection = () => (
-  <section className="relative overflow-hidden">
-    <div className="absolute inset-0">
-      <img src={heroBanner} alt="B2B Wholesale Marketplace" className="w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-foreground/70" />
-    </div>
-
-    <div className="relative container mx-auto px-4 py-10 sm:py-16 md:py-24">
-      <div className="max-w-2xl">
-        <div className="inline-flex items-center gap-2 bg-primary/20 text-primary-foreground px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-4 sm:mb-6 backdrop-blur-sm">
-          <BadgeCheck className="h-4 w-4" />
-          Pakistan's Trusted B2B Platform
-        </div>
-        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight mb-3 sm:mb-4">
-          Source Wholesale,{" "}
-          <span className="text-gradient-hero">Grow Your Business</span>
-        </h1>
-        <p className="text-sm sm:text-lg text-primary-foreground/80 mb-6 sm:mb-8 font-body">
-          Connect with verified Pakistani suppliers. Get the best wholesale prices on textiles, electronics, agriculture, and 500+ categories.
-        </p>
-
-        <div className="flex rounded-xl overflow-hidden shadow-lg mb-6 sm:mb-8">
-          <Input
-            placeholder="What are you looking for?"
-            className="h-11 sm:h-14 border-0 rounded-none text-sm sm:text-base bg-card text-foreground font-body"
-          />
-          <button className="bg-gradient-hero px-4 sm:px-8 text-primary-foreground font-semibold hover:opacity-90 transition flex items-center gap-2 whitespace-nowrap">
-            <Search className="h-5 w-5" />
-            <span className="hidden sm:inline">Search</span>
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <Link to="/products">
-            <Button variant="secondary" className="gap-2 font-body">
-              Browse Products <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link to="/rfq">
-            <Button variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 gap-2 font-body">
-              Post an RFQ
-            </Button>
-          </Link>
-        </div>
+  <section className="bg-gradient-hero py-12 sm:py-16 md:py-20">
+    <div className="container mx-auto px-4 text-center">
+      <div className="inline-flex items-center gap-2 bg-primary-foreground/15 text-primary-foreground px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-4 sm:mb-6 backdrop-blur-sm">
+        <BadgeCheck className="h-4 w-4" />
+        Pakistan's Trusted B2B Platform
       </div>
+      <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight mb-3 sm:mb-4">
+        Source Wholesale, Grow Your Business
+      </h1>
+      <p className="text-sm sm:text-lg text-primary-foreground/80 mb-8 sm:mb-10 font-body max-w-2xl mx-auto">
+        Connect with verified Pakistani suppliers. Get the best wholesale prices on textiles, electronics, agriculture, and 500+ categories.
+      </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-12">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-card/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-primary-foreground/10">
-            <div className="font-display font-extrabold text-lg sm:text-2xl text-primary-foreground">{stat.value}</div>
-            <div className="text-xs sm:text-sm text-primary-foreground/70 font-body">{stat.label}</div>
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+        {trustBadges.map(({ icon: Icon, text }) => (
+          <div key={text} className="bg-primary-foreground/10 backdrop-blur-md rounded-xl px-4 py-3 sm:px-6 sm:py-4 border border-primary-foreground/15 flex items-center gap-2.5">
+            <Icon className="h-5 w-5 text-primary-foreground" />
+            <span className="text-xs sm:text-sm font-semibold text-primary-foreground">{text}</span>
           </div>
         ))}
-      </div>
-    </div>
-
-    <div className="relative bg-card border-t border-border">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-wrap justify-center gap-8 text-sm font-body">
-          {[
-            { icon: Shield, text: "Secure Escrow Payments" },
-            { icon: BadgeCheck, text: "Verified Suppliers" },
-            { icon: Truck, text: "Pan-Pakistan Delivery" },
-          ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-2 text-muted-foreground">
-              <Icon className="h-5 w-5 text-primary" />
-              <span>{text}</span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   </section>
