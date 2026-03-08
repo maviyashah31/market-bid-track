@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { buyerOrders, products, rfqs, disputes, disputeReasons } from "@/data/mockData";
+import { buyerOrders, products, disputes, disputeReasons } from "@/data/mockData";
+import { rfqDetails } from "@/data/rfqData";
 import {
   Package, FileText, MessageSquare, Star, Heart, ShoppingCart,
-  ArrowRight, Clock, Eye, MapPin, AlertTriangle, Users
+  ArrowRight, Clock, Eye, MapPin, AlertTriangle, Users, Image as ImageIcon
 } from "lucide-react";
 import PostRFQForm from "@/components/PostRFQForm";
+import RFQDetailDialog from "@/components/RFQDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
