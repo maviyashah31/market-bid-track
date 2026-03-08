@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -11,6 +12,20 @@ import AnimatedPage from "@/components/AnimatedPage";
 
 const Products = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+  const categoryFilter = searchParams.get("category") || "";
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      const matchesSearch = !searchQuery || 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = !categoryFilter || p.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, categoryFilter]);
 
   return (
     <AnimatedPage>
@@ -64,8 +79,8 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="font-display font-bold text-xl sm:text-2xl text-foreground">All Products</h1>
-                <p className="text-sm text-muted-foreground font-body">{products.length} products found</p>
+                <h1 className="font-display font-bold text-xl sm:text-2xl text-foreground">{searchQuery ? `Results for "${searchQuery}"` : categoryFilter ? categoryFilter : "All Products"}</h1>
+                <p className="text-sm text-muted-foreground font-body">{filteredProducts.length} products found</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -91,7 +106,7 @@ const Products = () => {
               ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               : "space-y-4"
             }>
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
