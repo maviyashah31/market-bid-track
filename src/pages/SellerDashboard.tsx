@@ -154,7 +154,7 @@ const SellerDashboard = () => {
 
   const handleNavClick = (value: string) => {
     if (value === "orders") {
-      window.location.href = "/seller/orders";
+      navigate("/seller/orders");
       return;
     }
     setActiveTab(value);
