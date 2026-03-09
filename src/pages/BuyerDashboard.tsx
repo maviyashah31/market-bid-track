@@ -41,7 +41,7 @@ const sidebarItems = [
   { icon: Package, label: "Orders", value: "orders", count: 3 },
   { icon: FileText, label: "My RFQs", value: "rfqs" },
   { icon: AlertTriangle, label: "Disputes", value: "disputes", count: disputes.length },
-  { icon: MessageSquare, label: "Messages", value: "messages", count: 5, href: "/messages" },
+  { icon: MessageSquare, label: "Messages", value: "messages", count: 5 },
   { icon: Star, label: "Reviews", value: "reviews" },
   { icon: Heart, label: "Wishlist", value: "wishlist", count: 12 },
   { icon: ShoppingCart, label: "Cart", value: "cart", href: "/cart" },
