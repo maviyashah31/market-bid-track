@@ -1,7 +1,6 @@
-import { Users, FileText } from "lucide-react";
+import { Zap, ChefHat, Briefcase, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { categories } from "@/data/mockData";
 
 const qualities = [
 {
