@@ -1,23 +1,9 @@
-import { Shield, Truck, Users, FileText } from "lucide-react";
+import { Users, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { categories } from "@/data/mockData";
 
 const qualities = [
-{
-  icon: Shield,
-  title: "Buyer Protection",
-  desc: "Every order secured with escrow payments",
-  bg: "bg-[hsl(280,80%,55%)]",
-  iconColor: "text-white"
-},
-{
-  icon: Truck,
-  title: "Next-Day Delivery",
-  desc: "Fast shipping across Pakistan within 24hrs",
-  bg: "bg-[hsl(160,70%,45%)]",
-  iconColor: "text-white"
-},
 {
   icon: Users,
   title: "Verified Suppliers",
