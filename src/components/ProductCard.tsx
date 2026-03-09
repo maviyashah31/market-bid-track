@@ -7,14 +7,14 @@ const ProductCard = ({ product }: { product: Product }) => (
     to={`/product/${product.id}`}
     className="group bg-card rounded-lg border border-border overflow-hidden hover:shadow-md hover:border-primary/30 transition-all"
   >
-    <div className="aspect-square overflow-hidden bg-muted">
+    <div className="aspect-[4/3] overflow-hidden bg-muted">
       <img
         src={product.image}
         alt={product.name}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
     </div>
-    <div className="p-3">
+    <div className="p-2.5">
       <h3 className="font-display font-semibold text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors leading-snug">
         {product.name}
       </h3>
