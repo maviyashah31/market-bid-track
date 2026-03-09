@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Menu, X, ChevronDown, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
+import { ShoppingCart, User, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -113,7 +113,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const variant = detectVariant(location.pathname);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
@@ -321,9 +321,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             )}
-            <button className="text-primary-foreground p-1" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
         </div>
 
@@ -347,7 +344,7 @@ const Navbar = () => {
       </div>
 
       {/* Links bar below header */}
-      <nav className="hidden md:block border-t border-border bg-card">
+      <nav className="border-t border-border bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-8 py-1.5">
             {links.map((link) => (
@@ -364,54 +361,7 @@ const Navbar = () => {
       </nav>
 
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-card p-4 space-y-3">
-          <div className="space-y-2">
-            {links.map((link) => (
-              <Link
-                key={link.label}
-                to={link.to}
-                className="block py-1 text-sm font-semibold text-foreground hover:text-primary"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          {showCategories && (
-            <div className="space-y-2 pt-2 border-t border-border">
-              {categories.map((cat) => (
-                <Link key={cat} to={`/products?category=${encodeURIComponent(cat)}`} className="block py-1 text-sm text-muted-foreground hover:text-primary" onClick={() => setMobileOpen(false)}>
-                  {cat}
-                </Link>
-              ))}
-            </div>
-          )}
-          <div className="flex gap-2 pt-2 border-t border-border">
-            {variant !== "admin" && (
-              <Link to="/auth" className="flex-1">
-                <Button className="w-full" size="sm">Sign In</Button>
-              </Link>
-            )}
-            <Link to="/messages">
-              <Button variant="outline" size="sm" className="relative">
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">
-                    {unreadCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            {showCart && (
-              <Link to="/cart">
-                <Button variant="outline" size="sm"><ShoppingCart className="h-4 w-4" /></Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+
     </header>
   );
 };
