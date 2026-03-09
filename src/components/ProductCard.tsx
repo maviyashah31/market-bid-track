@@ -14,7 +14,7 @@ const ProductCard = ({ product }: { product: Product }) => (
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
     </div>
-    <div className="p-3">
+    <div className="p-2.5">
       <h3 className="font-display font-semibold text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors leading-snug">
         {product.name}
       </h3>
