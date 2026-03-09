@@ -1,23 +1,33 @@
-import { Users, FileText } from "lucide-react";
+import { Zap, ChefHat, Briefcase, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { categories } from "@/data/mockData";
 
-const qualities = [
-{
-  icon: Users,
-  title: "Verified Suppliers",
-  desc: "5,000+ vetted suppliers with quality ratings",
-  bg: "bg-[hsl(35,90%,55%)]",
-  iconColor: "text-white"
-},
-{
-  icon: FileText,
-  title: "RFQ Marketplace",
-  desc: "Post needs & let suppliers compete for you",
-  bg: "bg-[hsl(200,85%,50%)]",
-  iconColor: "text-white"
-}];
+const supplyCategories = [
+  {
+    icon: Zap,
+    title: "Electrical Supply",
+    bg: "bg-amber-500",
+    iconColor: "text-white"
+  },
+  {
+    icon: ChefHat,
+    title: "Restaurant Supply", 
+    bg: "bg-red-500",
+    iconColor: "text-white"
+  },
+  {
+    icon: Briefcase,
+    title: "Office Supply",
+    bg: "bg-blue-500", 
+    iconColor: "text-white"
+  },
+  {
+    icon: Stethoscope,
+    title: "Medical Instruments and Supply",
+    bg: "bg-green-500",
+    iconColor: "text-white"
+  }
+];
 
 
 const container = {
@@ -53,44 +63,25 @@ const HeroSection = () => {
               Order in bulk and get it delivered on your doorstep. The only B2B marketplace in Pakistan
             </motion.p>
 
-            {/* Quick Categories */}
+            {/* Supply Categories */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="grid grid-cols-4 gap-2">
-              {categories.slice(0, 4).map((cat) => (
+              className="grid grid-cols-2 gap-3">
+              {supplyCategories.map((category) => (
                 <Link
-                  key={cat.id}
-                  to={`/products?category=${encodeURIComponent(cat.name)}`}
-                  className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group py-3"
+                  key={category.title}
+                  to={`/products?category=${encodeURIComponent(category.title)}`}
+                  className={`${category.bg} flex flex-col items-center justify-center gap-2 rounded-xl hover:shadow-lg transition-all cursor-pointer group p-4`}
                 >
-                  <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{cat.icon}</span>
-                  <span className="font-display font-semibold text-[9px] sm:text-[11px] text-foreground truncate max-w-full px-1">{cat.name}</span>
+                  <category.icon className={`h-6 w-6 ${category.iconColor} group-hover:scale-110 transition-transform`} />
+                  <span className="font-display font-semibold text-white text-center text-xs leading-tight">{category.title}</span>
                 </Link>
               ))}
             </motion.div>
           </div>
 
-          {/* Right: 4 Cards in 2x2 */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-2 gap-4 w-full md:w-[380px] shrink-0">
-            {qualities.map((q) => (
-              <motion.div
-                key={q.title}
-                variants={item}
-                className={`${q.bg} rounded-xl p-5 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-200 cursor-default shadow-md`}>
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                  <q.icon className={`h-6 w-6 ${q.iconColor}`} />
-                </div>
-                <h3 className="font-display font-bold text-white text-sm mb-1">{q.title}</h3>
-                <p className="text-white/80 font-body text-xs leading-snug">{q.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
     </>
