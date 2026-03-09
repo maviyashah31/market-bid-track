@@ -82,7 +82,7 @@ const BuyerDashboard = () => {
   return (
     <AnimatedPage>
       <div className="min-h-screen bg-background">
-        <Navbar />
+        {!isMobile && <Navbar />}
         <div className="flex">
           {/* Sidebar */}
           {(isMobile ? sidebarOpen : true) && (
