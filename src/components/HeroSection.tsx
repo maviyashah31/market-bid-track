@@ -82,25 +82,6 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Right: 4 Cards in 2x2 */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-2 gap-4 w-full md:w-[380px] shrink-0">
-            {qualities.map((q) => (
-              <motion.div
-                key={q.title}
-                variants={item}
-                className={`${q.bg} rounded-xl p-5 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-200 cursor-default shadow-md`}>
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                  <q.icon className={`h-6 w-6 ${q.iconColor}`} />
-                </div>
-                <h3 className="font-display font-bold text-white text-sm mb-1">{q.title}</h3>
-                <p className="text-white/80 font-body text-xs leading-snug">{q.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
     </>
