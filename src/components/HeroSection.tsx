@@ -55,9 +55,17 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="font-display font-extrabold text-2xl sm:text-3xl md:text-5xl text-primary-foreground leading-tight mb-5">
+              className="font-display font-extrabold text-2xl sm:text-3xl md:text-5xl text-primary-foreground leading-tight mb-3">
               Bulk buying now made easy!
             </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="font-body text-lg sm:text-xl text-primary-foreground/90 leading-relaxed mb-6">
+              Order in bulk and get it delivered on your doorstep. The only B2B marketplace in Pakistan
+            </motion.p>
 
             {/* Quick Categories */}
             <motion.div
