@@ -311,11 +311,39 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile toggle */}
-          <button className="md:hidden ml-auto text-primary-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile actions */}
+          <div className="flex md:hidden items-center gap-1 ml-auto">
+            {showCart && (
+              <Link to="/cart">
+                <Button variant="ghost" size="sm" className="relative text-primary-foreground hover:bg-primary-foreground/10 p-1">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 bg-primary-foreground text-primary text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">3</span>
+                </Button>
+              </Link>
+            )}
+            <button className="text-primary-foreground p-1" onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile search bar */}
+        {showSearch && (
+          <div className="md:hidden px-4 pb-3">
+            <div className="flex w-full rounded-lg overflow-hidden border border-border bg-white focus-within:ring-2 focus-within:ring-primary-foreground/30 transition-all">
+              <div className="flex items-center pl-2.5 text-muted-foreground">
+                <Search className="h-3.5 w-3.5" />
+              </div>
+              <Input
+                placeholder="Search products..."
+                value={navSearch}
+                onChange={(e) => setNavSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleNavSearch()}
+                className="border-0 rounded-none focus-visible:ring-0 font-body bg-transparent h-8 text-sm text-foreground placeholder:text-muted-foreground flex-1"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Links bar below header */}
