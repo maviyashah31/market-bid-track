@@ -344,7 +344,7 @@ const Navbar = () => {
       </div>
 
       {/* Links bar below header */}
-      <nav className="hidden md:block border-t border-border bg-card">
+      <nav className="border-t border-border bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-8 py-1.5">
             {links.map((link) => (
