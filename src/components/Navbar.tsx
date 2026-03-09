@@ -367,14 +367,6 @@ const Navbar = () => {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card p-4 space-y-3">
-          {variant === "default" && (
-            <div className="flex rounded-lg overflow-hidden border border-border">
-              <Input placeholder="Search..." className="border-0 rounded-none" />
-              <button className="bg-primary px-4 text-primary-foreground">
-                <Search className="h-4 w-4" />
-              </button>
-            </div>
-          )}
           <div className="space-y-2">
             {links.map((link) => (
               <Link
