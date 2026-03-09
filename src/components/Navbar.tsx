@@ -113,7 +113,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const variant = detectVariant(location.pathname);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
