@@ -424,6 +424,39 @@ const BuyerDashboard = () => {
                 </div>
               )}
 
+              {/* Messages */}
+              {activeTab === "messages" && (
+                <div className="bg-card rounded-xl border border-border p-6">
+                  <h2 className="font-display font-bold text-xl text-foreground mb-6">Messages</h2>
+                  <div className="space-y-3">
+                    {[
+                      { id: "1", name: "Lahore Textile Mills", message: "Your order has been confirmed. We'll start processing it soon.", time: "2 min ago", unread: true },
+                      { id: "2", name: "Punjab Agro Exports", message: "Thank you for your payment. Order is being prepared for shipment.", time: "1 hour ago", unread: true },
+                      { id: "3", name: "Karachi Spice Co", message: "We have received your RFQ for organic turmeric. Our best quote is PKR 450/kg.", time: "3 hours ago", unread: false },
+                      { id: "4", name: "Islamabad Tech Parts", message: "Your laptop accessories are ready for dispatch. Tracking details will be shared soon.", time: "Yesterday", unread: false },
+                      { id: "5", name: "Faisalabad Cotton Mills", message: "We can offer you premium cotton at PKR 280/kg. Minimum order 500kg.", time: "2 days ago", unread: false }
+                    ].map((msg) => (
+                      <div key={msg.id} className={`border border-border rounded-lg p-4 hover:bg-accent/50 transition cursor-pointer ${msg.unread ? "bg-primary/5" : ""}`}>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`font-display font-semibold text-sm ${msg.unread ? "text-foreground" : "text-muted-foreground"}`}>
+                                {msg.name}
+                              </span>
+                              {msg.unread && (
+                                <div className="h-2 w-2 rounded-full bg-primary"></div>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground font-body line-clamp-2">{msg.message}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground font-body whitespace-nowrap ml-3">{msg.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Wishlist */}
               {activeTab === "wishlist" && (
                 <div className="bg-card rounded-xl border border-border p-6">
