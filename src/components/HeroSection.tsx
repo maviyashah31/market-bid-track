@@ -63,20 +63,20 @@ const HeroSection = () => {
               Order in bulk and get it delivered on your doorstep. The only B2B marketplace in Pakistan
             </motion.p>
 
-            {/* Quick Categories */}
+            {/* Supply Categories */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="grid grid-cols-4 gap-2">
-              {categories.slice(0, 4).map((cat) => (
+              className="grid grid-cols-2 gap-3">
+              {supplyCategories.map((category) => (
                 <Link
-                  key={cat.id}
-                  to={`/products?category=${encodeURIComponent(cat.name)}`}
-                  className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-card/80 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group py-3"
+                  key={category.title}
+                  to={`/products?category=${encodeURIComponent(category.title)}`}
+                  className={`${category.bg} flex flex-col items-center justify-center gap-2 rounded-xl hover:shadow-lg transition-all cursor-pointer group p-4`}
                 >
-                  <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{cat.icon}</span>
-                  <span className="font-display font-semibold text-[9px] sm:text-[11px] text-foreground truncate max-w-full px-1">{cat.name}</span>
+                  <category.icon className={`h-6 w-6 ${category.iconColor} group-hover:scale-110 transition-transform`} />
+                  <span className="font-display font-semibold text-white text-center text-xs leading-tight">{category.title}</span>
                 </Link>
               ))}
             </motion.div>
