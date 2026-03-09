@@ -45,7 +45,7 @@ const HeroSection = () => {
     <>
       <section className="bg-gradient-hero py-6 sm:py-8 md:py-10">
         <div className="container mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-center md:gap-12">
-          {/* Left: Heading + Categories */}
+          {/* Left: Heading + Text */}
           <div className="flex-1 max-w-xl mb-6 md:mb-0">
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
@@ -62,25 +62,25 @@ const HeroSection = () => {
               className="font-body text-lg sm:text-xl text-primary-foreground/90 leading-relaxed mb-6">
               Order in bulk and get it delivered on your doorstep. The only B2B marketplace in Pakistan
             </motion.p>
-
-            {/* Supply Categories */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="grid grid-cols-2 gap-3">
-              {supplyCategories.map((category) => (
-                <Link
-                  key={category.title}
-                  to={`/products?category=${encodeURIComponent(category.title)}`}
-                  className={`${category.bg} flex flex-col items-center justify-center gap-2 rounded-xl hover:shadow-lg transition-all cursor-pointer group p-4`}
-                >
-                  <category.icon className={`h-6 w-6 ${category.iconColor} group-hover:scale-110 transition-transform`} />
-                  <span className="font-display font-semibold text-white text-center text-xs leading-tight">{category.title}</span>
-                </Link>
-              ))}
-            </motion.div>
           </div>
+
+          {/* Right: Supply Categories */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="grid grid-cols-2 gap-3 w-full md:w-[380px] shrink-0">
+            {supplyCategories.map((category) => (
+              <Link
+                key={category.title}
+                to={`/products?category=${encodeURIComponent(category.title)}`}
+                className={`${category.bg} flex flex-col items-center justify-center gap-2 rounded-xl hover:shadow-lg transition-all cursor-pointer group p-4`}
+              >
+                <category.icon className={`h-6 w-6 ${category.iconColor} group-hover:scale-110 transition-transform`} />
+                <span className="font-display font-semibold text-white text-center text-xs leading-tight">{category.title}</span>
+              </Link>
+            ))}
+          </motion.div>
 
         </div>
       </section>
