@@ -1,4 +1,4 @@
-import { Shield, Truck, Users, FileText } from "lucide-react";
+import { Users, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { categories } from "@/data/mockData";
