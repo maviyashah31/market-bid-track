@@ -361,54 +361,7 @@ const Navbar = () => {
       </nav>
 
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-card p-4 space-y-3">
-          <div className="space-y-2">
-            {links.map((link) => (
-              <Link
-                key={link.label}
-                to={link.to}
-                className="block py-1 text-sm font-semibold text-foreground hover:text-primary"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          {showCategories && (
-            <div className="space-y-2 pt-2 border-t border-border">
-              {categories.map((cat) => (
-                <Link key={cat} to={`/products?category=${encodeURIComponent(cat)}`} className="block py-1 text-sm text-muted-foreground hover:text-primary" onClick={() => setMobileOpen(false)}>
-                  {cat}
-                </Link>
-              ))}
-            </div>
-          )}
-          <div className="flex gap-2 pt-2 border-t border-border">
-            {variant !== "admin" && (
-              <Link to="/auth" className="flex-1">
-                <Button className="w-full" size="sm">Sign In</Button>
-              </Link>
-            )}
-            <Link to="/messages">
-              <Button variant="outline" size="sm" className="relative">
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold text-[10px]">
-                    {unreadCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            {showCart && (
-              <Link to="/cart">
-                <Button variant="outline" size="sm"><ShoppingCart className="h-4 w-4" /></Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+
     </header>
   );
 };
