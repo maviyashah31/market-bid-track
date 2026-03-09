@@ -2,21 +2,32 @@ import { Zap, ChefHat, Briefcase, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const qualities = [
-{
-  icon: Users,
-  title: "Verified Suppliers",
-  desc: "5,000+ vetted suppliers with quality ratings",
-  bg: "bg-[hsl(35,90%,55%)]",
-  iconColor: "text-white"
-},
-{
-  icon: FileText,
-  title: "RFQ Marketplace",
-  desc: "Post needs & let suppliers compete for you",
-  bg: "bg-[hsl(200,85%,50%)]",
-  iconColor: "text-white"
-}];
+const supplyCategories = [
+  {
+    icon: Zap,
+    title: "Electrical Supply",
+    bg: "bg-amber-500",
+    iconColor: "text-white"
+  },
+  {
+    icon: ChefHat,
+    title: "Restaurant Supply", 
+    bg: "bg-red-500",
+    iconColor: "text-white"
+  },
+  {
+    icon: Briefcase,
+    title: "Office Supply",
+    bg: "bg-blue-500", 
+    iconColor: "text-white"
+  },
+  {
+    icon: Stethoscope,
+    title: "Medical Instruments and Supply",
+    bg: "bg-green-500",
+    iconColor: "text-white"
+  }
+];
 
 
 const container = {
