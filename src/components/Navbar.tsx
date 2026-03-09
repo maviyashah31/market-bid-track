@@ -346,7 +346,8 @@ const Navbar = () => {
       {/* Links bar below header */}
       <nav className="border-t border-border bg-card">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-8 py-1.5">
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center justify-center gap-8 py-1.5">
             {links.map((link) => (
               <Link
                 key={link.label}
@@ -356,6 +357,22 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+          </div>
+          
+          {/* Mobile links */}
+          <div className="flex md:hidden items-center justify-center gap-6 py-1.5">
+            <Link
+              to="/buyer/dashboard"
+              className="text-sm font-body font-semibold text-foreground hover:text-primary transition"
+            >
+              Post RFQ
+            </Link>
+            <Link
+              to="/auth"
+              className="text-sm font-body font-semibold text-foreground hover:text-primary transition"
+            >
+              Sign In
+            </Link>
           </div>
         </div>
       </nav>
