@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, ShoppingBag, AlertTriangle, Wallet,
@@ -7,6 +7,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { adminNotifications } from "@/data/adminMockData";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import AuthGuard from "@/components/AuthGuard";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
@@ -20,29 +23,33 @@ const navItems = [
   { label: "Notifications", icon: Bell, path: "/admin/notifications" },
 ];
 
-export default function AdminLayout() {
+function AdminLayoutInner() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const unreadCount = adminNotifications.filter(n => !n.read).length;
+  const { toast } = useToast();
 
   const isActive = (path: string) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({ title: "Signed out successfully" });
+    navigate("/admin-login");
+  };
+
   return (
     <div className="min-h-screen flex" style={{ background: "#0a0f1e" }}>
-      {/* Sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 flex flex-col border-r transition-transform duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{ background: "#0d1225", borderColor: "#1a2340" }}>
-        {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b" style={{ borderColor: "#1a2340" }}>
           <Link to="/admin" className="flex items-center gap-2">
             <span className="font-extrabold text-xl text-white">BULK<span style={{ color: "#00b894" }}>UR</span></span>
@@ -53,7 +60,6 @@ export default function AdminLayout() {
           </button>
         </div>
 
-        {/* Nav */}
         <ScrollArea className="flex-1 py-4">
           <nav className="space-y-1 px-3">
             {navItems.map(item => (
@@ -62,9 +68,7 @@ export default function AdminLayout() {
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.path)
-                    ? "text-white"
-                    : "text-gray-400 hover:text-gray-200"
+                  isActive(item.path) ? "text-white" : "text-gray-400 hover:text-gray-200"
                 }`}
                 style={isActive(item.path) ? { background: "#00b89420", color: "#00b894" } : {}}
               >
@@ -80,10 +84,9 @@ export default function AdminLayout() {
           </nav>
         </ScrollArea>
 
-        {/* Logout */}
         <div className="p-3 border-t" style={{ borderColor: "#1a2340" }}>
           <button
-            onClick={() => navigate("/admin/login")}
+            onClick={handleSignOut}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-red-400 w-full transition-colors"
           >
             <LogOut className="h-4 w-4" />
@@ -92,9 +95,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Header */}
         <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 sm:px-6 border-b" style={{ background: "#0d1225", borderColor: "#1a2340" }}>
           <div className="flex items-center gap-3">
             <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(true)}>
@@ -106,7 +107,6 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Notification bell */}
             <div className="relative">
               <button onClick={() => setNotifOpen(!notifOpen)} className="relative p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
                 <Bell className="h-5 w-5" />
@@ -121,12 +121,7 @@ export default function AdminLayout() {
                   <div className="p-3 border-b font-semibold text-white text-sm" style={{ borderColor: "#1a2340" }}>Notifications</div>
                   <ScrollArea className="max-h-72">
                     {adminNotifications.slice(0, 6).map(n => (
-                      <Link
-                        key={n.id}
-                        to={n.link}
-                        onClick={() => setNotifOpen(false)}
-                        className="block p-3 border-b hover:bg-white/5 transition" style={{ borderColor: "#1a234060" }}
-                      >
+                      <Link key={n.id} to={n.link} onClick={() => setNotifOpen(false)} className="block p-3 border-b hover:bg-white/5 transition" style={{ borderColor: "#1a234060" }}>
                         <div className="flex items-center gap-2">
                           <p className="text-sm text-white font-medium">{n.title}</p>
                           {!n.read && <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: "#00b894" }} />}
@@ -143,21 +138,25 @@ export default function AdminLayout() {
               )}
             </div>
 
-            {/* Admin avatar */}
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "#00b894", color: "#0a0f1e" }}>
-                A
-              </div>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "#00b894", color: "#0a0f1e" }}>A</div>
               <span className="text-sm text-gray-300 hidden sm:block">Admin</span>
             </div>
           </div>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 p-4 sm:p-6 overflow-auto">
           <Outlet />
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout() {
+  return (
+    <AuthGuard requiredRole="admin">
+      <AdminLayoutInner />
+    </AuthGuard>
   );
 }
