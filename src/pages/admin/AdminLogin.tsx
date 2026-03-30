@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-
-const MOCK_CREDENTIALS = { email: "admin@bulkur.pk", password: "admin123" };
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -12,18 +12,50 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Redirect if already logged in as admin
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+        if (profile?.role === "admin") navigate("/admin");
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      if (email === MOCK_CREDENTIALS.email && password === MOCK_CREDENTIALS.password) {
-        localStorage.setItem("bulkur_admin", "true");
+    try {
+      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      if (authData.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", authData.user.id)
+          .single();
+
+        if (profile?.role !== "admin") {
+          await supabase.auth.signOut();
+          toast({ title: "Access denied", description: "This login is for administrators only.", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+
         navigate("/admin");
-      } else {
-        toast({ title: "Invalid credentials", description: "Use admin@bulkur.pk / admin123", variant: "destructive" });
       }
+    } catch (error: any) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (
@@ -51,9 +83,8 @@ export default function AdminLogin() {
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full font-semibold text-sm" style={{ background: "#00b894", color: "#0a0f1e" }}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</> : "Sign In"}
           </Button>
-          <p className="text-xs text-gray-500 text-center mt-3">Demo: admin@bulkur.pk / admin123</p>
         </form>
       </div>
     </div>

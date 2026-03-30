@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
+import { ShoppingCart, User, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ThemeToggle from "@/components/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
 
 const categories = [
   "Textiles & Garments",
@@ -118,6 +119,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -125,6 +127,17 @@ const Navbar = () => {
   const showCart = variant === "default" || variant === "buyer";
   const showCategories = variant === "default";
   const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setIsLoggedIn(!!session));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   const handleNavSearch = () => {
     const params = new URLSearchParams();
@@ -293,13 +306,19 @@ const Navbar = () => {
               )}
             </div>
 
-            {variant !== "admin" && (
+            {variant !== "admin" && !isLoggedIn && (
               <Link to="/auth">
                 <Button variant="ghost" size="sm" className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
                   <User className="h-4 w-4" />
                   Sign In
                 </Button>
               </Link>
+            )}
+            {isLoggedIn && (
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             )}
             {showCart && (
               <Link to="/cart">
