@@ -3,30 +3,82 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, ArrowLeft, ShoppingCart, Factory, Shield } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, ShoppingCart, Factory, Loader2 } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"buyer" | "seller" | "admin">("buyer");
+  const [role, setRole] = useState<"buyer" | "seller">("buyer");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (role === "admin") {
-      navigate("/admin/dashboard");
-    } else if (role === "seller") {
-      navigate("/seller/dashboard");
-    } else {
-      navigate("/buyer/dashboard");
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Fetch profile to determine role
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+
+          if (profile?.role === "seller") {
+            navigate("/seller/dashboard");
+          } else {
+            navigate("/buyer/dashboard");
+          }
+        }
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName, role },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (error) throw error;
+
+        toast({
+          title: "Account created!",
+          description: "Please check your email to verify your account.",
+        });
+
+        if (role === "seller") {
+          navigate("/seller/dashboard");
+        } else {
+          navigate("/buyer/dashboard");
+        }
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: isLogin ? "Sign in failed" : "Sign up failed",
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const roleOptions = [
     { key: "buyer" as const, label: "Buyer", icon: ShoppingCart, color: "text-primary" },
     { key: "seller" as const, label: "Seller", icon: Factory, color: "text-verified" },
-    { key: "admin" as const, label: "Admin", icon: Shield, color: "text-destructive" },
   ];
 
   return (
@@ -70,10 +122,10 @@ const Auth = () => {
             {isLogin ? "Sign in to your Bulkur account" : "Join thousands of businesses on Bulkur"}
           </p>
 
-          {/* Role selection - always show */}
+          {/* Role selection */}
           <div className="mb-6">
             <Label className="text-sm font-medium text-foreground mb-2 block">Select Role</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {roleOptions.map(({ key, label, icon: Icon, color }) => (
                 <button
                   key={key}
@@ -96,17 +148,38 @@ const Auth = () => {
             {!isLogin && (
               <div>
                 <Label className="font-body">Full Name</Label>
-                <Input placeholder="Muhammad Ahmed" className="mt-1.5 font-body" />
+                <Input
+                  placeholder="Muhammad Ahmed"
+                  className="mt-1.5 font-body"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
               </div>
             )}
             <div>
               <Label className="font-body">Email</Label>
-              <Input type="email" placeholder="you@company.com" className="mt-1.5 font-body" />
+              <Input
+                type="email"
+                placeholder="you@company.com"
+                className="mt-1.5 font-body"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div>
               <Label className="font-body">Password</Label>
               <div className="relative mt-1.5">
-                <Input type={showPassword ? "text" : "password"} placeholder="••••••••" className="pr-10 font-body" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="pr-10 font-body"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -117,8 +190,16 @@ const Auth = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold h-11">
-              {isLogin ? "Sign In" : "Create Account"}
+            <Button
+              type="submit"
+              className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold h-11"
+              disabled={loading}
+            >
+              {loading ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...</>
+              ) : (
+                isLogin ? "Sign In" : "Create Account"
+              )}
             </Button>
           </form>
 
