@@ -119,6 +119,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [navSearch, setNavSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -126,6 +127,17 @@ const Navbar = () => {
   const showCart = variant === "default" || variant === "buyer";
   const showCategories = variant === "default";
   const showSearch = variant === "default" || variant === "buyer" || variant === "seller";
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setIsLoggedIn(!!session));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   const handleNavSearch = () => {
     const params = new URLSearchParams();
