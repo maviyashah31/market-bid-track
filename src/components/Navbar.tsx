@@ -306,13 +306,19 @@ const Navbar = () => {
               )}
             </div>
 
-            {variant !== "admin" && (
+            {variant !== "admin" && !isLoggedIn && (
               <Link to="/auth">
                 <Button variant="ghost" size="sm" className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
                   <User className="h-4 w-4" />
                   Sign In
                 </Button>
               </Link>
+            )}
+            {isLoggedIn && (
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2 font-body text-primary-foreground hover:bg-primary-foreground/10">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             )}
             {showCart && (
               <Link to="/cart">
