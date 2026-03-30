@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle } from "lucide-react";
+import { ShoppingCart, User, Bell, Search, Package, FileText, LayoutDashboard, Store, HelpCircle, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ThemeToggle from "@/components/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
 
 const categories = [
   "Textiles & Garments",
