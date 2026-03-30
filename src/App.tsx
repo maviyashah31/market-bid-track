@@ -23,6 +23,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 import SellerProfile from "./pages/SellerProfile";
 import BuyerProfile from "./pages/BuyerProfile";
+import ResetPassword from "./pages/ResetPassword";
 
 // Admin Panel
 import AdminLayout from "./layouts/AdminLayout";
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
@@ -63,6 +65,7 @@ const AnimatedRoutes = () => {
         <Route path="/buyer/:buyerId" element={<BuyerProfile />} />
 
         {/* Admin Panel */}
+        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
