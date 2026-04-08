@@ -10,10 +10,10 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
-import BuyerDashboard from "./pages/BuyerDashboard";
-import SellerDashboard from "./pages/SellerDashboard";
-import SellerOrders from "./pages/SellerOrders";
-import AdminDashboard from "./pages/AdminDashboard";
+import BuyerDashboard from "./pages/buyer/BuyerDashboard";
+import SellerDashboard from "./pages/seller/SellerDashboard";
+import SellerOrders from "./pages/seller/SellerOrders";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import Cart from "./pages/Cart";
 import Messages from "./pages/Messages";
 import OrderTracking from "./pages/OrderTracking";
@@ -21,8 +21,8 @@ import DisputeDetail from "./pages/DisputeDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
-import SellerProfile from "./pages/SellerProfile";
-import BuyerProfile from "./pages/BuyerProfile";
+import SellerProfile from "./pages/seller/SellerProfile";
+import BuyerProfile from "./pages/buyer/BuyerProfile";
 import ResetPassword from "./pages/ResetPassword";
 
 // Admin Panel
