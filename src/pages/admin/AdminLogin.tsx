@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -44,7 +44,7 @@ export default function AdminLogin() {
 
         if (profile?.role !== "admin") {
           await supabase.auth.signOut();
-          toast({ title: "Access denied", description: "This login is for administrators only.", variant: "destructive" });
+          toast.error("Access denied", { description: "This login is for administrators only." });
           setLoading(false);
           return;
         }
@@ -53,7 +53,7 @@ export default function AdminLogin() {
       }
     } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Admin login error:", error);
-      toast({ title: "Sign in failed", description: "Invalid email or password. Please try again.", variant: "destructive" });
+      toast.error("Sign in failed", { description: "Invalid email or password. Please try again." });
     } finally {
       setLoading(false);
     }

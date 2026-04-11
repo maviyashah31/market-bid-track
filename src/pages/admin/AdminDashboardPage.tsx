@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { dashboardMetrics } from "@/data/adminMockData";
 import { DollarSign, ShoppingBag, AlertTriangle, Users, TrendingUp, UserPlus, RefreshCw, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
 const cards = [
   { label: "GMV Today", value: fmt(dashboardMetrics.totalGMVToday), icon: DollarSign, sub: `This Month: ${fmt(dashboardMetrics.totalGMVMonth)}` },
   { label: "Commission Today", value: fmt(dashboardMetrics.commissionToday), icon: TrendingUp, sub: `This Month: ${fmt(dashboardMetrics.commissionMonth)}` },

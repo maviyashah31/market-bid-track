@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, Eye } from "lucide-react";
 
-const statusColor: Record<string, string> = { active: "#00b894", suspended: "#fdcb6e", banned: "#d63031" };
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
+import { adminUserStatusColors } from "@/lib/constants";
 
 export default function BuyerManagement() {
   const [search, setSearch] = useState("");
@@ -64,7 +64,7 @@ export default function BuyerManagement() {
                   <td className="px-4 py-3 text-gray-300">{b.disputeCount}</td>
                   <td className="px-4 py-3 text-gray-300">{b.creditScore ?? "—"}</td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-1 rounded text-[10px] font-bold uppercase" style={{ background: statusColor[b.status] + "20", color: statusColor[b.status] }}>
+                    <span className="px-2 py-1 rounded text-[10px] font-bold uppercase" style={{ background: adminUserStatusColors[b.status] + "20", color: adminUserStatusColors[b.status] }}>
                       {b.status}
                     </span>
                   </td>

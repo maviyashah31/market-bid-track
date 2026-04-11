@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -15,8 +15,6 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -30,11 +28,7 @@ const ResetPassword = () => {
     e.preventDefault();
     const result = passwordSchema.safeParse(password);
     if (!result.success) {
-      toast({
-        variant: "destructive",
-        title: "Weak password",
-        description: result.error.errors[0].message,
-      });
+      toast.error("Weak password", { description: result.error.errors[0].message });
       return;
     }
 
@@ -42,11 +36,11 @@ const ResetPassword = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast({ title: "Password updated!", description: "You can now sign in with your new password." });
+      toast.success("Password updated!", { description: "You can now sign in with your new password." });
       navigate("/auth");
     } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Password reset error:", error);
-      toast({ variant: "destructive", title: "Error", description: "Unable to update password. Please try again." });
+      toast.error("Error", { description: "Unable to update password. Please try again." });
     } finally {
       setLoading(false);
     }

@@ -10,13 +10,10 @@ import {
   Search, Eye, Ban, AlertTriangle, CheckCircle, XCircle, Edit, Package,
   DollarSign, Star, Sparkles, Flag, Phone, Mail, MapPin, Calendar, Shield, TrendingUp
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-const statusColor: Record<string, string> = {
-  active: "#00b894", suspended: "#fdcb6e", banned: "#d63031", pending: "#74b9ff",
-};
-
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
+import { adminUserStatusColors } from "@/lib/constants";
 
 export default function SupplierManagement() {
   const [search, setSearch] = useState("");
@@ -65,7 +62,7 @@ export default function SupplierManagement() {
       if (type === "warning") return s;
       return s;
     }));
-    toast({ title: `Action: ${type}`, description: `${type} applied to ${supplier.businessName}` });
+    toast.success(`Action: ${type}`, { description: `${type} applied to ${supplier.businessName}` });
     setActionDialog(null);
     setReason("");
     if (selected?.id === supplier.id) {
@@ -84,7 +81,7 @@ export default function SupplierManagement() {
         email: editForm.email || s.email,
       };
     }));
-    toast({ title: "Supplier updated", description: `${editDialog.businessName} details updated` });
+    toast.success("Supplier updated", { description: `${editDialog.businessName} details updated` });
     setEditDialog(null);
   };
 
@@ -163,7 +160,7 @@ export default function SupplierManagement() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 rounded text-[10px] font-bold uppercase" style={{ background: statusColor[s.status] + "20", color: statusColor[s.status] }}>
+                      <span className="px-2 py-1 rounded text-[10px] font-bold uppercase" style={{ background: adminUserStatusColors[s.status] + "20", color: adminUserStatusColors[s.status] }}>
                         {s.status}
                       </span>
                     </td>
@@ -197,12 +194,12 @@ export default function SupplierManagement() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-white flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: statusColor[selected.status] + "30", color: statusColor[selected.status] }}>
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: adminUserStatusColors[selected.status] + "30", color: adminUserStatusColors[selected.status] }}>
                     {selected.businessName.charAt(0)}
                   </div>
                   <div>
                     {selected.businessName}
-                    <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ background: statusColor[selected.status] + "20", color: statusColor[selected.status] }}>
+                    <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ background: adminUserStatusColors[selected.status] + "20", color: adminUserStatusColors[selected.status] }}>
                       {selected.status}
                     </span>
                   </div>

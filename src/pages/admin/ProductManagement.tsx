@@ -11,7 +11,7 @@ import {
   Search, Eye, Trash2, Star, Ban, CheckCircle, Flag, Package,
   TrendingUp, DollarSign, AlertTriangle, Sparkles, Edit, RotateCcw
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const statusConfig: Record<ProductStatus, { color: string; label: string }> = {
   active: { color: "#00b894", label: "Active" },
@@ -20,7 +20,7 @@ const statusConfig: Record<ProductStatus, { color: string; label: string }> = {
   pending_review: { color: "#74b9ff", label: "Pending Review" },
 };
 
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
 
 export default function ProductManagement() {
   const [data, setData] = useState(adminProducts);
@@ -96,7 +96,7 @@ export default function ProductManagement() {
       return p;
     }).filter(Boolean));
 
-    toast({ title: `${type} applied`, description: `Action applied to ${products.length} product(s)` });
+    toast.success(`${type} applied`, { description: `Action applied to ${products.length} product(s)` });
     setActionDialog(null);
     setReason("");
     setSelectedIds(new Set());
@@ -113,7 +113,7 @@ export default function ProductManagement() {
         moq: editMoq ? Number(editMoq) : p.moq,
       };
     }));
-    toast({ title: "Product updated", description: `${editDialog.name} has been updated` });
+    toast.success("Product updated", { description: `${editDialog.name} has been updated` });
     setEditDialog(null);
   };
 

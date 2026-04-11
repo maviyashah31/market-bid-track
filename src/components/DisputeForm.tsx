@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertTriangle, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface DisputeFormProps {
   open: boolean;
@@ -36,8 +36,6 @@ const DisputeForm = ({ open, onOpenChange, onSubmit }: DisputeFormProps) => {
   const [selectedReason, setSelectedReason] = useState<DisputeReason | "">("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
   // Filter orders that can have disputes (not completed yet)
   const eligibleOrders = buyerOrders.filter(
     (order) => order.status !== "completed"
@@ -45,11 +43,7 @@ const DisputeForm = ({ open, onOpenChange, onSubmit }: DisputeFormProps) => {
 
   const handleSubmit = async () => {
     if (!selectedOrder || !selectedReason || !description.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
+      toast.error("Missing Information", { description: "Please fill in all required fields." });
       return;
     }
 
@@ -64,10 +58,7 @@ const DisputeForm = ({ open, onOpenChange, onSubmit }: DisputeFormProps) => {
       description: description.trim(),
     });
 
-    toast({
-      title: "Dispute Raised Successfully",
-      description: "The seller has been notified and will respond within 24 hours.",
-    });
+    toast.success("Dispute Raised Successfully", { description: "The seller has been notified and will respond within 24 hours." });
 
     // Reset form
     setSelectedOrder("");

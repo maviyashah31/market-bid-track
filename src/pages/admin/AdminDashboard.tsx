@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
 
 const stats = [
@@ -78,8 +78,6 @@ const AdminDashboard = () => {
   const [showResolveDialog, setShowResolveDialog] = useState(false);
   const [resolution, setResolution] = useState("");
   const [resolutionType, setResolutionType] = useState<string>("");
-  const { toast } = useToast();
-
   const filteredUsers = adminUsers.filter(
     (u) => u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase())
   );
@@ -93,18 +91,11 @@ const AdminDashboard = () => {
 
   const handleResolveDispute = () => {
     if (!resolutionType || !resolution.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please select a resolution type and provide details.",
-        variant: "destructive",
-      });
+      toast.error("Missing Information", { description: "Please select a resolution type and provide details." });
       return;
     }
 
-    toast({
-      title: "Dispute Resolved",
-      description: `Dispute ${selectedDispute?.id} has been resolved with ${resolutionType}.`,
-    });
+    toast.success("Dispute Resolved", { description: `Dispute ${selectedDispute?.id} has been resolved with ${resolutionType}.` });
 
     setShowResolveDialog(false);
     setSelectedDispute(null);

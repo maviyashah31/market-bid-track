@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Clock, CheckCircle } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-const statusColor: Record<string, string> = { open: "#fdcb6e", escalated: "#d63031", resolved: "#00b894" };
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
+import { adminDisputeStatusColors } from "@/lib/constants";
 
 export default function DisputeManagement() {
   const [filter, setFilter] = useState("all");
@@ -23,7 +23,7 @@ export default function DisputeManagement() {
     setData(prev => prev.map(d => d.id === selected.id ? {
       ...d, status: "resolved" as const, ruling: rulingFor, rulingNote, resolvedDate: "2026-03-08"
     } : d));
-    toast({ title: "Dispute Resolved", description: `Ruled in favour of ${rulingFor} for ${selected.orderId}` });
+    toast.success("Dispute Resolved", { description: `Ruled in favour of ${rulingFor} for ${selected.orderId}` });
     setSelected(null);
     setRulingFor(null);
     setRulingNote("");
@@ -50,7 +50,7 @@ export default function DisputeManagement() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-3">
                 <span className="text-white font-mono text-sm font-bold">{d.id}</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ background: statusColor[d.status] + "20", color: statusColor[d.status] }}>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ background: adminDisputeStatusColors[d.status] + "20", color: adminDisputeStatusColors[d.status] }}>
                   {d.status}
                 </span>
               </div>

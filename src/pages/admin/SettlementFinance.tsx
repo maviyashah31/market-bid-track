@@ -3,7 +3,7 @@ import { payments, taxSummary } from "@/data/adminMockData";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowDownLeft, ArrowUpRight, Wallet } from "lucide-react";
 
-const fmt = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt } from "@/lib/formatters";
 
 const incoming = payments.filter(p => p.type === "incoming");
 const outgoing = payments.filter(p => p.type === "outgoing");

@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
 
 const statusConfig = {
@@ -47,7 +47,6 @@ const roleIcons = {
 const DisputeDetail = () => {
   const { disputeId } = useParams<{ disputeId: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const dispute = disputes.find((d) => d.id === disputeId);
@@ -133,10 +132,7 @@ const DisputeDetail = () => {
 
   const handleEscalate = () => {
     setStatus("escalated");
-    toast({
-      title: "Dispute Escalated",
-      description: "An admin will review your case within 24-48 hours.",
-    });
+    toast.success("Dispute Escalated", { description: "An admin will review your case within 24-48 hours." });
 
     // Add admin notification message
     const adminMsg: DisputeMessage = {
@@ -160,10 +156,7 @@ const DisputeDetail = () => {
 
   const handleAcceptResolution = () => {
     setStatus("resolved");
-    toast({
-      title: "Dispute Resolved",
-      description: "The dispute has been marked as resolved. Thank you!",
-    });
+    toast.success("Dispute Resolved", { description: "The dispute has been marked as resolved. Thank you!" });
   };
 
   return (

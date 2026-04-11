@@ -5,7 +5,7 @@ import {
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const fmt = (n: number) => "Rs. " + (n >= 1000000 ? (n / 1000000).toFixed(1) + "M" : (n / 1000).toFixed(0) + "K");
-const fmtFull = (n: number) => "Rs. " + n.toLocaleString("en-PK");
+import { fmt as fmtFull } from "@/lib/formatters";
 
 const chartStyle = { background: "#111a35", borderColor: "#1a2340" };
 

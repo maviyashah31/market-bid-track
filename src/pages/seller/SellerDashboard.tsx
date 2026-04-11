@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import OnboardingBanner from "@/components/OnboardingBanner";
+import { useSupplierOnboarding } from "@/hooks/useSupplierOnboarding";
 import { products as initialProducts, disputes, disputeReasons, chatConversations, chatMessages, type Dispute, type Product, type ChatMessage } from "@/data/mockData";
 import { rfqDetails, type RFQDetail } from "@/data/rfqData";
 import {
@@ -41,12 +44,7 @@ const recentOrders = [
   { id: "ORD-5006", product: "Leather Jackets x50", buyer: "Premium Wear", buyerEmail: "orders@premiumwear.pk", buyerPhone: "+92 301 4445566", total: "PKR 375,000", status: "processing", date: "2026-03-06", address: "Liberty Market, Lahore", paymentStatus: "escrow" },
 ];
 
-const statusColors: Record<string, string> = {
-  pending: "bg-warning/10 text-warning",
-  processing: "bg-verified/10 text-verified",
-  shipped: "bg-primary/10 text-primary",
-  delivered: "bg-success/10 text-success",
-};
+import { orderStatusColors as statusColors } from "@/lib/constants";
 
 const reviews = [
   { id: "1", buyer: "Muhammad Ahmed", product: "Cotton T-Shirts", rating: 5, comment: "Excellent quality! Will order again.", date: "2026-03-05" },
@@ -75,6 +73,7 @@ const sidebarItems = [
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
+  const { completedSteps, totalSteps, isComplete: onboardingComplete } = useSupplierOnboarding();
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
@@ -88,7 +87,6 @@ const SellerDashboard = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productFormView, setProductFormView] = useState(false);
 
-  const [orderDetailOpen, setOrderDetailOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
 
   // Profile state
@@ -323,6 +321,11 @@ const SellerDashboard = () => {
                 <div className="mb-6">
                   <h1 className="font-display font-bold text-2xl text-foreground">Seller Dashboard</h1>
                 </div>
+              )}
+
+              {/* Onboarding Banner */}
+              {!onboardingComplete && (
+                <OnboardingBanner completedSteps={completedSteps} totalSteps={totalSteps} />
               )}
 
               {/* Supplier Profile */}
@@ -593,79 +596,109 @@ const SellerDashboard = () => {
                 </div>
               )}
 
-              {/* Order Detail — inline page */}
-              {activeTab === "orders" && selectedOrder && (
-                <div className="space-y-6">
-                  <Button variant="outline" size="sm" className="gap-2 font-body" onClick={() => setSelectedOrder(null)}>
-                    <ChevronLeft className="h-4 w-4" /> Back to Orders
-                  </Button>
+              {/* Order Detail — full inline page */}
+              {activeTab === "orders" && selectedOrder && (() => {
+                const steps = ["pending", "processing", "shipped", "delivered"];
+                const currentIdx = steps.indexOf(selectedOrder.status);
+                const nextStatus = currentIdx < steps.length - 1 ? steps[currentIdx + 1] : null;
+                const nextLabels: Record<string, string> = { processing: "Mark as Processing", shipped: "Mark as Shipped", delivered: "Mark as Delivered" };
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main info */}
-                    <div className="lg:col-span-2 space-y-6">
-                      <div className="bg-card rounded-xl border border-border p-6">
-                        <div className="flex items-center justify-between mb-4">
+                return (
+                  <div className="space-y-6">
+                    {/* Page header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setSelectedOrder(null)}>
+                          <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <div>
                           <div className="flex items-center gap-3">
-                            <h2 className="font-display font-bold text-xl text-foreground">{selectedOrder.id}</h2>
-                            <Badge variant="outline" className={`capitalize ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
+                            <h2 className="font-display font-bold text-2xl text-foreground">{selectedOrder.id}</h2>
+                            <Badge variant="outline" className={`capitalize text-sm ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
                           </div>
-                          <Badge variant="outline" className="text-xs capitalize">{selectedOrder.paymentStatus} payment</Badge>
+                          <p className="text-sm text-muted-foreground font-body mt-0.5">{selectedOrder.product} — {selectedOrder.buyer}</p>
                         </div>
-                        <div className="bg-accent/30 rounded-lg p-4">
-                          <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
-                          <p className="font-body font-semibold text-foreground">{selectedOrder.product}</p>
-                          <p className="font-display font-bold text-lg text-foreground mt-1">{selectedOrder.total}</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground font-body mt-3">Order placed on {selectedOrder.date}</p>
                       </div>
-
-                      {/* Buyer details */}
-                      <div className="bg-card rounded-xl border border-border p-6">
-                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Buyer Details</h3>
-                        <div className="grid sm:grid-cols-2 gap-3 text-sm font-body">
-                          <div className="flex items-center gap-2 text-foreground"><User className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyer}</div>
-                          <div className="flex items-center gap-2 text-foreground"><Mail className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyerEmail}</div>
-                          <div className="flex items-center gap-2 text-foreground"><Phone className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.buyerPhone}</div>
-                          <div className="flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-muted-foreground shrink-0" />{selectedOrder.address}</div>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        {nextStatus && (
+                          <Button
+                            className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold gap-2"
+                            onClick={() => {
+                              setSelectedOrder({ ...selectedOrder, status: nextStatus });
+                              toast.success(`Order ${selectedOrder.id} updated to ${nextStatus}`);
+                            }}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            {nextLabels[nextStatus]}
+                          </Button>
+                        )}
+                        <Badge variant="outline" className="text-xs capitalize px-3 py-1.5">{selectedOrder.paymentStatus} payment</Badge>
                       </div>
                     </div>
 
-                    {/* Sidebar — Timeline + Actions */}
-                    <div className="space-y-6">
-                      <div className="bg-card rounded-xl border border-border p-6">
-                        <h3 className="font-display font-bold text-sm text-foreground mb-4">Order Timeline</h3>
-                        <div className="space-y-4 pl-3 border-l-2 border-border">
-                          {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
-                            const steps = ["pending", "processing", "shipped", "delivered"];
-                            const currentIdx = steps.indexOf(selectedOrder.status);
-                            const done = i <= currentIdx;
-                            const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
-                            const StepIcon = icons[step];
-                            return (
-                              <div key={step} className="flex items-center gap-3 relative">
-                                <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"}`} />
-                                <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
-                                <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
-                              </div>
-                            );
-                          })}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Main info */}
+                      <div className="lg:col-span-2 space-y-6">
+                        <div className="bg-card rounded-xl border border-border p-6">
+                          <h3 className="font-display font-bold text-lg text-foreground mb-4">Order Details</h3>
+                          <div className="bg-accent/30 rounded-lg p-4">
+                            <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
+                            <p className="font-body font-semibold text-foreground text-lg">{selectedOrder.product}</p>
+                            <p className="font-display font-bold text-2xl text-foreground mt-2">{selectedOrder.total}</p>
+                          </div>
+                          <p className="text-sm text-muted-foreground font-body mt-4">Order placed on <span className="text-foreground font-medium">{selectedOrder.date}</span></p>
+                        </div>
+
+                        {/* Buyer details */}
+                        <div className="bg-card rounded-xl border border-border p-6">
+                          <h3 className="font-display font-bold text-lg text-foreground mb-4">Buyer Details</h3>
+                          <div className="grid sm:grid-cols-2 gap-4 text-sm font-body">
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><User className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Name</p><p className="text-foreground font-medium">{selectedOrder.buyer}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Mail className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Email</p><p className="text-foreground font-medium">{selectedOrder.buyerEmail}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Phone className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Phone</p><p className="text-foreground font-medium">{selectedOrder.buyerPhone}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><MapPin className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Address</p><p className="text-foreground font-medium">{selectedOrder.address}</p></div></div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="bg-card rounded-xl border border-border p-6 space-y-3">
-                        <h3 className="font-display font-bold text-sm text-foreground mb-2">Actions</h3>
-                        <Link to="/messages" className="block">
-                          <Button variant="outline" className="w-full gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
-                        </Link>
-                        <Link to={`/order/${selectedOrder.id}`} className="block">
-                          <Button variant="outline" className="w-full gap-2 font-body"><Eye className="h-4 w-4" />Track Order</Button>
-                        </Link>
+                      {/* Sidebar — Timeline + Actions */}
+                      <div className="space-y-6">
+                        <div className="bg-card rounded-xl border border-border p-6">
+                          <h3 className="font-display font-bold text-sm text-foreground mb-4">Order Timeline</h3>
+                          <div className="space-y-4 pl-3 border-l-2 border-border">
+                            {(["pending", "processing", "shipped", "delivered"] as const).map((step, i) => {
+                              const done = i <= currentIdx;
+                              const isCurrent = i === currentIdx;
+                              const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
+                              const StepIcon = icons[step];
+                              return (
+                                <div key={step} className="flex items-center gap-3 relative">
+                                  <div className={`absolute -left-[19px] w-3 h-3 rounded-full border-2 ${done ? "bg-primary border-primary" : "bg-card border-border"} ${isCurrent ? "ring-2 ring-primary/30" : ""}`} />
+                                  <StepIcon className={`h-4 w-4 ${done ? "text-primary" : "text-muted-foreground/40"}`} />
+                                  <span className={`text-sm font-body capitalize ${done ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                                    {step}
+                                    {isCurrent && <span className="text-xs text-primary ml-2">(Current)</span>}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div className="bg-card rounded-xl border border-border p-6 space-y-3">
+                          <h3 className="font-display font-bold text-sm text-foreground mb-2">Quick Actions</h3>
+                          <Link to="/messages" className="block">
+                            <Button variant="outline" className="w-full gap-2 font-body"><MessageSquare className="h-4 w-4" />Message Buyer</Button>
+                          </Link>
+                          <Link to={`/order/${selectedOrder.id}`} className="block">
+                            <Button variant="outline" className="w-full gap-2 font-body"><Eye className="h-4 w-4" />Full Order Tracking</Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* RFQ Marketplace */}
               {activeTab === "rfqs" && (

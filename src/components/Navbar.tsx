@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { toast } from "sonner";
 
 const categories = [
   "Textiles & Garments",
@@ -120,7 +122,9 @@ const Navbar = () => {
   const [navSearch, setNavSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [switchingRole, setSwitchingRole] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const { hasRole, addRole } = useUserRoles();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const links = navLinksByVariant[variant];
@@ -186,13 +190,51 @@ const Navbar = () => {
           </div>
           <div className="hidden md:flex items-center gap-4 px-4 text-primary-foreground text-xs sm:text-sm shrink-0">
             {variant === "default" && (
-              <Link to="/seller/dashboard" className="hover:underline">Sell on Bulkur</Link>
+              <Link to="/auth" className="hover:underline">Sell on Bulkur</Link>
             )}
             {variant === "buyer" && (
-              <Link to="/seller/dashboard" className="hover:underline">Switch to Seller</Link>
+              <button
+                disabled={switchingRole}
+                onClick={async () => {
+                  setSwitchingRole(true);
+                  try {
+                    if (!hasRole("seller")) {
+                      await addRole("seller");
+                      toast.success("Seller role added to your account");
+                    }
+                    navigate("/seller/dashboard");
+                  } catch {
+                    toast.error("Failed to switch role. Please try again.");
+                  } finally {
+                    setSwitchingRole(false);
+                  }
+                }}
+                className="hover:underline disabled:opacity-50"
+              >
+                {switchingRole ? "Switching..." : "Switch to Seller"}
+              </button>
             )}
             {variant === "seller" && (
-              <Link to="/buyer/dashboard" className="hover:underline">Switch to Buyer</Link>
+              <button
+                disabled={switchingRole}
+                onClick={async () => {
+                  setSwitchingRole(true);
+                  try {
+                    if (!hasRole("buyer")) {
+                      await addRole("buyer");
+                      toast.success("Buyer role added to your account");
+                    }
+                    navigate("/buyer/dashboard");
+                  } catch {
+                    toast.error("Failed to switch role. Please try again.");
+                  } finally {
+                    setSwitchingRole(false);
+                  }
+                }}
+                className="hover:underline disabled:opacity-50"
+              >
+                {switchingRole ? "Switching..." : "Switch to Buyer"}
+              </button>
             )}
             {variant !== "admin" && (
               <Link to="/help" className="hover:underline">Help</Link>

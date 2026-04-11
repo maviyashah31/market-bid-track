@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { adminNotifications } from "@/data/adminMockData";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import AuthGuard from "@/components/AuthGuard";
 
 const navItems = [
@@ -29,8 +29,6 @@ function AdminLayoutInner() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const unreadCount = adminNotifications.filter(n => !n.read).length;
-  const { toast } = useToast();
-
   const isActive = (path: string) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
@@ -38,7 +36,7 @@ function AdminLayoutInner() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    toast({ title: "Signed out successfully" });
+    toast.success("Signed out successfully");
     navigate("/admin-login");
   };
 

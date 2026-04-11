@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, ArrowLeft, ShoppingCart, Factory, Loader2 } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { passwordSchema, getPasswordStrength } from "@/lib/validation";
 
 const Auth = () => {
@@ -20,8 +20,6 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
-  const { toast } = useToast();
-
   // Redirect if already logged in
   useEffect(() => {
     const checkSession = async () => {
@@ -48,11 +46,11 @@ const Auth = () => {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      toast({ title: "Reset email sent!", description: "Check your inbox for a password reset link." });
+      toast.success("Reset email sent!", { description: "Check your inbox for a password reset link." });
       setShowForgotPassword(false);
     } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Forgot password error:", error);
-      toast({ variant: "destructive", title: "Error", description: "Unable to send reset email. Please try again." });
+      toast.error("Error", { description: "Unable to send reset email. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -66,11 +64,7 @@ const Auth = () => {
     if (!isLogin) {
       const result = passwordSchema.safeParse(password);
       if (!result.success) {
-        toast({
-          variant: "destructive",
-          title: "Weak password",
-          description: result.error.errors[0].message,
-        });
+        toast.error("Weak password", { description: result.error.errors[0].message });
         setLoading(false);
         return;
       }
@@ -81,26 +75,23 @@ const Auth = () => {
         const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        // Check role matches selected tab
+        // Check if user has the selected role
         if (authData.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
+          const { data: userRoles } = await supabase
+            .from("user_roles")
             .select("role")
-            .eq("id", authData.user.id)
-            .single();
+            .eq("user_id", authData.user.id);
 
-          if (profile?.role !== role) {
-            await supabase.auth.signOut();
-            toast({
-              variant: "destructive",
-              title: "Invalid role selected",
-              description: "Invalid role selected for this account",
-            });
-            setLoading(false);
-            return;
+          const hasSelectedRole = userRoles?.some(r => r.role === role);
+
+          if (!hasSelectedRole) {
+            // User doesn't have this role yet — add it
+            await supabase
+              .from("user_roles")
+              .insert({ user_id: authData.user.id, role });
           }
 
-          if (profile?.role === "seller") navigate("/seller/dashboard");
+          if (role === "seller") navigate("/seller/dashboard");
           else navigate("/buyer/dashboard");
         }
       } else {
@@ -114,15 +105,13 @@ const Auth = () => {
         });
         if (error) throw error;
 
-        toast({ title: "Account created!", description: "Please check your email to verify your account." });
+        toast.success("Account created!", { description: "Please check your email to verify your account." });
         if (role === "seller") navigate("/seller/onboarding");
         else navigate("/buyer/dashboard");
       }
     } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Auth error:", error);
-      toast({
-        variant: "destructive",
-        title: isLogin ? "Sign in failed" : "Sign up failed",
+      toast.error(isLogin ? "Sign in failed" : "Sign up failed", {
         description: isLogin
           ? "Invalid email or password. Please try again."
           : "Unable to create account. Please try again.",
