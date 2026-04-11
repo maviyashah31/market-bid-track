@@ -17,7 +17,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        navigate(requiredRole === "admin" ? "/admin-login" : "/auth");
+        navigate(requiredRole === "admin" ? "/admin/login" : "/auth");
         return;
       }
 
@@ -42,7 +42,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
-        navigate(requiredRole === "admin" ? "/admin-login" : "/auth");
+        navigate(requiredRole === "admin" ? "/admin/login" : "/auth");
       }
     });
 

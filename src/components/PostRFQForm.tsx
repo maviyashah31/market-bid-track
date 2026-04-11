@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { categories } from "@/data/mockData";
 import { toast } from "sonner";
 import { ImagePlus, X, Plus } from "lucide-react";
+import { imageUrlSchema } from "@/lib/validation";
 
 interface PostRFQFormProps {
   open: boolean;
@@ -31,6 +32,11 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
 
   const addImage = () => {
     if (!imageUrl.trim()) return;
+    const result = imageUrlSchema.safeParse(imageUrl);
+    if (!result.success) {
+      toast.error(result.error.errors[0].message);
+      return;
+    }
     setImages((prev) => [...prev, { url: imageUrl, caption: imageCaption }]);
     setImageUrl("");
     setImageCaption("");

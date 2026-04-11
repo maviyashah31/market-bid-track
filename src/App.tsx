@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import AuthGuard from "@/components/AuthGuard";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Products from "./pages/Products";
@@ -24,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import SellerProfile from "./pages/seller/SellerProfile";
 import BuyerProfile from "./pages/buyer/BuyerProfile";
 import ResetPassword from "./pages/ResetPassword";
+import SupplierOnboarding from "./components/SupplierOnboarding";
 
 // Admin Panel
 import AdminLayout from "./layouts/AdminLayout";
@@ -51,23 +54,23 @@ const AnimatedRoutes = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
-        <Route path="/seller/dashboard" element={<SellerDashboard />} />
-        <Route path="/seller/orders" element={<SellerOrders />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/buyer/dashboard" element={<AuthGuard requiredRole="buyer"><BuyerDashboard /></AuthGuard>} />
+        <Route path="/seller/onboarding" element={<AuthGuard requiredRole="seller"><SupplierOnboarding /></AuthGuard>} />
+        <Route path="/seller/dashboard" element={<AuthGuard requiredRole="seller"><SellerDashboard /></AuthGuard>} />
+        <Route path="/seller/orders" element={<AuthGuard requiredRole="seller"><SellerOrders /></AuthGuard>} />
+        <Route path="/admin/dashboard" element={<AuthGuard requiredRole="admin"><AdminDashboard /></AuthGuard>} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-confirmation" element={<OrderConfirmation />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/order/:orderId" element={<OrderTracking />} />
         <Route path="/dispute/:disputeId" element={<DisputeDetail />} />
-        <Route path="/seller/:sellerId" element={<SellerProfile />} />
-        <Route path="/buyer/:buyerId" element={<BuyerProfile />} />
+        <Route path="/seller/:sellerId" element={<AuthGuard requiredRole="seller"><SellerProfile /></AuthGuard>} />
+        <Route path="/buyer/:buyerId" element={<AuthGuard requiredRole="buyer"><BuyerProfile /></AuthGuard>} />
 
         {/* Admin Panel */}
-        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<AuthGuard requiredRole="admin"><AdminLayout /></AuthGuard>}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="products" element={<ProductManagement />} />
           <Route path="suppliers" element={<SupplierManagement />} />
@@ -86,6 +89,7 @@ const AnimatedRoutes = () => {
 };
 
 const App = () => (
+  <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
@@ -98,6 +102,7 @@ const App = () => (
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

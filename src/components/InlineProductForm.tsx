@@ -79,8 +79,23 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
   };
 
   const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotos((prev) => {
+      const removed = prev[index];
+      if (removed && removed.startsWith("blob:")) {
+        URL.revokeObjectURL(removed);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
+
+  // Clean up blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      photos.forEach((url) => {
+        if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
 
   const handleSubmit = () => {
     if (!form.name || !form.category || !form.minPrice) {

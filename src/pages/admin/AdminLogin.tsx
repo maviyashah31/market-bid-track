@@ -51,8 +51,9 @@ export default function AdminLogin() {
 
         navigate("/admin");
       }
-    } catch (error: any) {
-      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      if (import.meta.env.DEV) console.error("Admin login error:", error);
+      toast({ title: "Sign in failed", description: "Invalid email or password. Please try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }

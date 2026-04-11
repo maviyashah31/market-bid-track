@@ -67,7 +67,7 @@ const BuyerDashboard = () => {
   const collapsed = isMobile ? !sidebarOpen : !sidebarOpen;
 
   const handleDisputeSubmit = (data: { orderId: string; reason: string; description: string }) => {
-    console.log("Dispute submitted:", data);
+    if (import.meta.env.DEV) console.log("Dispute submitted:", data);
   };
 
   const handleNavClick = (value: string, href?: string) => {

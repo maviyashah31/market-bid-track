@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import AnimatedPage from "@/components/AnimatedPage";
+import { passwordSchema, getPasswordStrength } from "@/lib/validation";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -27,14 +28,25 @@ const ResetPassword = () => {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = passwordSchema.safeParse(password);
+    if (!result.success) {
+      toast({
+        variant: "destructive",
+        title: "Weak password",
+        description: result.error.errors[0].message,
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast({ title: "Password updated!", description: "You can now sign in with your new password." });
       navigate("/auth");
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
+    } catch (error: unknown) {
+      if (import.meta.env.DEV) console.error("Password reset error:", error);
+      toast({ variant: "destructive", title: "Error", description: "Unable to update password. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -59,8 +71,21 @@ const ResetPassword = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
+              {password.length > 0 && (() => {
+                const strength = getPasswordStrength(password);
+                return (
+                  <div className="mt-2">
+                    <div className="flex gap-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className={`h-1 flex-1 rounded-full ${i <= strength.score ? strength.color : "bg-muted"}`} />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{strength.label}</p>
+                  </div>
+                );
+              })()}
             </div>
             <Button type="submit" className="w-full bg-gradient-hero text-primary-foreground font-display font-semibold h-11" disabled={loading}>
               {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...</> : "Update Password"}

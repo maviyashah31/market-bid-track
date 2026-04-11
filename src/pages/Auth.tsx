@@ -7,6 +7,7 @@ import { Eye, EyeOff, ArrowLeft, ShoppingCart, Factory, Loader2 } from "lucide-r
 import AnimatedPage from "@/components/AnimatedPage";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { passwordSchema, getPasswordStrength } from "@/lib/validation";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -49,8 +50,9 @@ const Auth = () => {
       if (error) throw error;
       toast({ title: "Reset email sent!", description: "Check your inbox for a password reset link." });
       setShowForgotPassword(false);
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
+    } catch (error: unknown) {
+      if (import.meta.env.DEV) console.error("Forgot password error:", error);
+      toast({ variant: "destructive", title: "Error", description: "Unable to send reset email. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -59,6 +61,20 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Validate password strength on signup
+    if (!isLogin) {
+      const result = passwordSchema.safeParse(password);
+      if (!result.success) {
+        toast({
+          variant: "destructive",
+          title: "Weak password",
+          description: result.error.errors[0].message,
+        });
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       if (isLogin) {
@@ -99,14 +115,17 @@ const Auth = () => {
         if (error) throw error;
 
         toast({ title: "Account created!", description: "Please check your email to verify your account." });
-        if (role === "seller") navigate("/seller/dashboard");
+        if (role === "seller") navigate("/seller/onboarding");
         else navigate("/buyer/dashboard");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (import.meta.env.DEV) console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: isLogin ? "Sign in failed" : "Sign up failed",
-        description: error.message || "Something went wrong. Please try again.",
+        description: isLogin
+          ? "Invalid email or password. Please try again."
+          : "Unable to create account. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -228,12 +247,25 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    minLength={6}
+                    minLength={8}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {!isLogin && password.length > 0 && (() => {
+                  const strength = getPasswordStrength(password);
+                  return (
+                    <div className="mt-2">
+                      <div className="flex gap-1 mb-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className={`h-1 flex-1 rounded-full ${i <= strength.score ? strength.color : "bg-muted"}`} />
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{strength.label}</p>
+                    </div>
+                  );
+                })()}
               </div>
 
               {isLogin && (
