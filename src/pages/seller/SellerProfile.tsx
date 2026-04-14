@@ -3,7 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedPage from "@/components/AnimatedPage";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/mockData";
+import { useProducts } from "@/hooks/useProducts";
+import { toProductCardData } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -66,9 +67,8 @@ const reviews = [
 const SellerProfile = () => {
   const { sellerId } = useParams();
   const profile = sellerProfiles[sellerId || ""] || sellerProfiles["lahore-textile-mills"];
-  const sellerProducts = products.filter(p =>
-    p.sellerName === profile.name || p.sellerLocation === profile.location.split(",")[0]
-  ).slice(0, 6);
+  const { data: realProducts = [] } = useProducts({ limit: 6 });
+  const sellerProducts = realProducts.map(toProductCardData);
 
   const ratingBreakdown = [
     { stars: 5, percent: 78 },

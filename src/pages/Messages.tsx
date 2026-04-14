@@ -1,37 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import { chatConversations, chatMessages, ChatMessage } from "@/data/mockData";
-import { Send, Search, MoreVertical, Phone, Video, Paperclip, Smile, ArrowLeft } from "lucide-react";
+import { useConversations, useMessages, useSendMessage, useMarkMessagesRead, type Conversation } from "@/hooks/useMessages";
+import { Send, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import AnimatedPage from "@/components/AnimatedPage";
+import { supabase } from "@/integrations/supabase/client";
 
 const Messages = () => {
-  const [selectedChat, setSelectedChat] = useState<string | null>("1");
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [messages, setMessages] = useState(chatMessages);
   const [showMobileList, setShowMobileList] = useState(true);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const currentMessages = selectedChat ? messages[selectedChat] || [] : [];
-  const currentContact = chatConversations.find((c) => c.id === selectedChat);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setMyUserId(session.user.id);
+    });
+  }, []);
+
+  const { data: conversations = [], isLoading: convsLoading } = useConversations();
+  const { data: messages = [] } = useMessages(selectedChat);
+  const sendMessage = useSendMessage();
+  const markRead = useMarkMessagesRead();
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (selectedChat) markRead.mutate(selectedChat);
+  }, [selectedChat]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const getOtherName = (conv: Conversation) => {
+    if (!myUserId) return "...";
+    if (conv.participant_1 === myUserId) return conv.p2_profile?.full_name || "User";
+    return conv.p1_profile?.full_name || "User";
+  };
+
+  const getInitials = (name: string) => name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   const handleSend = () => {
     if (!newMessage.trim() || !selectedChat) return;
-    const msg: ChatMessage = {
-      id: `m${Date.now()}`,
-      senderId: "buyer1",
-      senderName: "You",
-      content: newMessage,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      isOwn: true,
-    };
-    setMessages((prev) => ({
-      ...prev,
-      [selectedChat]: [...(prev[selectedChat] || []), msg],
-    }));
+    sendMessage.mutate({ conversationId: selectedChat, content: newMessage });
     setNewMessage("");
   };
 
@@ -39,6 +53,8 @@ const Messages = () => {
     setSelectedChat(id);
     setShowMobileList(false);
   };
+
+  const currentConv = conversations.find(c => c.id === selectedChat);
 
   return (
     <AnimatedPage>
@@ -55,90 +71,83 @@ const Messages = () => {
             </div>
           </div>
           <ScrollArea className="flex-1">
-            {chatConversations.map((conv) => (
-              <button
-                key={conv.id}
-                onClick={() => selectChat(conv.id)}
-                className={`w-full flex items-start gap-3 p-4 hover:bg-accent/50 transition text-left border-b border-border ${
-                  selectedChat === conv.id ? "bg-accent" : ""
-                }`}
-              >
-                <div className="relative">
+            {convsLoading && <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>}
+            {!convsLoading && conversations.length === 0 && (
+              <p className="text-muted-foreground font-body text-sm text-center py-8">No conversations yet.</p>
+            )}
+            {conversations.map((conv) => {
+              const otherName = getOtherName(conv);
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => selectChat(conv.id)}
+                  className={`w-full flex items-start gap-3 p-4 hover:bg-accent/50 transition text-left border-b border-border ${
+                    selectedChat === conv.id ? "bg-accent" : ""
+                  }`}
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-sm">
-                      {conv.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                      {getInitials(otherName)}
                     </AvatarFallback>
                   </Avatar>
-                  {conv.online && (
-                    <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-success border-2 border-card" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-semibold text-sm text-foreground truncate">{conv.contactName}</span>
-                    <span className="text-xs text-muted-foreground font-body whitespace-nowrap ml-2">{conv.lastTime}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-display font-semibold text-sm text-foreground truncate">{otherName}</span>
+                      <span className="text-xs text-muted-foreground font-body whitespace-nowrap ml-2">
+                        {new Date(conv.last_message_at).toLocaleDateString("en-PK")}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground font-body truncate mt-0.5">{conv.lastMessage}</p>
-                </div>
-                {conv.unread > 0 && (
-                  <Badge className="bg-primary text-primary-foreground text-xs h-5 w-5 flex items-center justify-center rounded-full p-0">
-                    {conv.unread}
-                  </Badge>
-                )}
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </ScrollArea>
         </div>
 
         {/* Chat area */}
         <div className={`flex-1 flex flex-col ${showMobileList ? "hidden md:flex" : "flex"}`}>
-          {selectedChat && currentContact ? (
+          {selectedChat && currentConv ? (
             <>
-              {/* Chat header */}
               <div className="flex items-center gap-3 p-4 border-b border-border bg-card">
                 <button className="md:hidden" onClick={() => setShowMobileList(true)}>
                   <ArrowLeft className="h-5 w-5" />
                 </button>
                 <Avatar className="h-9 w-9">
                   <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-sm">
-                    {currentContact.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                    {getInitials(getOtherName(currentConv))}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-display font-semibold text-foreground text-sm">{currentContact.contactName}</h3>
-                  <p className="text-xs text-muted-foreground font-body">{currentContact.online ? "Online" : "Offline"}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8"><Video className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
+                  <h3 className="font-display font-semibold text-foreground text-sm">{getOtherName(currentConv)}</h3>
                 </div>
               </div>
 
-              {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4 max-w-3xl mx-auto">
-                  {currentMessages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                        msg.isOwn
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-accent text-foreground rounded-bl-md"
-                      }`}>
-                        <p className="text-sm font-body">{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                          {msg.timestamp}
-                        </p>
+                  {messages.length === 0 && <p className="text-muted-foreground font-body text-sm text-center py-8">No messages yet. Start the conversation!</p>}
+                  {messages.map((msg) => {
+                    const isOwn = msg.sender_id === myUserId;
+                    return (
+                      <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                        <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                          isOwn
+                            ? "bg-primary text-primary-foreground rounded-br-md"
+                            : "bg-accent text-foreground rounded-bl-md"
+                        }`}>
+                          <p className="text-sm font-body">{msg.content}</p>
+                          <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                            {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                  <div ref={bottomRef} />
                 </div>
               </ScrollArea>
 
-              {/* Input */}
               <div className="p-4 border-t border-border bg-card">
                 <div className="flex items-center gap-2 max-w-3xl mx-auto">
-                  <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0"><Paperclip className="h-4 w-4" /></Button>
                   <Input
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
@@ -146,8 +155,7 @@ const Messages = () => {
                     placeholder="Type a message..."
                     className="font-body"
                   />
-                  <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0"><Smile className="h-4 w-4" /></Button>
-                  <Button onClick={handleSend} size="icon" className="bg-gradient-hero text-primary-foreground h-9 w-9 flex-shrink-0 hover:opacity-90">
+                  <Button onClick={handleSend} size="icon" className="bg-gradient-hero text-primary-foreground h-9 w-9 flex-shrink-0 hover:opacity-90" disabled={sendMessage.isPending}>
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

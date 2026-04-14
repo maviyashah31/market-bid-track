@@ -8,48 +8,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRoles } from "@/hooks/useUserRoles";
+import { useCategories } from "@/hooks/useCategories";
+import { useNotifications, useUnreadCount, useMarkNotificationRead, useMarkAllNotificationsRead } from "@/hooks/useNotifications";
 import { toast } from "sonner";
-
-const categories = [
-  "Textiles & Garments",
-  "Electronics",
-  "Agriculture",
-  "Machinery",
-  "Chemicals",
-  "Sports Goods",
-  "Surgical Instruments",
-  "Leather Products",
-];
-
-interface Notification {
-  id: string;
-  type: "order" | "message" | "rfq";
-  title: string;
-  description: string;
-  time: string;
-  read: boolean;
-  link: string;
-}
-
-const initialNotifications: Notification[] = [
-  { id: "1", type: "order", title: "Order Shipped", description: "ORD-2024-001 has been shipped by Lahore Textile Mills", time: "5 min ago", read: false, link: "/order/ORD-2024-001" },
-  { id: "2", type: "message", title: "New Message", description: "Lahore Textile Mills: We can offer 15% discount on bulk orders", time: "10 min ago", read: false, link: "/messages" },
-  { id: "3", type: "rfq", title: "New RFQ Bid", description: "You received 3 new bids on your Cotton Polo Shirts RFQ", time: "1 hr ago", read: false, link: "/buyer/dashboard" },
-  { id: "4", type: "order", title: "Order Delivered", description: "ORD-2024-002 has been delivered successfully", time: "2 hrs ago", read: true, link: "/order/ORD-2024-002" },
-  { id: "5", type: "message", title: "New Message", description: "Sialkot Sports Co.: Please share the custom logo file", time: "3 hrs ago", read: true, link: "/messages" },
-  { id: "6", type: "rfq", title: "RFQ Expiring Soon", description: "Your Leather Bags RFQ expires in 2 days", time: "5 hrs ago", read: true, link: "/buyer/dashboard" },
-];
 
 const typeColors: Record<string, string> = {
   order: "bg-primary/10 text-primary",
   message: "bg-verified/10 text-verified",
   rfq: "bg-warning/10 text-warning",
+  dispute: "bg-destructive/10 text-destructive",
+  review: "bg-success/10 text-success",
+  system: "bg-muted text-muted-foreground",
 };
 
 const typeLabels: Record<string, string> = {
   order: "Order",
   message: "Message",
   rfq: "RFQ",
+  dispute: "Dispute",
+  review: "Review",
+  system: "System",
 };
 
 type NavVariant = "default" | "buyer" | "seller" | "admin";
@@ -116,9 +94,14 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const variant = detectVariant(location.pathname);
-  
+  const { data: dbCategories = [] } = useCategories();
+  const categories = dbCategories.map(c => c.name);
+
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const { data: notifications = [] } = useNotifications();
+  const { data: unreadNotifCount = 0 } = useUnreadCount();
+  const markNotifRead = useMarkNotificationRead();
+  const markAllNotifsRead = useMarkAllNotificationsRead();
   const [navSearch, setNavSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -126,7 +109,7 @@ const Navbar = () => {
   const notifRef = useRef<HTMLDivElement>(null);
   const { hasRole, addRole } = useUserRoles();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = unreadNotifCount;
   const links = navLinksByVariant[variant];
   const showCart = variant === "default" || variant === "buyer";
   const showCategories = variant === "default";
@@ -155,13 +138,8 @@ const Navbar = () => {
     setNavSearch("");
   };
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const markRead = (id: string) => {
-    setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
-  };
+  const markAllRead = () => { markAllNotifsRead.mutate(); };
+  const markRead = (id: string) => { markNotifRead.mutate(id); };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -316,25 +294,28 @@ const Navbar = () => {
                     )}
                   </div>
                   <ScrollArea className="max-h-96">
+                    {notifications.length === 0 && (
+                      <p className="text-muted-foreground font-body text-sm text-center py-6">No notifications</p>
+                    )}
                     {notifications.map((notif) => (
                       <Link
                         key={notif.id}
-                        to={notif.link}
+                        to={notif.link || "#"}
                         onClick={() => { markRead(notif.id); setNotifOpen(false); }}
                         className={`flex gap-3 p-4 border-b border-border hover:bg-accent/50 transition ${
-                          !notif.read ? "bg-accent/30" : ""
+                          !notif.is_read ? "bg-accent/30" : ""
                         }`}
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${typeColors[notif.type]}`}>
-                              {typeLabels[notif.type]}
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${typeColors[notif.type] || "bg-muted text-muted-foreground"}`}>
+                              {typeLabels[notif.type] || notif.type}
                             </span>
-                            {!notif.read && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
+                            {!notif.is_read && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
                           </div>
                           <p className="font-display font-semibold text-sm text-foreground truncate">{notif.title}</p>
-                          <p className="text-xs text-muted-foreground font-body truncate mt-0.5">{notif.description}</p>
-                          <p className="text-[10px] text-muted-foreground font-body mt-1">{notif.time}</p>
+                          <p className="text-xs text-muted-foreground font-body truncate mt-0.5">{notif.body}</p>
+                          <p className="text-[10px] text-muted-foreground font-body mt-1">{new Date(notif.created_at).toLocaleDateString("en-PK")}</p>
                         </div>
                       </Link>
                     ))}

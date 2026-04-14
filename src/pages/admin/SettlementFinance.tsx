@@ -1,36 +1,41 @@
-import { useState } from "react";
-import { payments, taxSummary } from "@/data/adminMockData";
+import { useState, useMemo } from "react";
+import { useAdminPayments } from "@/hooks/admin/useAdminData";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowDownLeft, ArrowUpRight, Wallet } from "lucide-react";
+import { Download, ArrowDownLeft, ArrowUpRight, Wallet, Loader2 } from "lucide-react";
 
 import { fmt } from "@/lib/formatters";
 
-const incoming = payments.filter(p => p.type === "incoming");
-const outgoing = payments.filter(p => p.type === "outgoing");
-const totalIn = incoming.reduce((s, p) => s + p.amount, 0);
-const totalOut = outgoing.reduce((s, p) => s + p.amount, 0);
-const balance = totalIn - totalOut;
-const totalCommission = payments.filter(p => p.type === "outgoing").reduce((s, p) => s + p.commission, 0);
-
-const methodLabel: Record<string, string> = { bank_transfer: "Bank Transfer", easypaisa: "Easypaisa", jazzcash: "JazzCash", cheque: "Cheque" };
-
 export default function SettlementFinance() {
-  const [tab, setTab] = useState<"incoming" | "outgoing" | "commission" | "tax">("incoming");
+  const { data: payments = [], isLoading } = useAdminPayments();
+  const [tab, setTab] = useState<"all" | "payment" | "payout" | "commission">("all");
+
+  const stats = useMemo(() => {
+    const totalIn = payments.filter((p: any) => p.type === "payment").reduce((s: number, p: any) => s + (p.amount || 0), 0);
+    const totalOut = payments.filter((p: any) => p.type === "payout").reduce((s: number, p: any) => s + (p.amount || 0), 0);
+    const totalCommission = payments.filter((p: any) => p.type === "commission").reduce((s: number, p: any) => s + (p.amount || 0), 0);
+    return { totalIn, totalOut, totalCommission, balance: totalIn - totalOut };
+  }, [payments]);
+
+  const filtered = useMemo(() => {
+    if (tab === "all") return payments;
+    return payments.filter((p: any) => p.type === tab);
+  }, [payments, tab]);
 
   const exportCSV = () => {
-    const rows = payments.map(p => `${p.id},${p.orderId},${p.type},${p.amount},${p.commission},${p.date},${p.method}`);
-    const csv = "ID,Order,Type,Amount,Commission,Date,Method\n" + rows.join("\n");
+    const rows = payments.map((p: any) => `${p.id},${p.order_id || ""},${p.type},${p.amount},${p.method || ""},${p.created_at}`);
+    const csv = "ID,Order,Type,Amount,Method,Date\n" + rows.join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = "bulkur_ledger.csv"; a.click();
+    URL.revokeObjectURL(url);
   };
 
   const tabs = [
-    { key: "incoming" as const, label: "Incoming Payments" },
-    { key: "outgoing" as const, label: "Outgoing Releases" },
-    { key: "commission" as const, label: "Commission Ledger" },
-    { key: "tax" as const, label: "Tax Summary" },
+    { key: "all" as const, label: "All Transactions" },
+    { key: "payment" as const, label: "Incoming Payments" },
+    { key: "payout" as const, label: "Payouts" },
+    { key: "commission" as const, label: "Commission" },
   ];
 
   return (
@@ -39,10 +44,10 @@ export default function SettlementFinance() {
 
       {/* Balance cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-        <Card icon={Wallet} label="Settlement Balance" value={fmt(balance)} accent />
-        <Card icon={ArrowDownLeft} label="Total Incoming" value={fmt(totalIn)} />
-        <Card icon={ArrowUpRight} label="Total Released" value={fmt(totalOut)} />
-        <Card icon={Wallet} label="Total Commission" value={fmt(totalCommission)} />
+        <Card icon={Wallet} label="Balance" value={isLoading ? "..." : fmt(stats.balance)} accent />
+        <Card icon={ArrowDownLeft} label="Total Incoming" value={isLoading ? "..." : fmt(stats.totalIn)} />
+        <Card icon={ArrowUpRight} label="Total Released" value={isLoading ? "..." : fmt(stats.totalOut)} />
+        <Card icon={Wallet} label="Total Commission" value={isLoading ? "..." : fmt(stats.totalCommission)} />
       </div>
 
       {/* Tabs */}
@@ -59,68 +64,48 @@ export default function SettlementFinance() {
         </Button>
       </div>
 
-      {tab === "tax" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="rounded-xl border p-6" style={{ background: "#111a35", borderColor: "#1a2340" }}>
-            <p className="text-xs text-gray-400 mb-2">SST Owed to SRB (This Month)</p>
-            <p className="text-3xl font-bold text-white">{fmt(taxSummary.sstOwed)}</p>
-          </div>
-          <div className="rounded-xl border p-6" style={{ background: "#111a35", borderColor: "#1a2340" }}>
-            <p className="text-xs text-gray-400 mb-2">WHT Collected (This Month)</p>
-            <p className="text-3xl font-bold text-white">{fmt(taxSummary.whtCollected)}</p>
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-xl border overflow-hidden" style={{ background: "#111a35", borderColor: "#1a2340" }}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b" style={{ borderColor: "#1a2340" }}>
-                  {tab === "incoming" && ["ID", "Order", "Buyer", "Amount", "Method", "Date"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-400">{h}</th>)}
-                  {tab === "outgoing" && ["ID", "Order", "Supplier", "Released", "Commission", "Date"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-400">{h}</th>)}
-                  {tab === "commission" && ["Order", "Commission", "Running Total", "Date"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-400">{h}</th>)}
+      <div className="rounded-xl border overflow-hidden" style={{ background: "#111a35", borderColor: "#1a2340" }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b" style={{ borderColor: "#1a2340" }}>
+                {["Type", "Buyer", "Seller", "Amount", "Method", "Status", "Date"].map(h => (
+                  <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-400">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading && (
+                <tr><td colSpan={7} className="p-6 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500" /></td></tr>
+              )}
+              {!isLoading && filtered.length === 0 && (
+                <tr><td colSpan={7} className="p-6 text-center text-gray-500">No transactions found</td></tr>
+              )}
+              {filtered.map((p: any) => (
+                <tr key={p.id} className="border-b hover:bg-white/5" style={{ borderColor: "#1a234040" }}>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                      style={{ background: p.type === "payment" ? "#00b89420" : p.type === "payout" ? "#74b9ff20" : "#fdcb6e20", color: p.type === "payment" ? "#00b894" : p.type === "payout" ? "#74b9ff" : "#fdcb6e" }}>
+                      {p.type}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-300">{p.buyer?.full_name || "—"}</td>
+                  <td className="px-4 py-3 text-gray-300">{p.seller?.full_name || "—"}</td>
+                  <td className="px-4 py-3 text-white font-medium">{fmt(p.amount || 0)}</td>
+                  <td className="px-4 py-3 text-gray-400 text-xs">{p.method || "—"}</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                      style={{ background: p.status === "completed" ? "#00b89420" : "#fdcb6e20", color: p.status === "completed" ? "#00b894" : "#fdcb6e" }}>
+                      {p.status || "pending"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-400 text-xs">{p.created_at ? new Date(p.created_at).toLocaleDateString("en-PK") : "—"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {tab === "incoming" && incoming.slice(0, 40).map(p => (
-                  <tr key={p.id} className="border-b hover:bg-white/5" style={{ borderColor: "#1a234040" }}>
-                    <td className="px-4 py-3 text-gray-400 font-mono text-xs">{p.id}</td>
-                    <td className="px-4 py-3 text-gray-300 text-xs">{p.orderId}</td>
-                    <td className="px-4 py-3 text-gray-300">{p.buyerName}</td>
-                    <td className="px-4 py-3 text-white font-medium">{fmt(p.amount)}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{methodLabel[p.method]}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{p.date}</td>
-                  </tr>
-                ))}
-                {tab === "outgoing" && outgoing.map(p => (
-                  <tr key={p.id} className="border-b hover:bg-white/5" style={{ borderColor: "#1a234040" }}>
-                    <td className="px-4 py-3 text-gray-400 font-mono text-xs">{p.id}</td>
-                    <td className="px-4 py-3 text-gray-300 text-xs">{p.orderId}</td>
-                    <td className="px-4 py-3 text-gray-300">{p.supplierName}</td>
-                    <td className="px-4 py-3 text-white font-medium">{fmt(p.amount)}</td>
-                    <td className="px-4 py-3 text-yellow-400 font-medium">{fmt(p.commission)}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{p.date}</td>
-                  </tr>
-                ))}
-                {tab === "commission" && (() => {
-                  let running = 0;
-                  return outgoing.map(p => {
-                    running += p.commission;
-                    return (
-                      <tr key={p.id} className="border-b hover:bg-white/5" style={{ borderColor: "#1a234040" }}>
-                        <td className="px-4 py-3 text-gray-300 text-xs">{p.orderId}</td>
-                        <td className="px-4 py-3 text-white font-medium">{fmt(p.commission)}</td>
-                        <td className="px-4 py-3 font-medium" style={{ color: "#00b894" }}>{fmt(running)}</td>
-                        <td className="px-4 py-3 text-gray-400 text-xs">{p.date}</td>
-                      </tr>
-                    );
-                  });
-                })()}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -14,7 +14,6 @@ import ProductDetail from "./pages/ProductDetail";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerOrders from "./pages/seller/SellerOrders";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import Cart from "./pages/Cart";
 import Messages from "./pages/Messages";
 import OrderTracking from "./pages/OrderTracking";
@@ -57,7 +56,7 @@ const AnimatedRoutes = () => {
         <Route path="/seller/onboarding" element={<AuthGuard requiredRole="seller"><SupplierOnboarding /></AuthGuard>} />
         <Route path="/seller/dashboard" element={<AuthGuard requiredRole="seller"><SellerDashboard /></AuthGuard>} />
         <Route path="/seller/orders" element={<AuthGuard requiredRole="seller"><SellerOrders /></AuthGuard>} />
-        <Route path="/admin/dashboard" element={<AuthGuard requiredRole="admin"><AdminDashboard /></AuthGuard>} />
+        <Route path="/admin/dashboard" element={<AuthGuard requiredRole="admin"><Navigate to="/admin" replace /></AuthGuard>} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-confirmation" element={<OrderConfirmation />} />

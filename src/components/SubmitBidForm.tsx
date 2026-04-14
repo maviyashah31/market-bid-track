@@ -7,17 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type RFQDetail } from "@/data/rfqData";
+import { useSubmitBid, type RFQ } from "@/hooks/useRFQs";
 import { toast } from "sonner";
-import { DollarSign, Clock, MapPin, Truck, CheckCircle2 } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface SubmitBidFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  rfq: RFQDetail | null;
+  rfq: RFQ | null;
 }
 
 const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
+  const submitBid = useSubmitBid();
   const [form, setForm] = useState({
     pricePerUnit: "", totalPrice: "", deliveryDays: "", notes: "",
     moq: "", sampleAvailable: "yes", sampleCost: "", warranty: "",
@@ -32,16 +33,32 @@ const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
       toast.error("Please fill price per unit and delivery time");
       return;
     }
-    toast.success(`Bid submitted for "${rfq?.title}"! The buyer will review your offer.`);
-    onOpenChange(false);
-    setForm({ pricePerUnit: "", totalPrice: "", deliveryDays: "", notes: "", moq: "", sampleAvailable: "yes", sampleCost: "", warranty: "" });
+    if (!rfq) return;
+    const total = form.totalPrice ? Number(form.totalPrice) : Number(form.pricePerUnit) * rfq.quantity;
+    submitBid.mutate({
+      rfq_id: rfq.id,
+      price_per_unit: Number(form.pricePerUnit),
+      total_price: total,
+      delivery_days: Number(form.deliveryDays),
+      notes: form.notes || undefined,
+    }, {
+      onSuccess: () => {
+        toast.success(`Bid submitted for "${rfq.title}"! The buyer will review your offer.`);
+        onOpenChange(false);
+        setForm({ pricePerUnit: "", totalPrice: "", deliveryDays: "", notes: "", moq: "", sampleAvailable: "yes", sampleCost: "", warranty: "" });
+      },
+    });
   };
 
   if (!rfq) return null;
 
-  const budgetStr = `PKR ${(rfq.budgetMin / 1000000).toFixed(1)}M - ${(rfq.budgetMax / 1000000).toFixed(1)}M`;
-  const priceInBudget = form.pricePerUnit
-    ? Number(form.pricePerUnit) * rfq.quantity >= rfq.budgetMin && Number(form.pricePerUnit) * rfq.quantity <= rfq.budgetMax
+  const budgetMin = rfq.budget_min || 0;
+  const budgetMax = rfq.budget_max || 0;
+  const budgetStr = budgetMin || budgetMax
+    ? `PKR ${(budgetMin / 1000000).toFixed(1)}M - ${(budgetMax / 1000000).toFixed(1)}M`
+    : "Not specified";
+  const priceInBudget = form.pricePerUnit && budgetMin && budgetMax
+    ? Number(form.pricePerUnit) * rfq.quantity >= budgetMin && Number(form.pricePerUnit) * rfq.quantity <= budgetMax
     : null;
 
   return (
@@ -55,10 +72,10 @@ const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
         <div className="bg-accent/50 rounded-lg p-4 space-y-2">
           <div className="flex items-start justify-between">
             <div>
-              <Badge variant="secondary" className="font-body mb-1">{rfq.category}</Badge>
+              <Badge variant="secondary" className="font-body mb-1">{rfq.category?.name || "General"}</Badge>
               <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
               <p className="text-xs text-muted-foreground font-body flex items-center gap-1 mt-1">
-                <MapPin className="h-3 w-3" /> {rfq.buyerLocation} • {rfq.buyer}
+                <MapPin className="h-3 w-3" /> {rfq.buyer?.full_name || "Buyer"}
               </p>
             </div>
           </div>
@@ -73,22 +90,9 @@ const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground font-body">Deadline</p>
-              <p className="font-display font-bold text-sm">{rfq.deadline}</p>
+              <p className="font-display font-bold text-sm">{rfq.deadline ? new Date(rfq.deadline).toLocaleDateString("en-PK") : "Open"}</p>
             </div>
           </div>
-          {rfq.specifications.length > 0 && (
-            <div className="pt-2 border-t border-border">
-              <p className="text-xs text-muted-foreground font-body mb-1">Key Specifications:</p>
-              <div className="flex flex-wrap gap-1">
-                {rfq.specifications.slice(0, 4).map((spec, idx) => (
-                  <Badge key={idx} variant="outline" className="text-[10px] font-body">{spec}</Badge>
-                ))}
-                {rfq.specifications.length > 4 && (
-                  <Badge variant="outline" className="text-[10px] font-body">+{rfq.specifications.length - 4} more</Badge>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         <Separator />
@@ -113,7 +117,7 @@ const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
                 />
                 {priceInBudget !== null && (
                   <span className={`absolute right-3 top-1/2 -translate-y-1/2 mt-0.5 text-xs font-body ${priceInBudget ? "text-success" : "text-warning"}`}>
-                    {priceInBudget ? "✓ In budget" : "⚠ Out of budget"}
+                    {priceInBudget ? "In budget" : "Out of budget"}
                   </span>
                 )}
               </div>
@@ -169,7 +173,9 @@ const SubmitBidForm = ({ open, onOpenChange, rfq }: SubmitBidFormProps) => {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="font-body">Cancel</Button>
-          <Button onClick={handleSubmit} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold">Submit Bid</Button>
+          <Button onClick={handleSubmit} disabled={submitBid.isPending} className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold">
+            {submitBid.isPending ? "Submitting..." : "Submit Bid"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

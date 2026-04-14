@@ -1,42 +1,32 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Minus, Plus, Trash2, ArrowLeft, Shield } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowLeft, Shield, Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import AnimatedPage from "@/components/AnimatedPage";
-
-interface CartItem {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-  moq: number;
-  unit: string;
-  seller: string;
-}
-
-const initialItems: CartItem[] = [
-  { id: "1", name: "Premium Cotton T-Shirts - Bulk", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200", price: 220, quantity: 500, moq: 500, unit: "pcs", seller: "Lahore Textile Mills" },
-  { id: "3", name: "Leather Football - Match Quality", image: "https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=200", price: 550, quantity: 200, moq: 200, unit: "pcs", seller: "Sialkot Sports Co." },
-  { id: "6", name: "Genuine Leather Wallet - Premium", image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=200", price: 850, quantity: 100, moq: 50, unit: "pcs", seller: "Multan Leather Works" },
-];
+import { useCart, useUpdateCartItem, useRemoveCartItem } from "@/hooks/useCart";
+import { toast } from "sonner";
 
 const Cart = () => {
-  const [items, setItems] = useState(initialItems);
+  const { data: cartItems = [], isLoading } = useCart();
+  const updateItem = useUpdateCartItem();
+  const removeItem = useRemoveCartItem();
 
-  const updateQty = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(item.moq, item.quantity + delta) } : item
-      )
-    );
+  const updateQty = (id: string, currentQty: number, moq: number, delta: number) => {
+    const newQty = Math.max(moq, currentQty + delta);
+    updateItem.mutate({ id, quantity: newQty });
   };
 
-  const removeItem = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+  const handleRemove = (id: string) => {
+    removeItem.mutate(id, {
+      onSuccess: () => toast.success("Item removed from cart"),
+    });
+  };
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + (item.product?.min_price || 0) * item.quantity,
+    0
+  );
 
   return (
     <AnimatedPage>
@@ -47,67 +37,89 @@ const Cart = () => {
           <ArrowLeft className="h-4 w-4" /> Continue Shopping
         </Link>
 
-        <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Shopping Cart ({items.length})</h1>
+        <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-6 sm:mb-8">Shopping Cart ({cartItems.length})</h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Items */}
-          <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
-              <div key={item.id} className="bg-card rounded-xl border border-border p-3 sm:p-4 flex gap-3 sm:gap-4">
-                <img src={item.image} alt={item.name} className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-semibold text-foreground text-sm sm:text-base truncate">{item.name}</h3>
-                  <p className="text-xs text-muted-foreground font-body">{item.seller}</p>
-                  <p className="font-display font-bold text-primary mt-1 text-sm sm:text-base">PKR {item.price}/{item.unit}</p>
-                  <div className="flex items-center gap-3 mt-2">
-                    <div className="flex items-center border border-border rounded-lg">
-                      <button onClick={() => updateQty(item.id, -50)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="px-3 py-1 text-sm font-body font-medium text-foreground border-x border-border">{item.quantity}</span>
-                      <button onClick={() => updateQty(item.id, 50)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <button onClick={() => removeItem(item.id)} className="text-destructive hover:text-destructive/80">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="text-right font-display font-bold text-foreground text-sm sm:text-base hidden sm:block">
-                  PKR {(item.price * item.quantity).toLocaleString()}
-                </div>
-              </div>
-            ))}
+        {isLoading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-
-          {/* Summary */}
-          <div className="bg-card rounded-xl border border-border p-6 h-fit sticky top-32">
-            <h2 className="font-display font-bold text-xl text-foreground mb-4">Order Summary</h2>
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-sm font-body">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="text-foreground font-medium">PKR {subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm font-body">
-                <span className="text-muted-foreground">Shipping</span>
-                <span className="text-success font-medium">Calculated at checkout</span>
-              </div>
-              <div className="border-t border-border pt-3 flex justify-between">
-                <span className="font-display font-bold text-foreground">Total</span>
-                <span className="font-display font-bold text-xl text-primary">PKR {subtotal.toLocaleString()}</span>
-              </div>
-            </div>
-            <Link to="/checkout">
-              <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 font-display font-semibold">
-                Proceed to Checkout
-              </Button>
+        ) : cartItems.length === 0 ? (
+          <div className="text-center py-16">
+            <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="font-display font-bold text-xl text-foreground mb-2">Your cart is empty</h2>
+            <p className="text-muted-foreground font-body mb-6">Browse products and add them to your cart.</p>
+            <Link to="/products">
+              <Button className="bg-gradient-hero text-primary-foreground">Browse Products</Button>
             </Link>
-            <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground font-body justify-center">
-              <Shield className="h-4 w-4 text-primary" /> Secure escrow payment
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Items */}
+            <div className="lg:col-span-2 space-y-4">
+              {cartItems.map((item) => {
+                const product = item.product;
+                if (!product) return null;
+                const image = product.images?.[0] || "/placeholder.svg";
+                const sellerName = product.profiles?.full_name || "Unknown Seller";
+
+                return (
+                  <div key={item.id} className="bg-card rounded-xl border border-border p-3 sm:p-4 flex gap-3 sm:gap-4">
+                    <img src={image} alt={product.name} className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display font-semibold text-foreground text-sm sm:text-base truncate">{product.name}</h3>
+                      <p className="text-xs text-muted-foreground font-body">{sellerName}</p>
+                      <p className="font-display font-bold text-primary mt-1 text-sm sm:text-base">PKR {product.min_price}/{product.unit}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <div className="flex items-center border border-border rounded-lg">
+                          <button onClick={() => updateQty(item.id, item.quantity, product.moq, -50)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="px-3 py-1 text-sm font-body font-medium text-foreground border-x border-border">{item.quantity}</span>
+                          <button onClick={() => updateQty(item.id, item.quantity, product.moq, 50)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <button onClick={() => handleRemove(item.id)} className="text-destructive hover:text-destructive/80">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-right font-display font-bold text-foreground text-sm sm:text-base hidden sm:block">
+                      PKR {(product.min_price * item.quantity).toLocaleString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Summary */}
+            <div className="bg-card rounded-xl border border-border p-6 h-fit sticky top-32">
+              <h2 className="font-display font-bold text-xl text-foreground mb-4">Order Summary</h2>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm font-body">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-foreground font-medium">PKR {subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm font-body">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-success font-medium">Calculated at checkout</span>
+                </div>
+                <div className="border-t border-border pt-3 flex justify-between">
+                  <span className="font-display font-bold text-foreground">Total</span>
+                  <span className="font-display font-bold text-xl text-primary">PKR {subtotal.toLocaleString()}</span>
+                </div>
+              </div>
+              <Link to="/checkout">
+                <Button className="w-full bg-gradient-hero text-primary-foreground hover:opacity-90 h-12 font-display font-semibold">
+                  Proceed to Checkout
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground font-body justify-center">
+                <Shield className="h-4 w-4 text-primary" /> Secure escrow payment
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <Footer />
     </div>

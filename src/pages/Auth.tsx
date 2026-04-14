@@ -20,22 +20,41 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
-  // Redirect if already logged in
+  // Redirect if already logged in — tries user_roles first, falls back to profiles.role
   useEffect(() => {
+    let cancelled = false;
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (!session || cancelled) return;
+
+      // Try user_roles table first (new schema)
+      const { data: userRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+
+      if (cancelled) return;
+
+      let roles: string[] = [];
+      if (!rolesError && userRoles && userRoles.length > 0) {
+        roles = userRoles.map(r => r.role);
+      } else {
+        // Fallback to profiles.role (old schema / before migration)
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
           .single();
-        if (profile?.role === "seller") navigate("/seller/dashboard");
-        else if (profile?.role === "admin") navigate("/admin");
-        else navigate("/buyer/dashboard");
+        if (cancelled) return;
+        if (profile?.role) roles = [profile.role];
       }
+
+      if (roles.includes("admin")) navigate("/admin", { replace: true });
+      else if (roles.includes("seller")) navigate("/seller/dashboard", { replace: true });
+      else if (roles.includes("buyer")) navigate("/buyer/dashboard", { replace: true });
     };
     checkSession();
+    return () => { cancelled = true; };
   }, [navigate]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -77,18 +96,21 @@ const Auth = () => {
 
         // Check if user has the selected role
         if (authData.user) {
-          const { data: userRoles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", authData.user.id);
-
-          const hasSelectedRole = userRoles?.some(r => r.role === role);
-
-          if (!hasSelectedRole) {
-            // User doesn't have this role yet — add it
-            await supabase
+          // Try to check/add role in user_roles; silently skip if table doesn't exist yet
+          try {
+            const { data: userRoles } = await supabase
               .from("user_roles")
-              .insert({ user_id: authData.user.id, role });
+              .select("role")
+              .eq("user_id", authData.user.id);
+
+            const hasSelectedRole = userRoles?.some(r => r.role === role);
+            if (!hasSelectedRole) {
+              await supabase
+                .from("user_roles")
+                .insert({ user_id: authData.user.id, role });
+            }
+          } catch {
+            // user_roles table may not exist yet — continue with login
           }
 
           if (role === "seller") navigate("/seller/dashboard");

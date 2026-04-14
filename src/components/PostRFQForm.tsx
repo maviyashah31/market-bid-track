@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { categories } from "@/data/mockData";
+import { useCategories } from "@/hooks/useCategories";
+import { useCreateRFQ } from "@/hooks/useRFQs";
 import { toast } from "sonner";
 import { ImagePlus, X, Plus } from "lucide-react";
 import { imageUrlSchema } from "@/lib/validation";
@@ -17,6 +18,8 @@ interface PostRFQFormProps {
 }
 
 const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
+  const { data: categories = [] } = useCategories();
+  const createRFQ = useCreateRFQ();
   const [form, setForm] = useState({
     title: "", category: "", quantity: "", unit: "pcs",
     budgetMin: "", budgetMax: "", deadline: "", description: "",
@@ -59,12 +62,26 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
       toast.error("Please provide a description of your requirements");
       return;
     }
-    toast.success("RFQ posted successfully! Sellers will start bidding soon.");
-    onOpenChange(false);
-    setForm({ title: "", category: "", quantity: "", unit: "pcs", budgetMin: "", budgetMax: "", deadline: "", description: "", shippingTerms: "", paymentTerms: "", certifications: "" });
-    setImages([]);
-    setSpecs([""]);
-    setStep(1);
+    createRFQ.mutate({
+      title: form.title,
+      description: form.description,
+      category_id: form.category || undefined,
+      quantity: parseInt(form.quantity),
+      unit: form.unit,
+      budget_min: form.budgetMin ? parseFloat(form.budgetMin) : undefined,
+      budget_max: form.budgetMax ? parseFloat(form.budgetMax) : undefined,
+      deadline: form.deadline || undefined,
+      image_urls: images.map(i => i.url),
+    }, {
+      onSuccess: () => {
+        toast.success("RFQ posted successfully! Sellers will start bidding soon.");
+        onOpenChange(false);
+        setForm({ title: "", category: "", quantity: "", unit: "pcs", budgetMin: "", budgetMax: "", deadline: "", description: "", shippingTerms: "", paymentTerms: "", certifications: "" });
+        setImages([]);
+        setSpecs([""]);
+        setStep(1);
+      },
+    });
   };
 
   return (

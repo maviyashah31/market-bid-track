@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowLeft, Shield, CreditCard, Building2, Wallet, Truck, MapPin, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Shield, CreditCard, Building2, Wallet, Truck, MapPin, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,23 +11,54 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import AnimatedPage from "@/components/AnimatedPage";
 import { toast } from "sonner";
-
-const cartItems = [
-  { id: "1", name: "Premium Cotton T-Shirts - Bulk", price: 220, quantity: 500, unit: "pcs", seller: "Lahore Textile Mills" },
-  { id: "3", name: "Leather Football - Match Quality", price: 550, quantity: 200, unit: "pcs", seller: "Sialkot Sports Co." },
-  { id: "6", name: "Genuine Leather Wallet - Premium", price: 850, quantity: 100, unit: "pcs", seller: "Multan Leather Works" },
-];
+import { useCart } from "@/hooks/useCart";
+import { useAddresses, useCreateAddress } from "@/hooks/useAddresses";
+import { useCreateOrder } from "@/hooks/useOrders";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { data: cartItems = [], isLoading: cartLoading } = useCart();
+  const { data: savedAddresses = [] } = useAddresses();
+  const createAddress = useCreateAddress();
+  const createOrder = useCreateOrder();
   const [step, setStep] = useState<"shipping" | "payment" | "review">("shipping");
   const [paymentMethod, setPaymentMethod] = useState("escrow");
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [shipping, setShipping] = useState({
     fullName: "", company: "", phone: "", email: "",
     address: "", city: "", state: "", zip: "", notes: "",
   });
 
-  const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  // Load saved address if selected
+  const selectSavedAddress = (id: string) => {
+    const addr = savedAddresses.find(a => a.id === id);
+    if (addr) {
+      setSelectedAddressId(id);
+      setShipping({
+        fullName: addr.full_name,
+        company: addr.company || "",
+        phone: addr.phone,
+        email: addr.email || "",
+        address: addr.address_line1,
+        city: addr.city,
+        state: addr.province || "",
+        zip: addr.postal_code || "",
+        notes: "",
+      });
+    }
+  };
+
+  // Build items for display
+  const displayItems = cartItems.map(item => ({
+    id: item.id,
+    name: item.product?.name || "Product",
+    price: item.product?.min_price || 0,
+    quantity: item.quantity,
+    unit: item.product?.unit || "pcs",
+    seller: item.product?.profiles?.full_name || "Seller",
+  }));
+
+  const subtotal = displayItems.reduce((s, i) => s + i.price * i.quantity, 0);
   const shippingCost = 15000;
   const total = subtotal + shippingCost;
 
@@ -36,10 +67,75 @@ const Checkout = () => {
 
   const canProceedShipping = shipping.fullName && shipping.phone && shipping.address && shipping.city;
 
-  const handlePlaceOrder = () => {
-    toast.success("Order placed successfully! Order ID: ORD-2024-004");
-    navigate("/order-confirmation");
+  const handleSaveAddress = async () => {
+    if (!canProceedShipping) return;
+    await createAddress.mutateAsync({
+      full_name: shipping.fullName,
+      company: shipping.company || undefined,
+      phone: shipping.phone,
+      email: shipping.email || undefined,
+      address_line1: shipping.address,
+      city: shipping.city,
+      province: shipping.state || undefined,
+      postal_code: shipping.zip || undefined,
+    });
+    toast.success("Address saved!");
   };
+
+  const handlePlaceOrder = () => {
+    createOrder.mutate(
+      {
+        shippingAddress: {
+          full_name: shipping.fullName,
+          company: shipping.company,
+          phone: shipping.phone,
+          email: shipping.email,
+          address: shipping.address,
+          city: shipping.city,
+          province: shipping.state,
+          postal_code: shipping.zip,
+          notes: shipping.notes,
+        },
+        paymentMethod,
+        notes: shipping.notes || undefined,
+      },
+      {
+        onSuccess: (orderIds) => {
+          toast.success(`Order placed successfully! ${orderIds.length > 1 ? `${orderIds.length} orders created.` : ""}`);
+          navigate("/order-confirmation");
+        },
+        onError: () => {
+          toast.error("Failed to place order. Please try again.");
+        },
+      }
+    );
+  };
+
+  if (cartLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <AnimatedPage>
+        <div className="min-h-screen bg-background">
+          <Navbar />
+          <div className="container mx-auto px-4 py-16 text-center">
+            <h1 className="font-display font-bold text-2xl text-foreground mb-4">Your cart is empty</h1>
+            <Link to="/products"><Button>Browse Products</Button></Link>
+          </div>
+          <Footer />
+        </div>
+      </AnimatedPage>
+    );
+  }
 
   return (
     <AnimatedPage>
@@ -85,6 +181,31 @@ const Checkout = () => {
                   <h2 className="font-display font-bold text-xl text-foreground mb-6 flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-primary" /> Shipping Information
                   </h2>
+
+                  {/* Saved addresses */}
+                  {savedAddresses.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-display font-semibold text-sm text-foreground mb-3">Saved Addresses</h3>
+                      <div className="grid gap-2">
+                        {savedAddresses.map(addr => (
+                          <button
+                            key={addr.id}
+                            onClick={() => selectSavedAddress(addr.id)}
+                            className={`text-left p-3 rounded-lg border transition ${
+                              selectedAddressId === addr.id
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-primary/50"
+                            }`}
+                          >
+                            <p className="font-display font-semibold text-sm text-foreground">{addr.full_name}</p>
+                            <p className="text-xs text-muted-foreground font-body">{addr.address_line1}, {addr.city}</p>
+                          </button>
+                        ))}
+                      </div>
+                      <Separator className="my-4" />
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="font-body text-sm">Full Name *</Label>
@@ -123,13 +244,20 @@ const Checkout = () => {
                       <Textarea value={shipping.notes} onChange={(e) => updateShipping("notes", e.target.value)} placeholder="Special instructions for delivery..." className="mt-1" />
                     </div>
                   </div>
-                  <Button
-                    onClick={() => setStep("payment")}
-                    disabled={!canProceedShipping}
-                    className="mt-6 bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold"
-                  >
-                    Continue to Payment
-                  </Button>
+                  <div className="flex gap-3 mt-6">
+                    {!selectedAddressId && canProceedShipping && (
+                      <Button variant="outline" onClick={handleSaveAddress} className="font-body">
+                        Save Address
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => setStep("payment")}
+                      disabled={!canProceedShipping}
+                      className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold"
+                    >
+                      Continue to Payment
+                    </Button>
+                  </div>
                 </div>
               )}
 
@@ -142,7 +270,7 @@ const Checkout = () => {
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-4">
                     {[
                       { value: "escrow", label: "Escrow Payment", desc: "Secure payment held until you confirm delivery", icon: Shield },
-                      { value: "bank", label: "Bank Transfer", desc: "Direct bank transfer with order confirmation", icon: Building2 },
+                      { value: "bank_transfer", label: "Bank Transfer", desc: "Direct bank transfer with order confirmation", icon: Building2 },
                       { value: "cod", label: "Cash on Delivery", desc: "Pay when you receive the goods (extra charges apply)", icon: Wallet },
                     ].map(({ value, label, desc, icon: Icon }) => (
                       <label
@@ -190,7 +318,7 @@ const Checkout = () => {
                   <div className="bg-card rounded-xl border border-border p-6">
                     <h2 className="font-display font-bold text-xl text-foreground mb-4">Order Review</h2>
                     <div className="space-y-4">
-                      {cartItems.map((item) => (
+                      {displayItems.map((item) => (
                         <div key={item.id} className="flex justify-between items-center py-3 border-b border-border last:border-0">
                           <div>
                             <p className="font-display font-semibold text-foreground text-sm">{item.name}</p>
@@ -213,7 +341,9 @@ const Checkout = () => {
 
                   <div className="bg-card rounded-xl border border-border p-6">
                     <h3 className="font-display font-semibold text-foreground mb-3">Payment</h3>
-                    <p className="text-sm text-muted-foreground font-body capitalize">{paymentMethod === "cod" ? "Cash on Delivery" : paymentMethod === "bank" ? "Bank Transfer" : "Escrow Payment"}</p>
+                    <p className="text-sm text-muted-foreground font-body capitalize">
+                      {paymentMethod === "cod" ? "Cash on Delivery" : paymentMethod === "bank_transfer" ? "Bank Transfer" : "Escrow Payment"}
+                    </p>
                   </div>
 
                   <div className="flex gap-3">
@@ -230,7 +360,7 @@ const Checkout = () => {
             <div className="bg-card rounded-xl border border-border p-6 h-fit sticky top-32">
               <h2 className="font-display font-bold text-lg text-foreground mb-4">Order Summary</h2>
               <div className="space-y-3 text-sm font-body">
-                {cartItems.map((item) => (
+                {displayItems.map((item) => (
                   <div key={item.id} className="flex justify-between">
                     <span className="text-muted-foreground truncate mr-2">{item.name}</span>
                     <span className="text-foreground font-medium whitespace-nowrap">PKR {(item.price * item.quantity).toLocaleString()}</span>

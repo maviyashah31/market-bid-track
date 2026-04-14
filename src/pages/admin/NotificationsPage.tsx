@@ -1,58 +1,66 @@
-import { useState } from "react";
-import { adminNotifications, type AdminNotification } from "@/data/adminMockData";
-import { Link } from "react-router-dom";
-import { Bell, AlertTriangle, ShoppingBag, Users, Wallet, CreditCard } from "lucide-react";
+import { useAdminNotifications, useAdminMarkNotificationRead } from "@/hooks/admin/useAdminData";
+import { Bell, AlertTriangle, ShoppingBag, Users, Wallet, CreditCard, Loader2, MessageSquare } from "lucide-react";
 
 const typeIcon: Record<string, any> = {
-  supplier_application: Users,
-  dispute_raised: AlertTriangle,
-  strike_warning: AlertTriangle,
-  large_transaction: ShoppingBag,
-  missed_payment: CreditCard,
-  low_balance: Wallet,
+  order: ShoppingBag,
+  dispute: AlertTriangle,
+  system: Bell,
+  message: MessageSquare,
+  review: Users,
+  payment: CreditCard,
 };
 
 const typeColor: Record<string, string> = {
-  supplier_application: "#74b9ff",
-  dispute_raised: "#d63031",
-  strike_warning: "#fdcb6e",
-  large_transaction: "#00b894",
-  missed_payment: "#d63031",
-  low_balance: "#fdcb6e",
+  order: "#00b894",
+  dispute: "#d63031",
+  system: "#74b9ff",
+  message: "#fdcb6e",
+  review: "#00b894",
+  payment: "#00b894",
 };
 
 export default function NotificationsPage() {
-  const [data, setData] = useState(adminNotifications);
-  const unread = data.filter(n => !n.read).length;
+  const { data: notifications = [], isLoading } = useAdminNotifications();
+  const markRead = useAdminMarkNotificationRead();
 
-  const markAllRead = () => setData(prev => prev.map(n => ({ ...n, read: true })));
-  const markRead = (id: string) => setData(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  const unread = notifications.filter((n: any) => !n.is_read).length;
+
+  const handleMarkAllRead = () => {
+    notifications.filter((n: any) => !n.is_read).forEach((n: any) => markRead.mutate(n.id));
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-white">Notifications</h1>
         {unread > 0 && (
-          <button onClick={markAllRead} className="text-xs font-semibold" style={{ color: "#00b894" }}>
-            Mark all as read
+          <button onClick={handleMarkAllRead} className="text-xs font-semibold" style={{ color: "#00b894" }}>
+            Mark all as read ({unread})
           </button>
         )}
       </div>
 
+      {isLoading && (
+        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-gray-500" /></div>
+      )}
+
+      {!isLoading && notifications.length === 0 && (
+        <p className="text-gray-500 text-center py-12">No notifications</p>
+      )}
+
       <div className="space-y-3">
-        {data.map(n => {
+        {notifications.map((n: any) => {
           const Icon = typeIcon[n.type] || Bell;
           const color = typeColor[n.type] || "#00b894";
           return (
-            <Link
+            <div
               key={n.id}
-              to={n.link}
-              onClick={() => markRead(n.id)}
-              className={`block rounded-xl border p-4 transition hover:bg-white/5 ${!n.read ? "border-l-2" : ""}`}
+              onClick={() => !n.is_read && markRead.mutate(n.id)}
+              className={`block rounded-xl border p-4 transition hover:bg-white/5 cursor-pointer ${!n.is_read ? "border-l-2" : ""}`}
               style={{
-                background: !n.read ? "#111a35" : "#0d1225",
-                borderColor: !n.read ? color : "#1a2340",
-                borderLeftColor: !n.read ? color : undefined,
+                background: !n.is_read ? "#111a35" : "#0d1225",
+                borderColor: !n.is_read ? color : "#1a2340",
+                borderLeftColor: !n.is_read ? color : undefined,
               }}
             >
               <div className="flex items-start gap-3">
@@ -62,13 +70,16 @@ export default function NotificationsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-white">{n.title}</p>
-                    {!n.read && <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: "#00b894" }} />}
+                    {!n.is_read && <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: "#00b894" }} />}
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5">{n.description}</p>
-                  <p className="text-[10px] text-gray-500 mt-1">{n.time}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{n.body || "—"}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-[10px] text-gray-500">{n.created_at ? new Date(n.created_at).toLocaleString("en-PK") : "—"}</p>
+                    {n.user?.full_name && <p className="text-[10px] text-gray-500">• {n.user.full_name}</p>}
+                  </div>
                 </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>

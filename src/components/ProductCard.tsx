@@ -1,8 +1,8 @@
-import { BadgeCheck, Star, MapPin } from "lucide-react";
-import { Product } from "@/data/mockData";
+import { BadgeCheck, Star } from "lucide-react";
+import type { ProductCardData } from "@/types/database";
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product }: { product: Product }) => (
+const ProductCard = ({ product }: { product: ProductCardData }) => (
   <Link
     to={`/product/${product.id}`}
     className="group bg-card rounded-lg border border-border overflow-hidden hover:shadow-md hover:border-primary/30 transition-all"

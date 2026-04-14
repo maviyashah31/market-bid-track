@@ -4,8 +4,14 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import OnboardingBanner from "@/components/OnboardingBanner";
 import { useSupplierOnboarding } from "@/hooks/useSupplierOnboarding";
-import { products as initialProducts, disputes, disputeReasons, chatConversations, chatMessages, type Dispute, type Product, type ChatMessage } from "@/data/mockData";
-import { rfqDetails, type RFQDetail } from "@/data/rfqData";
+import { useConversations, useMessages, useSendMessage } from "@/hooks/useMessages";
+import type { ProductCardData as Product } from "@/types/database";
+import { useSellerProducts } from "@/hooks/useProducts";
+import { useSellerOrders, useUpdateOrderStatus, type Order } from "@/hooks/useOrders";
+import { useSellerWallet, useWalletTransactions } from "@/hooks/useSellerWallet";
+import { useSellerReviews } from "@/hooks/useReviews";
+import { useSellerDisputes as useSellerDisputesHook, useSendDisputeMessage, type Dispute as DisputeType } from "@/hooks/useDisputes";
+import { useRFQs, type RFQ } from "@/hooks/useRFQs";
 import {
   Package, DollarSign, TrendingUp, ShoppingCart, FileText, MessageSquare,
   Star, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, Plus, Eye, Edit, Trash2,
@@ -35,29 +41,9 @@ const stats = [
   { icon: Star, label: "Rating", value: "4.8/5", change: "+0.2", up: true },
 ];
 
-const recentOrders = [
-  { id: "ORD-5001", product: "Cotton T-Shirts x500", buyer: "Metro Wholesale", buyerEmail: "orders@metrowholesale.pk", buyerPhone: "+92 321 1234567", total: "PKR 175,000", status: "pending", date: "2026-03-08", address: "Shop #45, Bolton Market, Karachi", paymentStatus: "escrow" },
-  { id: "ORD-5002", product: "Polo Shirts x200", buyer: "Style Hub", buyerEmail: "buy@stylehub.pk", buyerPhone: "+92 300 9876543", total: "PKR 96,000", status: "processing", date: "2026-03-07", address: "Mall Road, Lahore", paymentStatus: "escrow" },
-  { id: "ORD-5003", product: "Denim Jeans x300", buyer: "Fashion Point", buyerEmail: "procurement@fashionpoint.pk", buyerPhone: "+92 333 5556677", total: "PKR 285,000", status: "shipped", date: "2026-03-05", address: "Blue Area, Islamabad", paymentStatus: "escrow" },
-  { id: "ORD-5004", product: "Cotton Fabric 1000m", buyer: "AL Textiles", buyerEmail: "info@altextiles.pk", buyerPhone: "+92 312 7778899", total: "PKR 450,000", status: "delivered", date: "2026-03-01", address: "Faisalabad Road, Faisalabad", paymentStatus: "released" },
-  { id: "ORD-5005", product: "Silk Scarves x150", buyer: "Karachi Traders", buyerEmail: "buy@karachitraders.pk", buyerPhone: "+92 345 1112233", total: "PKR 67,500", status: "pending", date: "2026-03-08", address: "Tariq Road, Karachi", paymentStatus: "escrow" },
-  { id: "ORD-5006", product: "Leather Jackets x50", buyer: "Premium Wear", buyerEmail: "orders@premiumwear.pk", buyerPhone: "+92 301 4445566", total: "PKR 375,000", status: "processing", date: "2026-03-06", address: "Liberty Market, Lahore", paymentStatus: "escrow" },
-];
 
 import { orderStatusColors as statusColors } from "@/lib/constants";
 
-const reviews = [
-  { id: "1", buyer: "Muhammad Ahmed", product: "Cotton T-Shirts", rating: 5, comment: "Excellent quality! Will order again.", date: "2026-03-05" },
-  { id: "2", buyer: "Sara Khan", product: "Polo Shirts", rating: 4, comment: "Good quality but delivery was slightly delayed.", date: "2026-03-03" },
-  { id: "3", buyer: "Ali Hassan", product: "Denim Jeans", rating: 5, comment: "Perfect stitching and material.", date: "2026-02-28" },
-];
-
-const walletTransactions = [
-  { id: "T1", type: "credit", desc: "Order ORD-5004 payment", amount: "+PKR 450,000", date: "2026-03-04" },
-  { id: "T2", type: "debit", desc: "Platform commission", amount: "-PKR 45,000", date: "2026-03-04" },
-  { id: "T3", type: "credit", desc: "Order ORD-5003 payment", amount: "+PKR 285,000", date: "2026-03-02" },
-  { id: "T4", type: "debit", desc: "Withdrawal to bank", amount: "-PKR 500,000", date: "2026-03-01" },
-];
 
 const sidebarItems = [
   { icon: BarChart3, label: "Overview", value: "overview" },
@@ -77,17 +63,32 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
-  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [selectedDispute, setSelectedDispute] = useState<DisputeType | null>(null);
   const [responseText, setResponseText] = useState("");
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
   
-  const sellerProducts = initialProducts.filter(p => p.sellerName === "Lahore Textile Mills" || p.sellerName === "Faisalabad Fabric House");
-  const [myProducts, setMyProducts] = useState<Product[]>(sellerProducts);
+  const { data: realSellerProducts = [] } = useSellerProducts();
+  const { data: sellerOrders = [] } = useSellerOrders();
+  const updateOrderStatus = useUpdateOrderStatus();
+  const myProductsMapped: Product[] = realSellerProducts.map(p => ({
+    id: p.id, name: p.name, image: p.images?.[0] || "/placeholder.svg",
+    category: p.categories?.name || "Uncategorized",
+    minPrice: p.min_price, maxPrice: p.max_price || p.min_price,
+    moq: p.moq, unit: p.unit,
+    sellerName: p.profiles?.full_name || "You",
+    sellerVerified: true, sellerRating: 0, sellerLocation: "",
+    responseTime: "< 24h", ordersCompleted: 0,
+  }));
+  const [myProducts, setMyProducts] = useState<Product[]>([]);
+  // Sync real products into local state when they load
+  if (realSellerProducts.length > 0 && myProducts.length === 0 && myProductsMapped.length > 0) {
+    setMyProducts(myProductsMapped);
+  }
   const [productFormOpen, setProductFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productFormView, setProductFormView] = useState(false);
 
-  const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   // Profile state
   const [profileData, setProfileData] = useState({
@@ -129,45 +130,46 @@ const SellerDashboard = () => {
     setProfileEditing(false);
   };
 
-  // Chat state
-  const [selectedChat, setSelectedChat] = useState<string | null>("1");
+  // Chat state (real hooks)
+  const { data: conversations = [] } = useConversations();
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [chatMsgs, setChatMsgs] = useState(chatMessages);
   const [showMobileChatList, setShowMobileChatList] = useState(true);
-  const currentMessages = selectedChat ? chatMsgs[selectedChat] || [] : [];
-  const currentContact = chatConversations.find((c) => c.id === selectedChat);
+  const { data: currentMessages = [] } = useMessages(selectedChat || undefined);
+  const sendMessage = useSendMessage();
+  const currentContact = conversations.find((c: any) => c.id === selectedChat);
   const handleChatSend = () => {
     if (!newMessage.trim() || !selectedChat) return;
-    const msg: ChatMessage = { id: `m${Date.now()}`, senderId: "seller1", senderName: "You", content: newMessage, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), isOwn: true };
-    setChatMsgs((prev) => ({ ...prev, [selectedChat]: [...(prev[selectedChat] || []), msg] }));
+    sendMessage.mutate({ conversationId: selectedChat, content: newMessage });
     setNewMessage("");
   };
 
   const [bidFormOpen, setBidFormOpen] = useState(false);
-  const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
+  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
   const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
-  const [detailRFQ, setDetailRFQ] = useState<RFQDetail | null>(null);
+  const [detailRFQ, setDetailRFQ] = useState<RFQ | null>(null);
   const [rfqSearch, setRfqSearch] = useState("");
   const [rfqCategoryFilter, setRfqCategoryFilter] = useState("all");
   const [rfqSortBy, setRfqSortBy] = useState("newest");
+  const { data: allRFQs = [] } = useRFQs({ status: "open" });
 
   const filteredRFQs = useMemo(() => {
-    let result = [...rfqDetails];
+    let result = [...allRFQs];
     if (rfqSearch) {
       const q = rfqSearch.toLowerCase();
-      result = result.filter(r => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q));
+      result = result.filter(r => r.title.toLowerCase().includes(q) || (r.description || "").toLowerCase().includes(q) || (r.buyer?.full_name || "").toLowerCase().includes(q));
     }
     if (rfqCategoryFilter !== "all") {
-      result = result.filter(r => r.category === rfqCategoryFilter);
+      result = result.filter(r => r.category?.name === rfqCategoryFilter);
     }
-    if (rfqSortBy === "newest") result.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    else if (rfqSortBy === "deadline") result.sort((a, b) => a.daysLeft - b.daysLeft);
-    else if (rfqSortBy === "budget_high") result.sort((a, b) => b.budgetMax - a.budgetMax);
-    else if (rfqSortBy === "bids_low") result.sort((a, b) => a.bidsCount - b.bidsCount);
+    if (rfqSortBy === "newest") result.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    else if (rfqSortBy === "deadline") result.sort((a, b) => (a.deadline || "").localeCompare(b.deadline || ""));
+    else if (rfqSortBy === "budget_high") result.sort((a, b) => (b.budget_max || 0) - (a.budget_max || 0));
+    else if (rfqSortBy === "bids_low") result.sort((a, b) => (a.rfq_responses?.length || 0) - (b.rfq_responses?.length || 0));
     return result;
-  }, [rfqSearch, rfqCategoryFilter, rfqSortBy]);
+  }, [allRFQs, rfqSearch, rfqCategoryFilter, rfqSortBy]);
 
-  const rfqCategories = [...new Set(rfqDetails.map(r => r.category))];
+  const rfqCategories = useMemo(() => [...new Set(allRFQs.map(r => r.category?.name).filter(Boolean))], [allRFQs]);
 
   const handleSaveProduct = (data: Partial<Product>) => {
     if (editingProduct) {
@@ -192,7 +194,13 @@ const SellerDashboard = () => {
     setMyProducts(prev => prev.filter(p => p.id !== id));
   };
 
-  const sellerDisputes = disputes.filter(d => d.sellerName === "Lahore Textile Mills");
+  const { data: sellerDisputesData = [] } = useSellerDisputesHook();
+  const sendDisputeMsg = useSendDisputeMessage();
+  const { data: walletData } = useSellerWallet();
+  const { data: walletTxData = [] } = useWalletTransactions();
+  const { data: sellerReviewsData = [] } = useSellerReviews();
+
+  const sellerDisputes = sellerDisputesData;
   const activeDisputeCount = sellerDisputes.filter(d => d.status !== "resolved" && d.status !== "closed").length;
 
   const disputeStatusColors: Record<string, string> = {
@@ -203,10 +211,9 @@ const SellerDashboard = () => {
     closed: "bg-muted text-muted-foreground",
   };
 
-  const getReasonLabel = (reason: string) => disputeReasons.find(r => r.value === reason)?.label || reason;
-
   const handleRespond = () => {
-    if (!responseText.trim()) return;
+    if (!responseText.trim() || !selectedDispute) return;
+    sendDisputeMsg.mutate({ disputeId: (selectedDispute as DisputeType).id, content: responseText });
     setResponseText("");
     setRespondDialogOpen(false);
     setSelectedDispute(null);
@@ -504,14 +511,14 @@ const SellerDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {recentOrders.map((order) => (
+                          {sellerOrders.slice(0, 5).map((order) => (
                             <tr key={order.id} className="border-b border-border last:border-0 hover:bg-accent/30">
-                              <td className="py-3 px-2 font-body font-medium text-foreground">{order.id}</td>
-                              <td className="py-3 px-2 font-body text-foreground">{order.product}</td>
-                              <td className="py-3 px-2 font-body text-muted-foreground hidden sm:table-cell">{order.buyer}</td>
-                              <td className="py-3 px-2 font-display font-semibold text-foreground">{order.total}</td>
+                              <td className="py-3 px-2 font-body font-medium text-foreground">{order.order_number}</td>
+                              <td className="py-3 px-2 font-body text-foreground">{order.order_items?.map(i => i.product_name_snapshot).join(", ") || "Order"}</td>
+                              <td className="py-3 px-2 font-body text-muted-foreground hidden sm:table-cell">{order.buyer?.full_name || "Buyer"}</td>
+                              <td className="py-3 px-2 font-display font-semibold text-foreground">PKR {order.total_amount.toLocaleString()}</td>
                               <td className="py-3 px-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[order.status]}`}>{order.status}</span>
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>{order.status}</span>
                               </td>
                             </tr>
                           ))}
@@ -563,7 +570,8 @@ const SellerDashboard = () => {
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
                   <div className="space-y-3">
-                    {recentOrders.map((order) => {
+                    {sellerOrders.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">No orders yet.</p>}
+                    {sellerOrders.map((order) => {
                       const icons: Record<string, typeof Clock> = { pending: Clock, processing: Package, shipped: Truck, delivered: CheckCircle };
                       const StatusIcon = icons[order.status] || Clock;
                       return (
@@ -573,20 +581,20 @@ const SellerDashboard = () => {
                           className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-border hover:bg-accent/30 hover:shadow-sm transition-all cursor-pointer"
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className={`p-2 rounded-lg shrink-0 ${statusColors[order.status]}`}>
+                            <div className={`p-2 rounded-lg shrink-0 ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
                               <StatusIcon className="h-4 w-4" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-display font-bold text-sm text-foreground">{order.id}</span>
-                                <Badge className={`text-[10px] capitalize border ${statusColors[order.status]}`} variant="outline">{order.status}</Badge>
+                                <span className="font-display font-bold text-sm text-foreground">{order.order_number}</span>
+                                <Badge className={`text-[10px] capitalize border ${statusColors[order.status] || ""}`} variant="outline">{order.status}</Badge>
                               </div>
-                              <p className="font-body text-sm text-foreground truncate">{order.product}</p>
-                              <p className="text-xs text-muted-foreground font-body">{order.buyer} • {order.date}</p>
+                              <p className="font-body text-sm text-foreground truncate">{order.order_items?.map(i => i.product_name_snapshot).join(", ") || "Order"}</p>
+                              <p className="text-xs text-muted-foreground font-body">{order.buyer?.full_name || "Buyer"} • {new Date(order.created_at).toLocaleDateString("en-PK")}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="font-display font-bold text-sm text-foreground">{order.total}</span>
+                            <span className="font-display font-bold text-sm text-foreground">PKR {order.total_amount.toLocaleString()}</span>
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           </div>
                         </div>
@@ -598,14 +606,14 @@ const SellerDashboard = () => {
 
               {/* Order Detail — full inline page */}
               {activeTab === "orders" && selectedOrder && (() => {
-                const steps = ["pending", "processing", "shipped", "delivered"];
+                const steps = ["pending", "confirmed", "processing", "packed", "shipped", "in_transit", "delivered"];
                 const currentIdx = steps.indexOf(selectedOrder.status);
                 const nextStatus = currentIdx < steps.length - 1 ? steps[currentIdx + 1] : null;
-                const nextLabels: Record<string, string> = { processing: "Mark as Processing", shipped: "Mark as Shipped", delivered: "Mark as Delivered" };
+                const nextLabels: Record<string, string> = { confirmed: "Confirm Order", processing: "Mark Processing", packed: "Mark Packed", shipped: "Mark Shipped", in_transit: "Mark In Transit", delivered: "Mark Delivered" };
+                const shippingAddr = selectedOrder.shipping_address_snapshot as Record<string, string> | null;
 
                 return (
                   <div className="space-y-6">
-                    {/* Page header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setSelectedOrder(null)}>
@@ -613,10 +621,10 @@ const SellerDashboard = () => {
                         </Button>
                         <div>
                           <div className="flex items-center gap-3">
-                            <h2 className="font-display font-bold text-2xl text-foreground">{selectedOrder.id}</h2>
-                            <Badge variant="outline" className={`capitalize text-sm ${statusColors[selectedOrder.status]}`}>{selectedOrder.status}</Badge>
+                            <h2 className="font-display font-bold text-2xl text-foreground">{selectedOrder.order_number}</h2>
+                            <Badge variant="outline" className={`capitalize text-sm ${statusColors[selectedOrder.status] || ""}`}>{selectedOrder.status}</Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground font-body mt-0.5">{selectedOrder.product} — {selectedOrder.buyer}</p>
+                          <p className="text-sm text-muted-foreground font-body mt-0.5">{selectedOrder.order_items?.map(i => i.product_name_snapshot).join(", ")} — {selectedOrder.buyer?.full_name || "Buyer"}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -624,39 +632,47 @@ const SellerDashboard = () => {
                           <Button
                             className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-display font-semibold gap-2"
                             onClick={() => {
-                              setSelectedOrder({ ...selectedOrder, status: nextStatus });
-                              toast.success(`Order ${selectedOrder.id} updated to ${nextStatus}`);
+                              updateOrderStatus.mutate({ orderId: selectedOrder.id, status: nextStatus }, {
+                                onSuccess: () => {
+                                  setSelectedOrder({ ...selectedOrder, status: nextStatus });
+                                  toast.success(`Order ${selectedOrder.order_number} updated to ${nextStatus}`);
+                                }
+                              });
                             }}
                           >
                             <CheckCircle className="h-4 w-4" />
-                            {nextLabels[nextStatus]}
+                            {nextLabels[nextStatus] || nextStatus}
                           </Button>
                         )}
-                        <Badge variant="outline" className="text-xs capitalize px-3 py-1.5">{selectedOrder.paymentStatus} payment</Badge>
+                        <Badge variant="outline" className="text-xs capitalize px-3 py-1.5">{selectedOrder.payment_status} payment</Badge>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      {/* Main info */}
                       <div className="lg:col-span-2 space-y-6">
                         <div className="bg-card rounded-xl border border-border p-6">
                           <h3 className="font-display font-bold text-lg text-foreground mb-4">Order Details</h3>
-                          <div className="bg-accent/30 rounded-lg p-4">
-                            <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
-                            <p className="font-body font-semibold text-foreground text-lg">{selectedOrder.product}</p>
-                            <p className="font-display font-bold text-2xl text-foreground mt-2">{selectedOrder.total}</p>
+                          {selectedOrder.order_items?.map(item => (
+                            <div key={item.id} className="bg-accent/30 rounded-lg p-4 mb-3">
+                              <p className="text-xs text-muted-foreground font-body mb-1">Product</p>
+                              <p className="font-body font-semibold text-foreground text-lg">{item.product_name_snapshot} x{item.quantity}</p>
+                              <p className="font-display font-bold text-xl text-foreground mt-1">PKR {item.total_price.toLocaleString()}</p>
+                            </div>
+                          ))}
+                          <div className="flex justify-between mt-3 pt-3 border-t border-border">
+                            <span className="font-body text-muted-foreground">Total</span>
+                            <span className="font-display font-bold text-2xl text-foreground">PKR {selectedOrder.total_amount.toLocaleString()}</span>
                           </div>
-                          <p className="text-sm text-muted-foreground font-body mt-4">Order placed on <span className="text-foreground font-medium">{selectedOrder.date}</span></p>
+                          <p className="text-sm text-muted-foreground font-body mt-4">Order placed on <span className="text-foreground font-medium">{new Date(selectedOrder.created_at).toLocaleDateString("en-PK", { day: "numeric", month: "long", year: "numeric" })}</span></p>
                         </div>
 
-                        {/* Buyer details */}
                         <div className="bg-card rounded-xl border border-border p-6">
                           <h3 className="font-display font-bold text-lg text-foreground mb-4">Buyer Details</h3>
                           <div className="grid sm:grid-cols-2 gap-4 text-sm font-body">
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><User className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Name</p><p className="text-foreground font-medium">{selectedOrder.buyer}</p></div></div>
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Mail className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Email</p><p className="text-foreground font-medium">{selectedOrder.buyerEmail}</p></div></div>
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Phone className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Phone</p><p className="text-foreground font-medium">{selectedOrder.buyerPhone}</p></div></div>
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><MapPin className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Address</p><p className="text-foreground font-medium">{selectedOrder.address}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><User className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Name</p><p className="text-foreground font-medium">{selectedOrder.buyer?.full_name || "—"}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Mail className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Email</p><p className="text-foreground font-medium">{selectedOrder.buyer?.email || "—"}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><Phone className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Phone</p><p className="text-foreground font-medium">{shippingAddr?.phone || "—"}</p></div></div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20"><MapPin className="h-4 w-4 text-muted-foreground shrink-0" /><div><p className="text-xs text-muted-foreground">Address</p><p className="text-foreground font-medium">{shippingAddr ? `${shippingAddr.address_line1 || ""}, ${shippingAddr.city || ""}` : "—"}</p></div></div>
                           </div>
                         </div>
                       </div>
@@ -751,15 +767,15 @@ const SellerDashboard = () => {
                             className="border border-border rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group"
                             onClick={() => { setDetailRFQ(rfq); setRfqDetailOpen(true); }}
                           >
-                            {rfq.images.length > 0 && (
+                            {rfq.image_urls && rfq.image_urls.length > 0 && (
                               <div className="mb-3 rounded-lg overflow-hidden">
-                                <img src={rfq.images[0].url} alt={rfq.title} className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" />
+                                <img src={rfq.image_urls[0]} alt={rfq.title} className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" />
                               </div>
                             )}
                             <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="secondary" className="font-body text-xs">{rfq.category}</Badge>
+                              <Badge variant="secondary" className="font-body text-xs">{rfq.category?.name || "General"}</Badge>
                               <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">Active</Badge>
-                              <span className="ml-auto text-xs text-muted-foreground font-body">{rfq.daysLeft}d left</span>
+                              {rfq.deadline && <span className="ml-auto text-xs text-muted-foreground font-body">{new Date(rfq.deadline).toLocaleDateString("en-PK")}</span>}
                             </div>
                             <h3 className="font-display font-semibold text-foreground group-hover:text-primary transition-colors">{rfq.title}</h3>
                             <p className="text-sm text-muted-foreground font-body mt-1 line-clamp-2">{rfq.description}</p>
@@ -770,16 +786,16 @@ const SellerDashboard = () => {
                               </div>
                               <div className="text-center">
                                 <p className="text-xs text-muted-foreground font-body">Budget</p>
-                                <p className="font-display font-bold text-xs text-foreground">PKR {(rfq.budgetMax / 1000000).toFixed(1)}M</p>
+                                <p className="font-display font-bold text-xs text-foreground">{rfq.budget_max ? `PKR ${(rfq.budget_max / 1000000).toFixed(1)}M` : "—"}</p>
                               </div>
                               <div className="text-center">
                                 <p className="text-xs text-muted-foreground font-body">Bids</p>
-                                <p className="font-display font-bold text-xs text-primary">{rfq.bidsCount}</p>
+                                <p className="font-display font-bold text-xs text-primary">{rfq.rfq_responses?.length || 0}</p>
                               </div>
                             </div>
                             <div className="flex items-center justify-between mt-3 pt-2 border-t border-border">
                               <p className="text-xs text-muted-foreground font-body flex items-center gap-1">
-                                <MapPin className="h-3 w-3" /> {rfq.buyerLocation}
+                                <MapPin className="h-3 w-3" /> {rfq.buyer?.full_name || "Buyer"}
                               </p>
                               <Button
                                 size="sm"
@@ -818,32 +834,31 @@ const SellerDashboard = () => {
                       </div>
                     </div>
                     <ScrollArea className="flex-1">
-                      {chatConversations.map((conv) => (
-                        <button
-                          key={conv.id}
-                          onClick={() => { setSelectedChat(conv.id); setShowMobileChatList(false); }}
-                          className={`w-full flex items-start gap-2.5 p-3 hover:bg-accent/50 transition text-left border-b border-border ${selectedChat === conv.id ? "bg-accent" : ""}`}
-                        >
-                          <div className="relative">
+                      {conversations.map((conv: any) => {
+                        const otherName = conv.participant_1_profile?.full_name || conv.participant_2_profile?.full_name || "User";
+                        return (
+                          <button
+                            key={conv.id}
+                            onClick={() => { setSelectedChat(conv.id); setShowMobileChatList(false); }}
+                            className={`w-full flex items-start gap-2.5 p-3 hover:bg-accent/50 transition text-left border-b border-border ${selectedChat === conv.id ? "bg-accent" : ""}`}
+                          >
                             <Avatar className="h-9 w-9">
                               <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-xs">
-                                {conv.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                                {otherName.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
                               </AvatarFallback>
                             </Avatar>
-                            {conv.online && <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-success border-2 border-card" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <span className="font-display font-semibold text-xs text-foreground truncate">{conv.contactName}</span>
-                              <span className="text-[10px] text-muted-foreground font-body ml-1">{conv.lastTime}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <span className="font-display font-semibold text-xs text-foreground truncate">{otherName}</span>
+                                <span className="text-[10px] text-muted-foreground font-body ml-1">{conv.last_message_at ? new Date(conv.last_message_at).toLocaleDateString("en-PK") : ""}</span>
+                              </div>
                             </div>
-                            <p className="text-[10px] text-muted-foreground font-body truncate mt-0.5">{conv.lastMessage}</p>
-                          </div>
-                          {conv.unread > 0 && (
-                            <Badge className="bg-primary text-primary-foreground text-[10px] h-4 w-4 flex items-center justify-center rounded-full p-0">{conv.unread}</Badge>
-                          )}
-                        </button>
-                      ))}
+                          </button>
+                        );
+                      })}
+                      {conversations.length === 0 && (
+                        <p className="text-xs text-muted-foreground text-center py-6">No conversations</p>
+                      )}
                     </ScrollArea>
                   </div>
 
@@ -855,28 +870,26 @@ const SellerDashboard = () => {
                           <button className="md:hidden" onClick={() => setShowMobileChatList(true)}><ArrowLeft className="h-4 w-4" /></button>
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary/10 text-primary font-display font-bold text-xs">
-                              {currentContact.contactName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                              {(currentContact.participant_1_profile?.full_name || currentContact.participant_2_profile?.full_name || "U").charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <h3 className="font-display font-semibold text-sm text-foreground">{currentContact.contactName}</h3>
-                            <p className="text-[10px] text-muted-foreground font-body">{currentContact.online ? "Online" : "Offline"}</p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7"><Video className="h-3.5 w-3.5" /></Button>
+                            <h3 className="font-display font-semibold text-sm text-foreground">{currentContact.participant_1_profile?.full_name || currentContact.participant_2_profile?.full_name || "User"}</h3>
                           </div>
                         </div>
                         <ScrollArea className="flex-1 p-4">
                           <div className="space-y-3 max-w-2xl mx-auto">
-                            {currentMessages.map((msg) => (
-                              <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${msg.isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-accent text-foreground rounded-bl-md"}`}>
-                                  <p className="text-sm font-body">{msg.content}</p>
-                                  <p className={`text-[10px] mt-0.5 ${msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{msg.timestamp}</p>
+                            {currentMessages.map((msg: any) => {
+                              const isOwn = msg.sender_id === currentContact.participant_1 || false;
+                              return (
+                                <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                                  <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-accent text-foreground rounded-bl-md"}`}>
+                                    <p className="text-sm font-body">{msg.content}</p>
+                                    <p className={`text-[10px] mt-0.5 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </ScrollArea>
                         <div className="p-3 border-t border-border">
@@ -926,7 +939,7 @@ const SellerDashboard = () => {
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="font-display font-bold text-foreground">{dispute.id}</span>
+                                  <span className="font-display font-bold text-foreground">{dispute.dispute_number}</span>
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${disputeStatusColors[dispute.status]}`}>
                                     {dispute.status.replace("_", " ")}
                                   </span>
@@ -934,13 +947,13 @@ const SellerDashboard = () => {
                                     <Badge variant="destructive" className="text-[10px] font-body">Escalated to Admin</Badge>
                                   )}
                                 </div>
-                                <h3 className="font-display font-semibold text-foreground">{dispute.orderName}</h3>
+                                <h3 className="font-display font-semibold text-foreground">Order {dispute.order?.order_number || dispute.order_id}</h3>
                                 <p className="text-sm text-muted-foreground font-body mt-1">
-                                  Order: {dispute.orderId} • Reason: {getReasonLabel(dispute.reason)}
+                                  Buyer: {dispute.buyer?.full_name || "—"} • Reason: {dispute.reason}
                                 </p>
                                 <p className="text-sm text-muted-foreground font-body mt-1">{dispute.description}</p>
                                 <p className="text-xs text-muted-foreground font-body mt-2">
-                                  Opened: {dispute.createdAt} • Updated: {dispute.updatedAt}
+                                  Opened: {new Date(dispute.created_at).toLocaleDateString("en-PK")} • Updated: {new Date(dispute.updated_at).toLocaleDateString("en-PK")}
                                 </p>
                                 {dispute.resolution && (
                                   <div className="mt-3 p-3 bg-success/10 rounded-lg border border-success/20">
@@ -974,13 +987,12 @@ const SellerDashboard = () => {
                   <Dialog open={respondDialogOpen} onOpenChange={setRespondDialogOpen}>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle className="font-display">Respond to Dispute {selectedDispute?.id}</DialogTitle>
+                        <DialogTitle className="font-display">Respond to Dispute</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <p className="text-sm font-body text-muted-foreground mb-1">Order: {selectedDispute?.orderName}</p>
-                          <p className="text-sm font-body text-muted-foreground">Reason: {selectedDispute ? getReasonLabel(selectedDispute.reason) : ""}</p>
-                          <p className="text-sm font-body text-muted-foreground mt-2 italic">"{selectedDispute?.description}"</p>
+                          <p className="text-sm font-body text-muted-foreground mb-1">Dispute response</p>
+                          <p className="text-sm font-body text-muted-foreground mt-2 italic">Your response will be sent as a message in the dispute thread.</p>
                         </div>
                         <Textarea
                           placeholder="Write your response to the buyer..."
@@ -1005,21 +1017,22 @@ const SellerDashboard = () => {
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h2 className="font-display font-bold text-xl text-foreground mb-6">Customer Reviews</h2>
                   <div className="space-y-4">
-                    {reviews.map((review) => (
+                    {sellerReviewsData.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">No reviews yet.</p>}
+                    {sellerReviewsData.map((review) => (
                       <div key={review.id} className="border border-border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <span className="font-display font-semibold text-foreground">{review.buyer}</span>
-                            <span className="text-xs text-muted-foreground font-body ml-2">on {review.product}</span>
+                            <span className="font-display font-semibold text-foreground">{review.buyer?.full_name || "Buyer"}</span>
+                            <span className="text-xs text-muted-foreground font-body ml-2">on {review.product?.name || "Product"}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground font-body">{review.date}</span>
+                          <span className="text-xs text-muted-foreground font-body">{new Date(review.created_at).toLocaleDateString("en-PK")}</span>
                         </div>
                         <div className="flex gap-0.5 mb-2">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? "fill-warning text-warning" : "text-muted"}`} />
                           ))}
                         </div>
-                        <p className="text-sm text-muted-foreground font-body">{review.comment}</p>
+                        <p className="text-sm text-muted-foreground font-body">{review.comment || "—"}</p>
                       </div>
                     ))}
                   </div>
@@ -1032,15 +1045,15 @@ const SellerDashboard = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-card rounded-xl border border-border p-6">
                       <p className="text-sm text-muted-foreground font-body mb-1">Available Balance</p>
-                      <p className="font-display font-bold text-2xl text-primary">PKR 1,245,000</p>
+                      <p className="font-display font-bold text-2xl text-primary">PKR {(walletData?.balance || 0).toLocaleString()}</p>
                     </div>
                     <div className="bg-card rounded-xl border border-border p-6">
-                      <p className="text-sm text-muted-foreground font-body mb-1">Pending</p>
-                      <p className="font-display font-bold text-2xl text-warning">PKR 285,000</p>
+                      <p className="text-sm text-muted-foreground font-body mb-1">Total Withdrawn</p>
+                      <p className="font-display font-bold text-2xl text-warning">PKR {(walletData?.total_withdrawn || 0).toLocaleString()}</p>
                     </div>
                     <div className="bg-card rounded-xl border border-border p-6">
                       <p className="text-sm text-muted-foreground font-body mb-1">Total Earned</p>
-                      <p className="font-display font-bold text-2xl text-success">PKR 2,450,000</p>
+                      <p className="font-display font-bold text-2xl text-success">PKR {(walletData?.total_earned || 0).toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="bg-card rounded-xl border border-border p-6">
@@ -1049,14 +1062,15 @@ const SellerDashboard = () => {
                       <Button className="bg-gradient-hero text-primary-foreground hover:opacity-90 font-body">Withdraw</Button>
                     </div>
                     <div className="space-y-3">
-                      {walletTransactions.map((tx) => (
+                      {walletTxData.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">No transactions yet.</p>}
+                      {walletTxData.map((tx) => (
                         <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
                           <div>
-                            <p className="font-body text-sm text-foreground">{tx.desc}</p>
-                            <p className="text-xs text-muted-foreground font-body">{tx.date}</p>
+                            <p className="font-body text-sm text-foreground">{tx.description || tx.type}</p>
+                            <p className="text-xs text-muted-foreground font-body">{new Date(tx.created_at).toLocaleDateString("en-PK")}</p>
                           </div>
-                          <span className={`font-display font-bold ${tx.type === "credit" ? "text-success" : "text-destructive"}`}>
-                            {tx.amount}
+                          <span className={`font-display font-bold ${tx.type === "payment" || tx.type === "refund" ? "text-success" : "text-destructive"}`}>
+                            {tx.type === "payout" || tx.type === "commission" ? "-" : "+"}PKR {Math.abs(tx.amount).toLocaleString()}
                           </span>
                         </div>
                       ))}

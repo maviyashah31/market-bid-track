@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { buyerOrders, products, disputes, disputeReasons } from "@/data/mockData";
-import { rfqDetails } from "@/data/rfqData";
+import { useProducts } from "@/hooks/useProducts";
+import { toProductCardData } from "@/types/database";
+import { useBuyerOrders } from "@/hooks/useOrders";
+import { useBuyerDisputes } from "@/hooks/useDisputes";
+import { useBuyerReviews } from "@/hooks/useReviews";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useBuyerRFQs, type RFQ } from "@/hooks/useRFQs";
 import {
   Package, FileText, MessageSquare, Star, Heart, ShoppingCart,
   ArrowRight, Clock, Eye, MapPin, AlertTriangle, Users, Image as ImageIcon,
@@ -36,23 +41,17 @@ const disputeStatusColors: Record<string, string> = {
   closed: "bg-muted text-muted-foreground",
 };
 
-const sidebarItems = [
+const sidebarItemsDef = [
   { icon: LayoutDashboard, label: "Overview", value: "overview" },
-  { icon: Package, label: "Orders", value: "orders", count: 3 },
+  { icon: Package, label: "Orders", value: "orders" },
   { icon: FileText, label: "My RFQs", value: "rfqs" },
-  { icon: AlertTriangle, label: "Disputes", value: "disputes", count: disputes.length },
-  { icon: MessageSquare, label: "Messages", value: "messages", count: 5 },
+  { icon: AlertTriangle, label: "Disputes", value: "disputes" },
+  { icon: MessageSquare, label: "Messages", value: "messages" },
   { icon: Star, label: "Reviews", value: "reviews" },
-  { icon: Heart, label: "Wishlist", value: "wishlist", count: 12 },
+  { icon: Heart, label: "Wishlist", value: "wishlist" },
   { icon: ShoppingCart, label: "Cart", value: "cart", href: "/cart" },
 ];
 
-const wishlistItems = products.slice(0, 4);
-
-const myReviews = [
-  { id: "1", product: "Premium Cotton T-Shirts", seller: "Lahore Textile Mills", rating: 5, comment: "Great quality cotton, delivered on time!", date: "2026-03-02" },
-  { id: "2", product: "Basmati Rice Super Kernel", seller: "Punjab Agro Exports", rating: 4, comment: "Good quality but packaging could be better.", date: "2026-02-22" },
-];
 
 const BuyerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -61,9 +60,28 @@ const BuyerDashboard = () => {
   const [showDisputeForm, setShowDisputeForm] = useState(false);
   const [showRFQForm, setShowRFQForm] = useState(false);
   const [rfqDetailOpen, setRfqDetailOpen] = useState(false);
-  const [selectedRFQ, setSelectedRFQ] = useState<(typeof rfqDetails)[0] | null>(null);
+  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
+  const { data: buyerOrders = [] } = useBuyerOrders();
+  const { data: buyerDisputes = [] } = useBuyerDisputes();
+  const { data: buyerReviewsData = [] } = useBuyerReviews();
+  const { data: wishlistData = [] } = useWishlist();
 
-  const myRFQs = rfqDetails.filter(r => r.buyer === "AcmeCo");
+  // Fallback to products if wishlist is empty (before migration)
+  const { data: fallbackProducts = [] } = useProducts({ limit: 4 });
+  const wishlistItems = wishlistData.length > 0
+    ? wishlistData.filter(w => w.product).map(w => ({
+        id: w.product!.id, name: w.product!.name,
+        image: w.product!.images?.[0] || "/placeholder.svg",
+        category: "", minPrice: w.product!.min_price,
+        maxPrice: w.product!.max_price || w.product!.min_price,
+        moq: w.product!.moq, unit: w.product!.unit,
+        sellerName: w.product!.profiles?.full_name || "Seller",
+        sellerVerified: true, sellerRating: 0, sellerLocation: "",
+        responseTime: "", ordersCompleted: 0,
+      }))
+    : fallbackProducts.map(toProductCardData);
+
+  const { data: myRFQs = [] } = useBuyerRFQs();
   const collapsed = isMobile ? !sidebarOpen : !sidebarOpen;
 
   const handleDisputeSubmit = (data: { orderId: string; reason: string; description: string }) => {
@@ -124,7 +142,7 @@ const BuyerDashboard = () => {
 
                 {/* Nav items */}
                 <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-                  {sidebarItems.map(({ icon: Icon, label, value, count, href }) => (
+                  {sidebarItemsDef.map(({ icon: Icon, label, value, count, href }) => (
                     <button
                       key={value}
                       onClick={() => handleNavClick(value, href)}
@@ -136,7 +154,7 @@ const BuyerDashboard = () => {
                         collapsed && !isMobile && "justify-center px-0"
                       )}
                     >
-                      <Icon className={cn("h-5 w-5 shrink-0", value === "disputes" && disputes.length > 0 && "text-warning")} />
+                      <Icon className={cn("h-5 w-5 shrink-0", value === "disputes" && buyerDisputes.length > 0 && "text-warning")} />
                       {(!collapsed || isMobile) && (
                         <>
                           <span className="truncate">{label}</span>
@@ -194,23 +212,24 @@ const BuyerDashboard = () => {
                     </Button>
                   </div>
                   <div className="space-y-4">
-                    {buyerOrders.map((order) => (
+                    {buyerOrders.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">No orders yet. Start shopping!</p>}
+                    {buyerOrders.slice(0, 5).map((order) => (
                       <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1">
-                            <span className="font-display font-bold text-sm text-foreground">{order.id}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColors[order.status]}`}>
+                            <span className="font-display font-bold text-sm text-foreground">{order.order_number}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
                               {order.status.replace("_", " ")}
                             </span>
                           </div>
-                          <p className="font-body text-sm text-foreground">{order.productName}</p>
-                          <p className="text-xs text-muted-foreground font-body">{order.sellerName} • Qty: {order.quantity}</p>
+                          <p className="font-body text-sm text-foreground">{order.order_items?.map(i => i.product_name_snapshot).join(", ") || "Order"}</p>
+                          <p className="text-xs text-muted-foreground font-body">{order.seller?.full_name || "Seller"} • {order.order_items?.reduce((s, i) => s + i.quantity, 0) || 0} items</p>
                         </div>
                         <div className="mt-2 sm:mt-0 flex items-center gap-3">
                           <div className="text-right">
-                            <div className="font-display font-bold text-foreground">PKR {order.total.toLocaleString()}</div>
+                            <div className="font-display font-bold text-foreground">PKR {order.total_amount.toLocaleString()}</div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground font-body justify-end">
-                              <Clock className="h-3 w-3" /> {order.date}
+                              <Clock className="h-3 w-3" /> {new Date(order.created_at).toLocaleDateString("en-PK")}
                             </div>
                           </div>
                           <Link to={`/order/${order.id}`}>
@@ -228,22 +247,23 @@ const BuyerDashboard = () => {
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h2 className="font-display font-bold text-xl text-foreground mb-6">All Orders</h2>
                   <div className="space-y-4">
+                    {buyerOrders.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">No orders yet. Start shopping!</p>}
                     {buyerOrders.map((order) => (
                       <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1">
-                            <span className="font-display font-bold text-sm text-foreground">{order.id}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColors[order.status]}`}>
+                            <span className="font-display font-bold text-sm text-foreground">{order.order_number}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
                               {order.status.replace("_", " ")}
                             </span>
                           </div>
-                          <p className="font-body text-sm text-foreground">{order.productName}</p>
-                          <p className="text-xs text-muted-foreground font-body">{order.sellerName} • Qty: {order.quantity}</p>
+                          <p className="font-body text-sm text-foreground">{order.order_items?.map(i => i.product_name_snapshot).join(", ") || "Order"}</p>
+                          <p className="text-xs text-muted-foreground font-body">{order.seller?.full_name || "Seller"} • {order.order_items?.reduce((s, i) => s + i.quantity, 0) || 0} items</p>
                         </div>
                         <div className="mt-2 sm:mt-0 flex items-center gap-3">
                           <div className="text-right">
-                            <div className="font-display font-bold text-foreground">PKR {order.total.toLocaleString()}</div>
-                            <div className="text-xs text-muted-foreground font-body">{order.date}</div>
+                            <div className="font-display font-bold text-foreground">PKR {order.total_amount.toLocaleString()}</div>
+                            <div className="text-xs text-muted-foreground font-body">{new Date(order.created_at).toLocaleDateString("en-PK")}</div>
                           </div>
                           <Link to={`/order/${order.id}`}>
                             <Button variant="outline" size="sm" className="gap-1 font-body"><MapPin className="h-3 w-3" /> Track</Button>
@@ -281,40 +301,38 @@ const BuyerDashboard = () => {
                             onClick={() => { setSelectedRFQ(rfq); setRfqDetailOpen(true); }}
                           >
                             <div className="flex items-start gap-4">
-                              {rfq.images.length > 0 && (
-                                <img src={rfq.images[0].url} alt={rfq.title} className="w-20 h-20 rounded-lg object-cover shrink-0" />
+                              {rfq.image_urls && rfq.image_urls.length > 0 && (
+                                <img src={rfq.image_urls[0]} alt={rfq.title} className="w-20 h-20 rounded-lg object-cover shrink-0" />
                               )}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <Badge variant="secondary" className="font-body text-xs">{rfq.category}</Badge>
+                                  <Badge variant="secondary" className="font-body text-xs">{rfq.category?.name || "General"}</Badge>
                                   <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">
-                                    {rfq.status.charAt(0).toUpperCase() + rfq.status.slice(1)}
+                                    {(rfq.status || "open").charAt(0).toUpperCase() + (rfq.status || "open").slice(1)}
                                   </Badge>
-                                  {rfq.images.length > 0 && (
+                                  {rfq.image_urls && rfq.image_urls.length > 0 && (
                                     <span className="text-xs text-muted-foreground font-body flex items-center gap-0.5">
-                                      <ImageIcon className="h-3 w-3" /> {rfq.images.length}
+                                      <ImageIcon className="h-3 w-3" /> {rfq.image_urls.length}
                                     </span>
                                   )}
                                 </div>
                                 <h3 className="font-display font-semibold text-foreground">{rfq.title}</h3>
                                 <p className="text-sm text-muted-foreground font-body mt-1 line-clamp-1">{rfq.description}</p>
                                 <p className="text-sm text-muted-foreground font-body mt-1">
-                                  Qty: {rfq.quantity.toLocaleString()} {rfq.unit} • Budget: PKR {(rfq.budgetMin / 1000000).toFixed(1)}M - {(rfq.budgetMax / 1000000).toFixed(1)}M
+                                  Qty: {rfq.quantity.toLocaleString()} {rfq.unit}
+                                  {(rfq.budget_min || rfq.budget_max) && ` • Budget: PKR ${((rfq.budget_min || 0) / 1000000).toFixed(1)}M - ${((rfq.budget_max || 0) / 1000000).toFixed(1)}M`}
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
-                                  <Clock className="h-3 w-3" /> {rfq.deadline} left
-                                </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground font-body">
-                                  {rfq.certifications.length > 0 && rfq.certifications.slice(0, 2).join(", ")}
+                                  <Clock className="h-3 w-3" /> {rfq.deadline ? new Date(rfq.deadline).toLocaleDateString("en-PK") : "Open"}
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1 text-xs text-primary font-semibold font-body">
-                                  <Users className="h-3 w-3" /> {rfq.bidsCount} bids
+                                  <Users className="h-3 w-3" /> {rfq.rfq_responses?.length || 0} bids
                                 </div>
                                 <Button variant="outline" size="sm" className="font-body text-xs gap-1" onClick={(e) => { e.stopPropagation(); setSelectedRFQ(rfq); setRfqDetailOpen(true); }}>
                                   <Eye className="h-3 w-3" /> View Bids
@@ -350,7 +368,7 @@ const BuyerDashboard = () => {
                     </Button>
                   </div>
 
-                  {disputes.length === 0 ? (
+                  {buyerDisputes.length === 0 ? (
                     <div className="text-center py-12">
                       <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="font-display font-semibold text-foreground mb-2">No Disputes</h3>
@@ -358,29 +376,27 @@ const BuyerDashboard = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {disputes.map((dispute) => {
-                        const reasonLabel = disputeReasons.find(r => r.value === dispute.reason)?.label;
-                        return (
+                      {buyerDisputes.map((dispute) => (
                           <div key={dispute.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-3">
-                                <span className="font-display font-bold text-foreground">{dispute.id}</span>
-                                <Badge className={disputeStatusColors[dispute.status]}>
+                                <span className="font-display font-bold text-foreground">{dispute.dispute_number}</span>
+                                <Badge className={disputeStatusColors[dispute.status] || "bg-muted text-muted-foreground"}>
                                   {dispute.status.charAt(0).toUpperCase() + dispute.status.slice(1)}
                                 </Badge>
                               </div>
-                              <span className="text-xs text-muted-foreground font-body">{dispute.createdAt}</span>
+                              <span className="text-xs text-muted-foreground font-body">{new Date(dispute.created_at).toLocaleDateString("en-PK")}</span>
                             </div>
-                            <h3 className="font-display font-semibold text-foreground">{dispute.orderName}</h3>
+                            <h3 className="font-display font-semibold text-foreground">Order {dispute.order?.order_number || dispute.order_id}</h3>
                             <p className="text-sm text-muted-foreground font-body mt-1">
-                              {dispute.sellerName} • {reasonLabel}
+                              {dispute.seller?.full_name || "Seller"} • {dispute.reason}
                             </p>
                             <p className="text-sm text-muted-foreground font-body mt-2 line-clamp-2">
                               {dispute.description}
                             </p>
                             {dispute.resolution && (
                               <p className="text-sm text-success font-body mt-2 bg-success/10 rounded p-2">
-                                ✓ {dispute.resolution}
+                                {dispute.resolution}
                               </p>
                             )}
                             <div className="flex justify-end mt-4">
@@ -391,8 +407,7 @@ const BuyerDashboard = () => {
                               </Link>
                             </div>
                           </div>
-                        );
-                      })}
+                      ))}
                     </div>
                   )}
                 </div>
@@ -403,21 +418,21 @@ const BuyerDashboard = () => {
                 <div className="bg-card rounded-xl border border-border p-6">
                   <h2 className="font-display font-bold text-xl text-foreground mb-6">My Reviews</h2>
                   <div className="space-y-4">
-                    {myReviews.map((review) => (
+                    {buyerReviewsData.length === 0 && <p className="text-muted-foreground font-body text-sm py-8 text-center">You haven't written any reviews yet.</p>}
+                    {buyerReviewsData.map((review) => (
                       <div key={review.id} className="border border-border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <span className="font-display font-semibold text-foreground">{review.product}</span>
-                            <span className="text-xs text-muted-foreground font-body ml-2">• {review.seller}</span>
+                            <span className="font-display font-semibold text-foreground">{review.product?.name || "Product"}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground font-body">{review.date}</span>
+                          <span className="text-xs text-muted-foreground font-body">{new Date(review.created_at).toLocaleDateString("en-PK")}</span>
                         </div>
                         <div className="flex gap-0.5 mb-2">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? "fill-warning text-warning" : "text-muted"}`} />
                           ))}
                         </div>
-                        <p className="text-sm text-muted-foreground font-body">{review.comment}</p>
+                        <p className="text-sm text-muted-foreground font-body">{review.comment || "—"}</p>
                       </div>
                     ))}
                   </div>

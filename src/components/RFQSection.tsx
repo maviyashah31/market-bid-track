@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { rfqDetails } from "@/data/rfqData";
-import { Clock, Users, ArrowRight, MapPin } from "lucide-react";
+import { useRFQs, type RFQ } from "@/hooks/useRFQs";
+import { Clock, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import RFQDetailDialog from "@/components/RFQDetailDialog";
-import type { RFQDetail } from "@/data/rfqData";
 
 const RFQSection = () => {
-  const [selectedRFQ, setSelectedRFQ] = useState<RFQDetail | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { data: rfqs = [] } = useRFQs({ status: "open" });
+  const displayRFQs = rfqs.slice(0, 3);
 
   return (
     <section className="py-12 bg-accent">
@@ -25,58 +23,55 @@ const RFQSection = () => {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-          {rfqDetails.slice(0, 3).map((rfq) => (
-            <div
-              key={rfq.id}
-              className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
-              onClick={() => { setSelectedRFQ(rfq); setDialogOpen(true); }}
-            >
-              {rfq.images.length > 0 && (
-                <img src={rfq.images[0].url} alt={rfq.title} className="w-full h-36 object-cover" />
-              )}
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="secondary" className="font-body">{rfq.category}</Badge>
-                  <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">Active</Badge>
-                </div>
-                <h3 className="font-display font-semibold text-foreground mb-3">{rfq.title}</h3>
-                <div className="space-y-2 text-sm font-body text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Quantity:</span>
-                    <span className="font-medium text-foreground">{rfq.quantity.toLocaleString()} {rfq.unit}</span>
+        {displayRFQs.length === 0 ? (
+          <p className="text-muted-foreground font-body text-center py-12">No active RFQs right now.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            {displayRFQs.map((rfq) => (
+              <div
+                key={rfq.id}
+                className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-md hover:border-primary/30 transition-all"
+              >
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="secondary" className="font-body">{rfq.category?.name || "General"}</Badge>
+                    <Badge className="bg-success/10 text-success border border-success/20 font-body text-xs">Active</Badge>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Budget:</span>
-                    <span className="font-medium text-foreground">PKR {(rfq.budgetMin / 1000000).toFixed(1)}M - {(rfq.budgetMax / 1000000).toFixed(1)}M</span>
+                  <h3 className="font-display font-semibold text-foreground mb-3">{rfq.title}</h3>
+                  <div className="space-y-2 text-sm font-body text-muted-foreground">
+                    <div className="flex justify-between">
+                      <span>Quantity:</span>
+                      <span className="font-medium text-foreground">{rfq.quantity.toLocaleString()} {rfq.unit}</span>
+                    </div>
+                    {(rfq.budget_min || rfq.budget_max) && (
+                      <div className="flex justify-between">
+                        <span>Budget:</span>
+                        <span className="font-medium text-foreground">
+                          PKR {(rfq.budget_min || 0).toLocaleString()} - {(rfq.budget_max || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span>Buyer:</span>
+                      <span className="font-medium text-foreground">{rfq.buyer?.full_name || "Buyer"}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Location:</span>
-                    <span className="font-medium text-foreground flex items-center gap-1"><MapPin className="h-3 w-3" /> {rfq.buyerLocation}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    {rfq.deadline} left
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-primary font-semibold">
-                    <Users className="h-3 w-3" />
-                    {rfq.bidsCount} bids
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      {rfq.deadline ? new Date(rfq.deadline).toLocaleDateString("en-PK") : "Open"}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-primary font-semibold">
+                      <Users className="h-3 w-3" />
+                      {rfq.rfq_responses?.length || 0} bids
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      <RFQDetailDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        rfq={selectedRFQ}
-        mode="buyer"
-      />
     </section>
   );
 };

@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { adminNotifications } from "@/data/adminMockData";
+import { useAdminNotifications } from "@/hooks/admin/useAdminData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AuthGuard from "@/components/AuthGuard";
@@ -28,7 +28,8 @@ function AdminLayoutInner() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const unreadCount = adminNotifications.filter(n => !n.read).length;
+  const { data: adminNotifs = [] } = useAdminNotifications();
+  const unreadCount = adminNotifs.filter((n: any) => !n.is_read).length;
   const isActive = (path: string) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);

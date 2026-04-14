@@ -1,39 +1,17 @@
-import { useState, useEffect } from "react";
-import { dashboardMetrics } from "@/data/adminMockData";
-import { DollarSign, ShoppingBag, AlertTriangle, Users, TrendingUp, UserPlus, RefreshCw, Wallet } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { fmt } from "@/lib/formatters";
-const cards = [
-  { label: "GMV Today", value: fmt(dashboardMetrics.totalGMVToday), icon: DollarSign, sub: `This Month: ${fmt(dashboardMetrics.totalGMVMonth)}` },
-  { label: "Commission Today", value: fmt(dashboardMetrics.commissionToday), icon: TrendingUp, sub: `This Month: ${fmt(dashboardMetrics.commissionMonth)}` },
-  { label: "Settlement Balance", value: fmt(dashboardMetrics.settlementBalance), icon: Wallet, sub: "Current balance" },
-  { label: "Active Orders", value: dashboardMetrics.activeOrders.toString(), icon: ShoppingBag, sub: "Right now" },
-  { label: "Open Disputes", value: dashboardMetrics.openDisputes.toString(), icon: AlertTriangle, sub: "Needs attention" },
-  { label: "Pending Suppliers", value: dashboardMetrics.pendingSupplierApps.toString(), icon: Users, sub: "Awaiting approval" },
-  { label: "New Buyers Today", value: dashboardMetrics.newBuyerSignups.toString(), icon: UserPlus, sub: "Signups today" },
-  { label: "Repeat Buyer Rate", value: dashboardMetrics.repeatBuyerRate + "%", icon: RefreshCw, sub: "This month" },
-];
-
-interface Profile {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  role: string | null;
-  created_at: string | null;
-}
+import { DollarSign, ShoppingBag, AlertTriangle, Users, TrendingUp, UserPlus, Package, Loader2 } from "lucide-react";
+import { useAdminStats, useAdminUsers } from "@/hooks/admin/useAdminData";
 
 export default function AdminDashboardPage() {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const { data: stats, isLoading: statsLoading } = useAdminStats();
+  const { data: allUsers = [], isLoading: usersLoading } = useAdminUsers();
 
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-      if (data) setProfiles(data);
-      setLoadingProfiles(false);
-    };
-    fetchProfiles();
-  }, []);
+  const cards = [
+    { label: "Total Revenue", value: stats ? `PKR ${stats.totalRevenue.toLocaleString()}` : "—", icon: DollarSign, sub: "From delivered orders" },
+    { label: "Total Orders", value: stats?.totalOrders.toString() || "0", icon: ShoppingBag, sub: `${stats?.pendingOrders || 0} pending` },
+    { label: "Total Products", value: stats?.totalProducts.toString() || "0", icon: Package, sub: "Active listings" },
+    { label: "Open Disputes", value: stats?.totalDisputes.toString() || "0", icon: AlertTriangle, sub: "Needs attention" },
+    { label: "Total Users", value: stats?.totalUsers.toString() || "0", icon: Users, sub: "Registered users" },
+  ];
 
   return (
     <div>
@@ -45,13 +23,12 @@ export default function AdminDashboardPage() {
               <span className="text-xs text-gray-400 font-medium">{c.label}</span>
               <c.icon className="h-4 w-4" style={{ color: "#00b894" }} />
             </div>
-            <p className="text-2xl font-bold text-white">{c.value}</p>
+            <p className="text-2xl font-bold text-white">{statsLoading ? "..." : c.value}</p>
             <p className="text-xs text-gray-500 mt-1">{c.sub}</p>
           </div>
         ))}
       </div>
 
-      {/* All Users Section */}
       <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <Users className="h-5 w-5" style={{ color: "#00b894" }} />
         All Users
@@ -60,31 +37,30 @@ export default function AdminDashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b" style={{ borderColor: "#1a2340" }}>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Full Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Email</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase">Created At</th>
+              <tr style={{ borderBottom: "1px solid #1a2340" }}>
+                <th className="text-left p-3 text-gray-400 font-medium">Name</th>
+                <th className="text-left p-3 text-gray-400 font-medium">Email</th>
+                <th className="text-left p-3 text-gray-400 font-medium">Role</th>
+                <th className="text-left p-3 text-gray-400 font-medium">Joined</th>
               </tr>
             </thead>
             <tbody>
-              {loadingProfiles ? (
-                <tr><td colSpan={4} className="text-center py-6 text-gray-500">Loading...</td></tr>
-              ) : profiles.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-6 text-gray-500">No users found</td></tr>
-              ) : profiles.map(p => (
-                <tr key={p.id} className="border-b hover:bg-white/5 transition" style={{ borderColor: "#1a234060" }}>
-                  <td className="px-4 py-3 text-white font-medium">{p.full_name || "—"}</td>
-                  <td className="px-4 py-3 text-gray-300">{p.email || "—"}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs px-2 py-0.5 rounded font-semibold capitalize" style={{
-                      background: p.role === "admin" ? "#00b89420" : p.role === "seller" ? "#6c5ce720" : "#3b82f620",
-                      color: p.role === "admin" ? "#00b894" : p.role === "seller" ? "#6c5ce7" : "#3b82f6"
-                    }}>
-                      {p.role || "—"}
+              {usersLoading && (
+                <tr><td colSpan={4} className="p-6 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500" /></td></tr>
+              )}
+              {!usersLoading && allUsers.length === 0 && (
+                <tr><td colSpan={4} className="p-6 text-center text-gray-500">No users found</td></tr>
+              )}
+              {allUsers.map((user: any) => (
+                <tr key={user.id} style={{ borderBottom: "1px solid #1a2340" }} className="hover:bg-white/5">
+                  <td className="p-3 text-white">{user.full_name || "—"}</td>
+                  <td className="p-3 text-gray-400">{user.email || "—"}</td>
+                  <td className="p-3">
+                    <span className="px-2 py-0.5 rounded text-xs" style={{ background: "#00b89420", color: "#00b894" }}>
+                      {user.user_roles?.map((r: any) => r.role).join(", ") || user.role || "—"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400">{p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}</td>
+                  <td className="p-3 text-gray-500">{user.created_at ? new Date(user.created_at).toLocaleDateString("en-PK") : "—"}</td>
                 </tr>
               ))}
             </tbody>

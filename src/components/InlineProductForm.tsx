@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { categories, type Product } from "@/data/mockData";
+import { useCategories } from "@/hooks/useCategories";
+import type { ProductCardData as Product } from "@/types/database";
 import { toast } from "sonner";
 import { ChevronLeft, ImagePlus, X, Upload } from "lucide-react";
 
@@ -15,6 +16,7 @@ interface InlineProductFormProps {
 }
 
 const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps) => {
+  const { data: categories = [] } = useCategories();
   const [form, setForm] = useState({
     name: "",
     category: "",
