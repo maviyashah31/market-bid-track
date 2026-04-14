@@ -9,41 +9,50 @@ import { useCategories } from "@/hooks/useCategories";
 import type { ProductCardData as Product } from "@/types/database";
 import { toast } from "sonner";
 
+interface ProductSaveData extends Partial<Product> {
+  category_id?: string | null;
+}
+
 interface ProductFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product?: Product | null;
-  onSave: (product: Partial<Product>) => void;
+  onSave: (product: ProductSaveData) => void;
 }
 
 const ProductFormDialog = ({ open, onOpenChange, product, onSave }: ProductFormDialogProps) => {
   const { data: categories = [] } = useCategories();
   const [form, setForm] = useState({
-    name: "", category: "", minPrice: "", maxPrice: "",
+    name: "", categoryId: "", minPrice: "", maxPrice: "",
     moq: "", unit: "pieces", image: "", description: "",
   });
 
   useEffect(() => {
     if (product) {
+      const selectedCategory = categories.find((c) => c.name === product.category)?.id || "";
       setForm({
-        name: product.name, category: product.category,
+        name: product.name,
+        categoryId: selectedCategory,
         minPrice: String(product.minPrice), maxPrice: String(product.maxPrice),
         moq: String(product.moq), unit: product.unit, image: product.image, description: "",
       });
     } else {
-      setForm({ name: "", category: "", minPrice: "", maxPrice: "", moq: "", unit: "pieces", image: "", description: "" });
+      setForm({ name: "", categoryId: "", minPrice: "", maxPrice: "", moq: "", unit: "pieces", image: "", description: "" });
     }
-  }, [product, open]);
+  }, [product, open, categories]);
 
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
 
   const handleSubmit = () => {
-    if (!form.name || !form.category || !form.minPrice) {
+    if (!form.name || !form.categoryId || !form.minPrice) {
       toast.error("Please fill in required fields");
       return;
     }
+    const selectedCategory = categories.find((c) => c.id === form.categoryId)?.name || "";
     onSave({
-      name: form.name, category: form.category,
+      name: form.name,
+      category_id: form.categoryId,
+      category: selectedCategory,
       minPrice: Number(form.minPrice), maxPrice: Number(form.maxPrice),
       moq: Number(form.moq), unit: form.unit, image: form.image || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
     });
@@ -64,11 +73,11 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: ProductFormD
           </div>
           <div>
             <Label className="font-body text-sm">Category *</Label>
-            <Select value={form.category} onValueChange={(v) => update("category", v)}>
+            <Select value={form.categoryId} onValueChange={(v) => update("categoryId", v)}>
               <SelectTrigger className="mt-1"><SelectValue placeholder="Select category" /></SelectTrigger>
               <SelectContent>
                 {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

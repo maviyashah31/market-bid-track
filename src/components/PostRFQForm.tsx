@@ -21,7 +21,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
   const { data: categories = [] } = useCategories();
   const createRFQ = useCreateRFQ();
   const [form, setForm] = useState({
-    title: "", category: "", quantity: "", unit: "pcs",
+    title: "", categoryId: "", quantity: "", unit: "pcs",
     budgetMin: "", budgetMax: "", deadline: "", description: "",
     shippingTerms: "", paymentTerms: "", certifications: "",
   });
@@ -54,7 +54,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
   const removeSpec = (idx: number) => setSpecs((prev) => prev.filter((_, i) => i !== idx));
 
   const handleSubmit = () => {
-    if (!form.title || !form.category || !form.quantity) {
+    if (!form.title || !form.categoryId || !form.quantity) {
       toast.error("Please fill in required fields (Title, Category, Quantity)");
       return;
     }
@@ -65,7 +65,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
     createRFQ.mutate({
       title: form.title,
       description: form.description,
-      category_id: form.category || undefined,
+      category_id: form.categoryId,
       quantity: parseInt(form.quantity),
       unit: form.unit,
       budget_min: form.budgetMin ? parseFloat(form.budgetMin) : undefined,
@@ -76,7 +76,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
       onSuccess: () => {
         toast.success("RFQ posted successfully! Sellers will start bidding soon.");
         onOpenChange(false);
-        setForm({ title: "", category: "", quantity: "", unit: "pcs", budgetMin: "", budgetMax: "", deadline: "", description: "", shippingTerms: "", paymentTerms: "", certifications: "" });
+        setForm({ title: "", categoryId: "", quantity: "", unit: "pcs", budgetMin: "", budgetMax: "", deadline: "", description: "", shippingTerms: "", paymentTerms: "", certifications: "" });
         setImages([]);
         setSpecs([""]);
         setStep(1);
@@ -111,11 +111,11 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
             </div>
             <div>
               <Label className="font-body text-sm font-medium">Category *</Label>
-              <Select value={form.category} onValueChange={(v) => update("category", v)}>
+              <Select value={form.categoryId} onValueChange={(v) => update("categoryId", v)}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.name}>{c.icon} {c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -285,7 +285,7 @@ const PostRFQForm = ({ open, onOpenChange }: PostRFQFormProps) => {
           <div className="flex-1" />
           {step < 3 ? (
             <Button onClick={() => {
-              if (step === 1 && (!form.title || !form.category || !form.quantity)) {
+              if (step === 1 && (!form.title || !form.categoryId || !form.quantity)) {
                 toast.error("Please fill required fields before proceeding");
                 return;
               }

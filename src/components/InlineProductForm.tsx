@@ -9,9 +9,13 @@ import type { ProductCardData as Product } from "@/types/database";
 import { toast } from "sonner";
 import { ChevronLeft, ImagePlus, X, Upload } from "lucide-react";
 
+interface ProductSaveData extends Partial<Product> {
+  category_id?: string | null;
+}
+
 interface InlineProductFormProps {
   product?: Product | null;
-  onSave: (product: Partial<Product>) => void;
+  onSave: (product: ProductSaveData) => void;
   onCancel: () => void;
 }
 
@@ -19,7 +23,7 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
   const { data: categories = [] } = useCategories();
   const [form, setForm] = useState({
     name: "",
-    category: "",
+    categoryId: "",
     minPrice: "",
     maxPrice: "",
     moq: "",
@@ -43,9 +47,10 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
 
   useEffect(() => {
     if (product) {
+      const selectedCategory = categories.find((c) => c.name === product.category)?.id || "";
       setForm({
         name: product.name,
-        category: product.category,
+        categoryId: selectedCategory,
         minPrice: String(product.minPrice),
         maxPrice: String(product.maxPrice),
         moq: String(product.moq),
@@ -65,7 +70,7 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
       });
       if (product.image) setPhotos([product.image]);
     }
-  }, [product]);
+  }, [product, categories]);
 
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
 
@@ -100,13 +105,15 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
   }, []);
 
   const handleSubmit = () => {
-    if (!form.name || !form.category || !form.minPrice) {
+    if (!form.name || !form.categoryId || !form.minPrice) {
       toast.error("Please fill in required fields (Name, Category, Min Price)");
       return;
     }
+    const selectedCategory = categories.find((c) => c.id === form.categoryId)?.name || "";
     onSave({
       name: form.name,
-      category: form.category,
+      category_id: form.categoryId,
+      category: selectedCategory,
       minPrice: Number(form.minPrice),
       maxPrice: Number(form.maxPrice) || Number(form.minPrice),
       moq: Number(form.moq) || 1,
@@ -141,11 +148,11 @@ const InlineProductForm = ({ product, onSave, onCancel }: InlineProductFormProps
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label className="font-body text-sm font-semibold">Category *</Label>
-                  <Select value={form.category} onValueChange={(v) => update("category", v)}>
+                  <Select value={form.categoryId} onValueChange={(v) => update("categoryId", v)}>
                     <SelectTrigger className="mt-1"><SelectValue placeholder="Select category" /></SelectTrigger>
                     <SelectContent>
                       {categories.map((c) => (
-                        <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -6,7 +6,7 @@ import OnboardingBanner from "@/components/OnboardingBanner";
 import { useSupplierOnboarding } from "@/hooks/useSupplierOnboarding";
 import { useConversations, useMessages, useSendMessage } from "@/hooks/useMessages";
 import type { ProductCardData as Product } from "@/types/database";
-import { useSellerProducts } from "@/hooks/useProducts";
+import { useSellerProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { useSellerOrders, useUpdateOrderStatus, type Order } from "@/hooks/useOrders";
 import { useSellerWallet, useWalletTransactions } from "@/hooks/useSellerWallet";
 import { useSellerReviews } from "@/hooks/useReviews";
@@ -70,22 +70,34 @@ const SellerDashboard = () => {
   const { data: realSellerProducts = [] } = useSellerProducts();
   const { data: sellerOrders = [] } = useSellerOrders();
   const updateOrderStatus = useUpdateOrderStatus();
-  const myProductsMapped: Product[] = realSellerProducts.map(p => ({
-    id: p.id, name: p.name, image: p.images?.[0] || "/placeholder.svg",
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  const deleteProduct = useDeleteProduct();
+  type SellerProductItem = Product & { category_id?: string | null };
+  const myProductsMapped: SellerProductItem[] = realSellerProducts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    image: p.images?.[0] || "/placeholder.svg",
     category: p.categories?.name || "Uncategorized",
-    minPrice: p.min_price, maxPrice: p.max_price || p.min_price,
-    moq: p.moq, unit: p.unit,
+    category_id: p.category_id || null,
+    minPrice: p.min_price,
+    maxPrice: p.max_price || p.min_price,
+    moq: p.moq,
+    unit: p.unit,
     sellerName: p.profiles?.full_name || "You",
-    sellerVerified: true, sellerRating: 0, sellerLocation: "",
-    responseTime: "< 24h", ordersCompleted: 0,
+    sellerVerified: true,
+    sellerRating: 0,
+    sellerLocation: "",
+    responseTime: "< 24h",
+    ordersCompleted: 0,
   }));
-  const [myProducts, setMyProducts] = useState<Product[]>([]);
-  // Sync real products into local state when they load
-  if (realSellerProducts.length > 0 && myProducts.length === 0 && myProductsMapped.length > 0) {
+  const [myProducts, setMyProducts] = useState<SellerProductItem[]>([]);
+
+  useEffect(() => {
     setMyProducts(myProductsMapped);
-  }
+  }, [myProductsMapped]);
   const [productFormOpen, setProductFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<SellerProductItem | null>(null);
   const [productFormView, setProductFormView] = useState(false);
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -171,27 +183,46 @@ const SellerDashboard = () => {
 
   const rfqCategories = useMemo(() => [...new Set(allRFQs.map(r => r.category?.name).filter(Boolean))], [allRFQs]);
 
-  const handleSaveProduct = (data: Partial<Product>) => {
+  const handleSaveProduct = (data: Partial<Product> & { category_id?: string | null }) => {
+    const payload = {
+      name: data.name || editingProduct?.name || "Untitled product",
+      description: data.description ?? null,
+      category_id: data.category_id ?? editingProduct?.category_id ?? null,
+      min_price: data.minPrice ?? editingProduct?.minPrice ?? 0,
+      max_price: data.maxPrice ?? editingProduct?.maxPrice ?? data.minPrice ?? 0,
+      moq: data.moq ?? editingProduct?.moq ?? 1,
+      unit: data.unit ?? editingProduct?.unit ?? "pieces",
+      images: data.image ? [data.image] : editingProduct?.image ? [editingProduct.image] : [],
+      status: "active",
+      sku: data.sku ?? null,
+      specifications: data.specifications ?? {},
+    };
+
     if (editingProduct) {
-      setMyProducts(prev => prev.map(p => p.id === editingProduct.id ? { ...p, ...data } : p));
+      updateProduct.mutate({ id: editingProduct.id, ...payload }, {
+        onSuccess: () => {
+          toast.success("Product updated successfully.");
+          setEditingProduct(null);
+          setProductFormView(false);
+        },
+      });
     } else {
-      const newProduct: Product = {
-        id: String(Date.now()),
-        sellerName: "Lahore Textile Mills",
-        sellerVerified: true,
-        sellerRating: 4.8,
-        sellerLocation: "Lahore",
-        responseTime: "< 2 hours",
-        ordersCompleted: 0,
-        ...data,
-      } as Product;
-      setMyProducts(prev => [...prev, newProduct]);
+      createProduct.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Product added successfully.");
+          setProductFormView(false);
+        },
+      });
     }
-    setEditingProduct(null);
   };
 
   const handleDeleteProduct = (id: string) => {
-    setMyProducts(prev => prev.filter(p => p.id !== id));
+    deleteProduct.mutate(id, {
+      onSuccess: () => {
+        toast.success("Product deleted successfully.");
+        setMyProducts((prev) => prev.filter((p) => p.id !== id));
+      },
+    });
   };
 
   const { data: sellerDisputesData = [] } = useSellerDisputesHook();
