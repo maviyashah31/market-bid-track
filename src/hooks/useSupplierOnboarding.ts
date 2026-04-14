@@ -8,6 +8,8 @@ export interface OnboardingData {
   products_added: boolean;
   payment_terms_accepted: boolean;
   documents_uploaded: boolean;
+  profile_status: "draft" | "pending" | "approved" | "rejected";
+  profile_reviewed_at: string | null;
   business_name: string | null;
   business_type: string | null;
   business_address: string | null;

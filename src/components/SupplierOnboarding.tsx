@@ -82,8 +82,9 @@ const SupplierOnboarding = ({ onComplete, initialStep = "profile" }: SupplierOnb
       await updateOnboarding({
         ...profile,
         profile_completed: true,
+        profile_status: "pending",
       } as Partial<OnboardingData>);
-      toast.success("Profile saved successfully!");
+      toast.success("Profile saved successfully! Your details are sent for admin review.");
     } catch {
       toast.error("Failed to save profile. Please try again.");
     } finally {

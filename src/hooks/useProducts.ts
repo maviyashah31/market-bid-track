@@ -125,6 +125,7 @@ export function useCreateProduct() {
         .from("products")
         .insert({
           ...product,
+          status: product.status ?? "pending_review",
           slug,
           seller_id: session.user.id,
         })

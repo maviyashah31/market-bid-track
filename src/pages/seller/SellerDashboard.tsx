@@ -59,7 +59,7 @@ const sidebarItems = [
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
-  const { completedSteps, totalSteps, isComplete: onboardingComplete } = useSupplierOnboarding();
+  const { data: onboardingData, completedSteps, totalSteps, isComplete: onboardingComplete } = useSupplierOnboarding();
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const isMobile = useIsMobile();
@@ -193,7 +193,7 @@ const SellerDashboard = () => {
       moq: data.moq ?? editingProduct?.moq ?? 1,
       unit: data.unit ?? editingProduct?.unit ?? "pieces",
       images: data.image ? [data.image] : editingProduct?.image ? [editingProduct.image] : [],
-      status: "active",
+      status: editingProduct ? editingProduct.status : "pending_review",
       sku: data.sku ?? null,
       specifications: data.specifications ?? {},
     };
@@ -358,6 +358,12 @@ const SellerDashboard = () => {
               {!isMobile && !collapsed && (
                 <div className="mb-6">
                   <h1 className="font-display font-bold text-2xl text-foreground">Seller Dashboard</h1>
+                </div>
+              )}
+
+              {onboardingData?.profile_status === "pending" && (
+                <div className="rounded-xl border border-primary/20 bg-primary/10 p-4 mb-6 text-sm text-primary">
+                  Your seller profile is under review by admin. You can still add products from your dashboard, but they will appear on the marketplace once approved.
                 </div>
               )}
 

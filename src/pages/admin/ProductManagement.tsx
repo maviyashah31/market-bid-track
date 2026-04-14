@@ -18,6 +18,8 @@ const statusConfig: Record<string, { color: string; label: string }> = {
   draft: { color: "#636e72", label: "Draft" },
   out_of_stock: { color: "#d63031", label: "Out of Stock" },
   pending: { color: "#74b9ff", label: "Pending" },
+  pending_review: { color: "#74b9ff", label: "Pending Review" },
+  rejected: { color: "#d63031", label: "Rejected" },
 };
 
 export default function ProductManagement() {
@@ -112,7 +114,7 @@ export default function ProductManagement() {
             className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500" />
         </div>
         <div className="flex flex-wrap gap-2">
-          {["all", "active", "draft", "out_of_stock", "pending"].map(f => (
+          {["all", "active", "draft", "out_of_stock", "pending", "pending_review", "rejected"].map(f => (
             <button key={f} onClick={() => setStatusFilter(f)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors"
               style={statusFilter === f ? { background: "#00b89430", color: "#00b894" } : { background: "#1a234060", color: "#9ca3af" }}>
@@ -244,7 +246,19 @@ export default function ProductManagement() {
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2 pt-3 border-t" style={{ borderColor: "#1a2340" }}>
-                  {selected.status !== "active" && (
+                  {selected.status === "pending_review" && (
+                    <>
+                      <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "active" }); setSelected(null); toast.success("Product approved and published"); }}
+                        style={{ background: "#00b894", color: "#0a0f1e" }}>
+                        <CheckCircle className="h-3 w-3 mr-1" /> Approve
+                      </Button>
+                      <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "rejected" }); setSelected(null); toast.success("Product rejected"); }}
+                        className="bg-red-600 hover:bg-red-700 text-white">
+                        <Ban className="h-3 w-3 mr-1" /> Reject
+                      </Button>
+                    </>
+                  )}
+                  {selected.status !== "active" && selected.status !== "pending_review" && (
                     <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "active" }); setSelected(null); toast.success("Product activated"); }}
                       style={{ background: "#00b894", color: "#0a0f1e" }}>
                       <CheckCircle className="h-3 w-3 mr-1" /> Activate

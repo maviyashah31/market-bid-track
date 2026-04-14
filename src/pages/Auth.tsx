@@ -117,7 +117,7 @@ const Auth = () => {
           else navigate("/buyer/dashboard");
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -126,6 +126,14 @@ const Auth = () => {
           },
         });
         if (error) throw error;
+
+        if (signUpData?.user?.id) {
+          try {
+            await supabase.from("user_roles").insert({ user_id: signUpData.user.id, role });
+          } catch {
+            // If user_roles table does not exist yet, continue anyway.
+          }
+        }
 
         toast.success("Account created!", { description: "Please check your email to verify your account." });
         if (role === "seller") navigate("/seller/onboarding");

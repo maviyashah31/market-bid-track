@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
-import { useAdminUsers } from "@/hooks/admin/useAdminData";
+import { useAdminUsers, useAdminUpdateSupplierOnboardingStatus } from "@/hooks/admin/useAdminData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, Eye, Loader2, Users, Mail, Calendar } from "lucide-react";
+import { toast } from "sonner";
 
 import { fmt } from "@/lib/formatters";
 
 export default function SupplierManagement() {
   const { data: suppliers = [], isLoading } = useAdminUsers("seller");
+  const updateSupplierStatus = useAdminUpdateSupplierOnboardingStatus();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any | null>(null);
 
@@ -113,7 +115,52 @@ export default function SupplierManagement() {
                       <Users className="h-3 w-3 text-gray-500" />
                       <div><span className="text-xs text-gray-500">Roles</span><p className="text-gray-200">{selected.user_roles?.map((r: any) => r.role).join(", ") || "seller"}</p></div>
                     </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-xs text-gray-500">Verification Status</span>
+                      <p className="text-gray-200">{selected.supplier_onboarding?.[0]?.profile_status || "pending"}</p>
+                    </div>
                   </div>
+                </div>
+
+                {selected.supplier_onboarding?.[0] && (
+                  <div className="rounded-lg border p-4" style={{ background: "#0d1225", borderColor: "#1a2340" }}>
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase mb-3">Onboarding Info</h3>
+                    <div className="space-y-3 text-sm text-gray-200">
+                      <div><span className="text-xs text-gray-500">Business Name</span><p>{selected.supplier_onboarding[0].business_name || "—"}</p></div>
+                      <div><span className="text-xs text-gray-500">City</span><p>{selected.supplier_onboarding[0].business_city || "—"}</p></div>
+                      <div><span className="text-xs text-gray-500">Phone</span><p>{selected.supplier_onboarding[0].business_phone || "—"}</p></div>
+                      <div><span className="text-xs text-gray-500">Document Status</span><p>{selected.supplier_onboarding[0].documents_uploaded ? "Uploaded" : "Missing documents"}</p></div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {selected.supplier_onboarding?.[0]?.profile_status === "pending" && (
+                    <>
+                      <Button size="sm" onClick={async () => {
+                        const onboardingId = selected.supplier_onboarding[0].id;
+                        await updateSupplierStatus.mutateAsync({ onboardingId, profile_status: "approved" });
+                        toast.success("Seller profile approved.");
+                        setSelected(null);
+                      }} className="bg-green-500 text-white">
+                        Approve
+                      </Button>
+                      <Button size="sm" onClick={async () => {
+                        const onboardingId = selected.supplier_onboarding[0].id;
+                        await updateSupplierStatus.mutateAsync({ onboardingId, profile_status: "rejected" });
+                        toast.success("Seller profile rejected.");
+                        setSelected(null);
+                      }} className="bg-red-600 text-white">
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                  {selected.supplier_onboarding?.[0]?.profile_status === "approved" && (
+                    <div className="rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-800">Approved</div>
+                  )}
+                  {selected.supplier_onboarding?.[0]?.profile_status === "rejected" && (
+                    <div className="rounded-full px-3 py-1 text-xs font-semibold bg-red-100 text-red-800">Rejected</div>
+                  )}
                 </div>
               </div>
             </>

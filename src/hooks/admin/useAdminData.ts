@@ -92,13 +92,36 @@ export function useAdminUsers(role?: string) {
   return useQuery({
     queryKey: ["admin-users", role],
     queryFn: async () => {
-      let query = supabase.from("profiles").select("*, user_roles(role)").order("created_at", { ascending: false }).limit(100);
+      let query = supabase
+        .from("profiles")
+        .select("*, user_roles(role), supplier_onboarding!user_id(*)")
+        .order("created_at", { ascending: false })
+        .limit(100);
       const { data, error } = await query;
       if (error) throw error;
       if (role && data) {
-        return data.filter((u: any) => u.user_roles?.some((r: any) => r.role === role));
+        return data.filter((u: any) =>
+          u.user_roles?.some((r: any) => r.role === role) || u.role === role
+        );
       }
       return data || [];
+    },
+  });
+}
+
+export function useAdminUpdateSupplierOnboardingStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ onboardingId, profile_status }: { onboardingId: string; profile_status: "approved" | "rejected" | "pending" | "draft" }) => {
+      const { error } = await supabase
+        .from("supplier_onboarding")
+        .update({ profile_status, profile_reviewed_at: new Date().toISOString() })
+        .eq("id", onboardingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "seller"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
 }
