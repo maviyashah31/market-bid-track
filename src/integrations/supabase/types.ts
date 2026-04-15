@@ -630,6 +630,7 @@ export type Database = {
           min_price: number
           moq: number
           name: string
+          rejection_reason: string | null
           seller_id: string
           sku: string | null
           slug: string
@@ -650,6 +651,7 @@ export type Database = {
           min_price: number
           moq?: number
           name: string
+          rejection_reason?: string | null
           seller_id: string
           sku?: string | null
           slug: string
@@ -670,6 +672,7 @@ export type Database = {
           min_price?: number
           moq?: number
           name?: string
+          rejection_reason?: string | null
           seller_id?: string
           sku?: string | null
           slug?: string
@@ -702,6 +705,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_verified: boolean | null
           role: string | null
         }
         Insert: {
@@ -709,6 +713,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          is_verified?: boolean | null
           role?: string | null
         }
         Update: {
@@ -716,6 +721,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_verified?: boolean | null
           role?: string | null
         }
         Relationships: []
