@@ -36,7 +36,7 @@ export interface Product {
 /** Product with joined category and seller info */
 export interface ProductWithDetails extends Product {
   categories: Pick<Category, "name" | "slug"> | null;
-  profiles: { full_name: string | null; email: string | null } | null;
+  profiles: { full_name: string | null; email: string | null; is_verified?: boolean } | null;
 }
 
 export interface ProductPricingTier {
@@ -107,7 +107,7 @@ export function toProductCardData(p: ProductWithDetails): ProductCardData {
     moq: p.moq,
     unit: p.unit,
     sellerName: p.profiles?.full_name || "Unknown Seller",
-    sellerVerified: true, // TODO: add verified flag to profiles
+    sellerVerified: p.profiles?.is_verified ?? false,
     sellerRating: 0,      // TODO: compute from reviews table
     sellerLocation: "",    // TODO: add location to profiles
     responseTime: "< 24 hours",

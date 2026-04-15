@@ -9,7 +9,7 @@ export function useProducts(filters?: ProductFilters) {
     queryFn: async () => {
       let query = supabase
         .from("products")
-        .select("*, categories(name, slug), profiles!seller_id(full_name, email)")
+        .select("*, categories(name, slug), profiles!seller_id(full_name, email, is_verified)")
         .eq("status", "active");
 
       if (filters?.category) {
