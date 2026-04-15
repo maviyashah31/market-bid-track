@@ -579,21 +579,44 @@ const SellerDashboard = () => {
                     <Button onClick={() => { setEditingProduct(null); setProductFormView(true); }} className="bg-gradient-hero text-primary-foreground hover:opacity-90 gap-2 font-body w-full sm:w-auto"><Plus className="h-4 w-4" /> Add Product</Button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {myProducts.map((product) => (
-                      <div key={product.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
-                        <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-3" />
-                        <h3 className="font-display font-semibold text-sm text-foreground">{product.name}</h3>
-                        <p className="text-primary font-display font-bold text-sm mt-1">PKR {product.minPrice} - {product.maxPrice}</p>
-                        <p className="text-xs text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
-                        <div className="flex gap-2 mt-3">
-                          <Link to={`/product/${product.id}`}>
-                            <Button variant="outline" size="sm" className="gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
-                          </Link>
-                          <Button variant="outline" size="sm" className="gap-1 font-body" onClick={() => { setEditingProduct(product); setProductFormView(true); }}><Edit className="h-3 w-3" /> Edit</Button>
-                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-3 w-3" /></Button>
+                    {myProducts.map((product) => {
+                      const statusColors: Record<string, string> = {
+                        active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+                        pending_review: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+                        rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+                        draft: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
+                      };
+                      return (
+                        <div key={product.id} className="border border-border rounded-lg p-4 hover:shadow-md transition">
+                          <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg mb-3" />
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-display font-semibold text-sm text-foreground truncate">{product.name}</h3>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ml-2 ${statusColors[product.status || "draft"] || statusColors.draft}`}>
+                              {(product.status || "draft").replace("_", " ")}
+                            </span>
+                          </div>
+                          <p className="text-primary font-display font-bold text-sm mt-1">PKR {product.minPrice} - {product.maxPrice}</p>
+                          <p className="text-xs text-muted-foreground font-body">MOQ: {product.moq} {product.unit}</p>
+                          
+                          {product.status === "rejected" && product.rejection_reason && (
+                            <div className="mt-2 p-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                              <p className="text-[10px] font-semibold text-destructive uppercase mb-0.5">Admin Feedback:</p>
+                              <p className="text-xs text-destructive">{product.rejection_reason}</p>
+                            </div>
+                          )}
+
+                          <div className="flex gap-2 mt-3">
+                            <Link to={`/product/${product.id}`}>
+                              <Button variant="outline" size="sm" className="gap-1 font-body"><Eye className="h-3 w-3" /> View</Button>
+                            </Link>
+                            <Button variant="outline" size="sm" className="gap-1 font-body" onClick={() => { setEditingProduct(product); setProductFormView(true); }}>
+                              <Edit className="h-3 w-3" /> {product.status === "rejected" ? "Edit & Resubmit" : "Edit"}
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-3 w-3" /></Button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
