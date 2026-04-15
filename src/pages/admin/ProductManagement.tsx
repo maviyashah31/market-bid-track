@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Search, Eye, Trash2, Ban, CheckCircle, Flag, Package,
-  AlertTriangle, Sparkles, Loader2
+  Search, Eye, Ban, CheckCircle, Flag, Package,
+  AlertTriangle, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { fmt } from "@/lib/formatters";
@@ -18,7 +18,7 @@ const statusConfig: Record<string, { color: string; label: string }> = {
   draft: { color: "#636e72", label: "Draft" },
   out_of_stock: { color: "#d63031", label: "Out of Stock" },
   pending: { color: "#74b9ff", label: "Pending" },
-  pending_review: { color: "#74b9ff", label: "Pending Review" },
+  pending_review: { color: "#fdcb6e", label: "Pending Review" },
   rejected: { color: "#d63031", label: "Rejected" },
 };
 
@@ -32,6 +32,9 @@ export default function ProductManagement() {
   const [actionDialog, setActionDialog] = useState<{ type: string; productIds: string[] } | null>(null);
   const [reason, setReason] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectProductId, setRejectProductId] = useState<string | null>(null);
 
   const categories = useMemo(() => [...new Set(products.map((p: any) => p.categories?.name).filter(Boolean))], [products]);
 
@@ -48,8 +51,8 @@ export default function ProductManagement() {
   const metrics = useMemo(() => ({
     total: products.length,
     active: products.filter((p: any) => p.status === "active").length,
-    draft: products.filter((p: any) => p.status === "draft").length,
-    outOfStock: products.filter((p: any) => (p.stock_quantity || 0) === 0).length,
+    pendingReview: products.filter((p: any) => p.status === "pending_review").length,
+    rejected: products.filter((p: any) => p.status === "rejected").length,
   }), [products]);
 
   const toggleSelect = (id: string) => {
@@ -84,6 +87,28 @@ export default function ProductManagement() {
     setSelectedIds(new Set());
   };
 
+  const handleApprove = (productId: string) => {
+    updateStatus.mutate({ productId, status: "active", rejectionReason: "" });
+    setSelected(null);
+    toast.success("Product approved and published on marketplace");
+  };
+
+  const openRejectDialog = (productId: string) => {
+    setRejectProductId(productId);
+    setRejectReason("");
+    setRejectDialogOpen(true);
+  };
+
+  const confirmReject = () => {
+    if (!rejectProductId || !rejectReason.trim()) return;
+    updateStatus.mutate({ productId: rejectProductId, status: "rejected", rejectionReason: rejectReason.trim() });
+    setRejectDialogOpen(false);
+    setRejectProductId(null);
+    setRejectReason("");
+    setSelected(null);
+    toast.success("Product rejected with feedback");
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-6">Product Management</h1>
@@ -93,8 +118,8 @@ export default function ProductManagement() {
         {[
           { label: "Total Products", value: metrics.total, icon: Package, color: "#00b894" },
           { label: "Active", value: metrics.active, icon: CheckCircle, color: "#00b894" },
-          { label: "Draft", value: metrics.draft, icon: Flag, color: "#fdcb6e" },
-          { label: "Out of Stock", value: metrics.outOfStock, icon: AlertTriangle, color: "#d63031" },
+          { label: "Pending Review", value: metrics.pendingReview, icon: Flag, color: "#fdcb6e" },
+          { label: "Rejected", value: metrics.rejected, icon: AlertTriangle, color: "#d63031" },
         ].map(m => (
           <div key={m.label} className="rounded-xl border p-4" style={{ background: "#111a35", borderColor: "#1a2340" }}>
             <div className="flex items-center justify-between mb-2">
@@ -114,7 +139,7 @@ export default function ProductManagement() {
             className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500" />
         </div>
         <div className="flex flex-wrap gap-2">
-          {["all", "active", "draft", "out_of_stock", "pending", "pending_review", "rejected"].map(f => (
+          {["all", "active", "draft", "pending_review", "rejected"].map(f => (
             <button key={f} onClick={() => setStatusFilter(f)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors"
               style={statusFilter === f ? { background: "#00b89430", color: "#00b894" } : { background: "#1a234060", color: "#9ca3af" }}>
@@ -159,17 +184,17 @@ export default function ProductManagement() {
                   <Checkbox checked={selectedIds.size === filtered.length && filtered.length > 0} onCheckedChange={toggleSelectAll}
                     className="border-gray-500 data-[state=checked]:bg-[#00b894] data-[state=checked]:border-[#00b894]" />
                 </th>
-                {["Product", "Seller", "Price", "Stock", "Category", "Status", "Actions"].map(h => (
+                {["Product", "Seller", "Price", "Stock", "Status", "Actions"].map(h => (
                   <th key={h} className="text-left px-3 py-3 text-xs font-medium text-gray-400 whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isLoading && (
-                <tr><td colSpan={8} className="p-6 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500" /></td></tr>
+                <tr><td colSpan={7} className="p-6 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500" /></td></tr>
               )}
               {!isLoading && filtered.length === 0 && (
-                <tr><td colSpan={8} className="p-6 text-center text-gray-500">No products found</td></tr>
+                <tr><td colSpan={7} className="p-6 text-center text-gray-500">No products found</td></tr>
               )}
               {filtered.map((p: any) => {
                 const sc = statusConfig[p.status] || { color: "#636e72", label: p.status };
@@ -181,7 +206,7 @@ export default function ProductManagement() {
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-3">
-                        {p.image_urls?.[0] && <img src={p.image_urls[0]} alt={p.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />}
+                        {p.images?.[0] && <img src={p.images[0]} alt={p.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />}
                         <div className="min-w-0">
                           <p className="text-white font-medium text-xs truncate max-w-[180px]">{p.name}</p>
                           <p className="text-[10px] text-gray-500">{p.categories?.name || "—"}</p>
@@ -198,7 +223,6 @@ export default function ProductManagement() {
                         {(p.stock_quantity || 0).toLocaleString()} {p.unit || "pcs"}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-gray-300 text-xs">{p.categories?.name || "—"}</td>
                     <td className="px-3 py-3">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ background: sc.color + "20", color: sc.color }}>
                         {sc.label}
@@ -228,14 +252,14 @@ export default function ProductManagement() {
               <DialogHeader><DialogTitle className="text-white">{selected.name}</DialogTitle></DialogHeader>
               <div className="space-y-4 text-sm">
                 <div className="flex gap-4">
-                  {selected.image_urls?.[0] && <img src={selected.image_urls[0]} alt={selected.name} className="w-24 h-24 rounded-lg object-cover" />}
+                  {selected.images?.[0] && <img src={selected.images[0]} alt={selected.name} className="w-24 h-24 rounded-lg object-cover" />}
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 flex-1">
                     <div><span className="text-xs text-gray-500">Category</span><p className="text-gray-200">{selected.categories?.name || "—"}</p></div>
                     <div><span className="text-xs text-gray-500">Seller</span><p className="text-gray-200">{selected.profiles?.full_name || "—"}</p></div>
                     <div><span className="text-xs text-gray-500">Price</span><p className="text-gray-200">{selected.min_price ? fmt(selected.min_price) : "—"}</p></div>
                     <div><span className="text-xs text-gray-500">MOQ</span><p className="text-gray-200">{selected.moq || "—"} {selected.unit || "pcs"}</p></div>
                     <div><span className="text-xs text-gray-500">Stock</span><p className={(selected.stock_quantity || 0) === 0 ? "text-red-400" : "text-gray-200"}>{selected.stock_quantity || 0} {selected.unit || "pcs"}</p></div>
-                    <div><span className="text-xs text-gray-500">Status</span><p className="text-gray-200">{selected.status}</p></div>
+                    <div><span className="text-xs text-gray-500">Status</span><p className="text-gray-200 capitalize">{(selected.status || "").replace("_", " ")}</p></div>
                     <div><span className="text-xs text-gray-500">Created</span><p className="text-gray-200">{selected.created_at ? new Date(selected.created_at).toLocaleDateString("en-PK") : "—"}</p></div>
                   </div>
                 </div>
@@ -245,24 +269,32 @@ export default function ProductManagement() {
                     <p className="text-gray-300 text-xs mt-1">{selected.description}</p>
                   </div>
                 )}
+                {selected.rejection_reason && (
+                  <div className="pt-3 border-t" style={{ borderColor: "#1a2340" }}>
+                    <span className="text-xs text-red-400">Rejection Reason</span>
+                    <p className="text-red-300 text-xs mt-1">{selected.rejection_reason}</p>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2 pt-3 border-t" style={{ borderColor: "#1a2340" }}>
                   {selected.status === "pending_review" && (
                     <>
-                      <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "active" }); setSelected(null); toast.success("Product approved and published"); }}
+                      <Button size="sm" onClick={() => handleApprove(selected.id)}
                         style={{ background: "#00b894", color: "#0a0f1e" }}>
                         <CheckCircle className="h-3 w-3 mr-1" /> Approve
                       </Button>
-                      <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "rejected" }); setSelected(null); toast.success("Product rejected"); }}
+                      <Button size="sm" onClick={() => openRejectDialog(selected.id)}
                         className="bg-red-600 hover:bg-red-700 text-white">
                         <Ban className="h-3 w-3 mr-1" /> Reject
                       </Button>
                     </>
                   )}
-                  {selected.status !== "active" && selected.status !== "pending_review" && (
-                    <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "active" }); setSelected(null); toast.success("Product activated"); }}
-                      style={{ background: "#00b894", color: "#0a0f1e" }}>
-                      <CheckCircle className="h-3 w-3 mr-1" /> Activate
-                    </Button>
+                  {selected.status === "rejected" && (
+                    <>
+                      <Button size="sm" onClick={() => handleApprove(selected.id)}
+                        style={{ background: "#00b894", color: "#0a0f1e" }}>
+                        <CheckCircle className="h-3 w-3 mr-1" /> Approve
+                      </Button>
+                    </>
                   )}
                   {selected.status === "active" && (
                     <Button size="sm" onClick={() => { updateStatus.mutate({ productId: selected.id, status: "draft" }); setSelected(null); toast.success("Product delisted"); }}
@@ -277,7 +309,28 @@ export default function ProductManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Action confirmation */}
+      {/* Reject with reason dialog */}
+      <Dialog open={rejectDialogOpen} onOpenChange={() => { setRejectDialogOpen(false); setRejectReason(""); }}>
+        <DialogContent className="max-w-sm border text-white" style={{ background: "#111a35", borderColor: "#1a2340" }}>
+          <DialogHeader>
+            <DialogTitle className="text-white">Reject Product</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="text-xs text-gray-400">Please provide a reason so the seller can make improvements:</label>
+            <Textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Images are low quality, description incomplete..."
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500" rows={4} />
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => { setRejectDialogOpen(false); setRejectReason(""); }}
+                className="border-white/10 text-gray-300">Cancel</Button>
+              <Button size="sm" disabled={!rejectReason.trim()} onClick={confirmReject} className="bg-red-600 hover:bg-red-700 text-white">
+                Reject Product
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk action confirmation */}
       <Dialog open={!!actionDialog} onOpenChange={() => { setActionDialog(null); setReason(""); }}>
         <DialogContent className="max-w-sm border text-white" style={{ background: "#111a35", borderColor: "#1a2340" }}>
           <DialogHeader>
