@@ -368,7 +368,19 @@ const SellerDashboard = () => {
 
               {onboardingData?.profile_status === "pending" && (
                 <div className="rounded-xl border border-primary/20 bg-primary/10 p-4 mb-6 text-sm text-primary">
-                  Your seller profile is under review by admin. You can still add products from your dashboard, but they will appear on the marketplace once approved.
+                  ⏳ Your seller profile is under review by admin. You can still add products, but they won't appear on the marketplace until your profile and products are approved.
+                </div>
+              )}
+
+              {onboardingData?.profile_status === "rejected" && (
+                <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 mb-6 text-sm text-destructive">
+                  ❌ Your seller profile was rejected. Please update your profile information and resubmit for approval.
+                </div>
+              )}
+
+              {onboardingData?.profile_status === "approved" && (
+                <div className="rounded-xl border border-green-500/20 bg-green-500/10 p-4 mb-6 text-sm text-green-700 dark:text-green-400">
+                  ✅ Your seller profile is approved! Products will appear on the marketplace once individually approved by admin.
                 </div>
               )}
 
