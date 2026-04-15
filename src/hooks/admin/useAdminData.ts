@@ -10,6 +10,8 @@ export interface AdminStats {
   totalRevenue: number;
   totalDisputes: number;
   pendingOrders: number;
+  pendingProducts: number;
+  pendingSuppliers: number;
 }
 
 export function useAdminStats() {
@@ -20,13 +22,15 @@ export function useAdminStats() {
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("orders").select("*", { count: "exact", head: true }),
         supabase.from("products").select("*", { count: "exact", head: true }),
-        supabase.from("disputes").select("*", { count: "exact", head: true }),
+        (supabase as any).from("disputes").select("*", { count: "exact", head: true }),
       ]);
 
       const { data: revenueData } = await supabase.from("orders").select("total_amount").eq("status", "delivered");
       const totalRevenue = revenueData?.reduce((sum, o) => sum + (o.total_amount || 0), 0) || 0;
 
       const { count: pendingCount } = await supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending");
+      const { count: pendingProducts } = await supabase.from("products").select("*", { count: "exact", head: true }).eq("status", "pending_review");
+      const { count: pendingSuppliers } = await (supabase as any).from("supplier_onboarding").select("*", { count: "exact", head: true }).eq("profile_status", "pending");
 
       return {
         totalUsers: users.count || 0,
@@ -35,6 +39,8 @@ export function useAdminStats() {
         totalRevenue,
         totalDisputes: disputes.count || 0,
         pendingOrders: pendingCount || 0,
+        pendingProducts: pendingProducts || 0,
+        pendingSuppliers: pendingSuppliers || 0,
       };
     },
     staleTime: 30_000,
@@ -78,8 +84,11 @@ export function useAdminProducts() {
 export function useAdminUpdateProductStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ productId, status }: { productId: string; status: string }) => {
-      const { error } = await supabase.from("products").update({ status }).eq("id", productId);
+    mutationFn: async ({ productId, status, rejectionReason }: { productId: string; status: string; rejectionReason?: string }) => {
+      const updates: any = { status };
+      if (rejectionReason !== undefined) updates.rejection_reason = rejectionReason;
+      if (status === "active") updates.rejection_reason = null;
+      const { error } = await supabase.from("products").update(updates).eq("id", productId);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-products"] }); },
@@ -92,7 +101,7 @@ export function useAdminUsers(role?: string) {
   return useQuery({
     queryKey: ["admin-users", role],
     queryFn: async () => {
-      let query = supabase
+      const query = supabase
         .from("profiles")
         .select("*, user_roles(role), supplier_onboarding!user_id(*)")
         .order("created_at", { ascending: false })
@@ -113,10 +122,27 @@ export function useAdminUpdateSupplierOnboardingStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ onboardingId, profile_status }: { onboardingId: string; profile_status: "approved" | "rejected" | "pending" | "draft" }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("supplier_onboarding")
         .update({ profile_status, profile_reviewed_at: new Date().toISOString() })
         .eq("id", onboardingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users", "seller"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+  });
+}
+
+export function useAdminVerifySeller() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, isVerified }: { userId: string; isVerified: boolean }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_verified: isVerified } as any)
+        .eq("id", userId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -132,7 +158,7 @@ export function useAdminDisputes() {
   return useQuery({
     queryKey: ["admin-disputes"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("disputes")
         .select("*, order:orders!order_id(order_number), buyer:profiles!buyer_id(full_name, email), seller:profiles!seller_id(full_name, email)")
         .order("created_at", { ascending: false })
@@ -147,7 +173,7 @@ export function useAdminUpdateDisputeStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ disputeId, status, resolution }: { disputeId: string; status: string; resolution?: string }) => {
-      const { error } = await supabase.from("disputes").update({ status, resolution: resolution || null }).eq("id", disputeId);
+      const { error } = await (supabase as any).from("disputes").update({ status, resolution: resolution || null }).eq("id", disputeId);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-disputes"] }); },
@@ -160,7 +186,7 @@ export function useAdminPayments() {
   return useQuery({
     queryKey: ["admin-payments"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("payment_transactions")
         .select("*, buyer:profiles!buyer_id(full_name), seller:profiles!seller_id(full_name)")
         .order("created_at", { ascending: false })
@@ -177,7 +203,7 @@ export function useAdminNotifications() {
   return useQuery({
     queryKey: ["admin-notifications"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("notifications")
         .select("*, user:profiles!user_id(full_name)")
         .order("created_at", { ascending: false })
@@ -192,7 +218,7 @@ export function useAdminMarkNotificationRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("notifications").update({ is_read: true }).eq("id", id);
+      const { error } = await (supabase as any).from("notifications").update({ is_read: true }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-notifications"] }); },
@@ -202,7 +228,7 @@ export function useAdminMarkNotificationRead() {
 export function useAdminSendNotification() {
   return useMutation({
     mutationFn: async (input: { user_id: string; type: string; title: string; body?: string; link?: string }) => {
-      const { error } = await supabase.from("notifications").insert(input);
+      const { error } = await (supabase as any).from("notifications").insert(input);
       if (error) throw error;
     },
   });

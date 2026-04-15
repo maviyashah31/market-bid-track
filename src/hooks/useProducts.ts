@@ -9,7 +9,7 @@ export function useProducts(filters?: ProductFilters) {
     queryFn: async () => {
       let query = supabase
         .from("products")
-        .select("*, categories(name, slug), profiles!seller_id(full_name, email)")
+        .select("*, categories(name, slug), profiles!seller_id(full_name, email, is_verified)")
         .eq("status", "active");
 
       if (filters?.category) {
@@ -121,14 +121,18 @@ export function useCreateProduct() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") + "-" + Date.now().toString(36);
 
+      const insertPayload: any = {
+        ...product,
+        status: product.status ?? "pending_review",
+        slug,
+        seller_id: session.user.id,
+      };
+      if (product.specifications) {
+        insertPayload.specifications = JSON.parse(JSON.stringify(product.specifications));
+      }
       const { data, error } = await supabase
         .from("products")
-        .insert({
-          ...product,
-          status: product.status ?? "pending_review",
-          slug,
-          seller_id: session.user.id,
-        })
+        .insert(insertPayload)
         .select()
         .single();
 
@@ -148,9 +152,13 @@ export function useUpdateProduct() {
 
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<ProductInsert> & { id: string }) => {
+      const payload: any = { ...updates };
+      if (updates.specifications) {
+        payload.specifications = JSON.parse(JSON.stringify(updates.specifications));
+      }
       const { data, error } = await supabase
         .from("products")
-        .update(updates)
+        .update(payload)
         .eq("id", id)
         .select()
         .single();
