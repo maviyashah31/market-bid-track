@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, ShoppingBag, AlertTriangle, Wallet,
-  BarChart3, Bell, Menu, X, LogOut, ChevronDown, Package
+  BarChart3, Bell, Menu, X, LogOut, Package
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAdminNotifications } from "@/hooks/admin/useAdminData";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,14 +118,14 @@ function AdminLayoutInner() {
                 <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border shadow-xl z-50" style={{ background: "#111a35", borderColor: "#1a2340" }}>
                   <div className="p-3 border-b font-semibold text-white text-sm" style={{ borderColor: "#1a2340" }}>Notifications</div>
                   <ScrollArea className="max-h-72">
-                    {adminNotifications.slice(0, 6).map(n => (
-                      <Link key={n.id} to={n.link} onClick={() => setNotifOpen(false)} className="block p-3 border-b hover:bg-white/5 transition" style={{ borderColor: "#1a234060" }}>
+                    {adminNotifs.slice(0, 6).map((n: any) => (
+                      <Link key={n.id} to={n.link || "/admin/notifications"} onClick={() => setNotifOpen(false)} className="block p-3 border-b hover:bg-white/5 transition" style={{ borderColor: "#1a234060" }}>
                         <div className="flex items-center gap-2">
                           <p className="text-sm text-white font-medium">{n.title}</p>
-                          {!n.read && <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: "#00b894" }} />}
+                          {!n.is_read && <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: "#00b894" }} />}
                         </div>
-                        <p className="text-xs text-gray-400 mt-0.5">{n.description}</p>
-                        <p className="text-[10px] text-gray-500 mt-1">{n.time}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{n.body || ""}</p>
+                        <p className="text-[10px] text-gray-500 mt-1">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ""}</p>
                       </Link>
                     ))}
                   </ScrollArea>
