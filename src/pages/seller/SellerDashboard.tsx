@@ -73,7 +73,7 @@ const SellerDashboard = () => {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
-  type SellerProductItem = Product & { category_id?: string | null };
+  type SellerProductItem = Product & { category_id?: string | null; status?: string; rejection_reason?: string | null; description?: string | null; sku?: string | null; specifications?: Record<string, unknown> };
   const myProductsMapped: SellerProductItem[] = realSellerProducts.map((p) => ({
     id: p.id,
     name: p.name,
@@ -90,6 +90,11 @@ const SellerDashboard = () => {
     sellerLocation: "",
     responseTime: "< 24h",
     ordersCompleted: 0,
+    status: (p as any).status || "pending_review",
+    rejection_reason: (p as any).rejection_reason || null,
+    description: p.description || null,
+    sku: (p as any).sku || null,
+    specifications: (p as any).specifications || {},
   }));
   const [myProducts, setMyProducts] = useState<SellerProductItem[]>([]);
 
