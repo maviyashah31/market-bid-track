@@ -188,8 +188,8 @@ const SellerDashboard = () => {
 
   const rfqCategories = useMemo(() => [...new Set(allRFQs.map(r => r.category?.name).filter(Boolean))], [allRFQs]);
 
-  const handleSaveProduct = (data: Partial<Product> & { category_id?: string | null }) => {
-    const payload = {
+  const handleSaveProduct = (data: any) => {
+    const payload: any = {
       name: data.name || editingProduct?.name || "Untitled product",
       description: data.description ?? null,
       category_id: data.category_id ?? editingProduct?.category_id ?? null,
@@ -198,7 +198,7 @@ const SellerDashboard = () => {
       moq: data.moq ?? editingProduct?.moq ?? 1,
       unit: data.unit ?? editingProduct?.unit ?? "pieces",
       images: data.image ? [data.image] : editingProduct?.image ? [editingProduct.image] : [],
-      status: editingProduct ? editingProduct.status : "pending_review",
+      status: editingProduct?.status === "rejected" ? "pending_review" : (editingProduct ? editingProduct.status : "pending_review"),
       sku: data.sku ?? null,
       specifications: data.specifications ?? {},
     };
